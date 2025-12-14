@@ -1,7 +1,8 @@
 // src/app/Company/applicant/page.tsx
 "use client";
 
-import DashboardLayout from "@/src/components/Company/DashboardLayout";
+import DashboardLayout from "@/src/components/Student/DashboardLayout";
+
 
 export default function ApplicantPage() {
   return (

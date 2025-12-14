@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect,useState } from "react";
-import LeftSidebar from "@/src/components/Company/LeftSidebar";
+import LeftSidebar from "@/src/components/Student/LeftSidebar";
 import { useSidebar } from "@/src/lib/sidebarContext";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

@@ -1,6 +1,6 @@
 // src/app/Company/payment/page.tsx
 "use client";
-import DashboardLayout from "@/src/components/common/DashboardLayout";
+import DashboardLayout from "@/src/components/Company/DashboardLayout";
 
 export default function PaymentPage() {
   return (

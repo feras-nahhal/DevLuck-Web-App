@@ -136,13 +136,10 @@
   left: 10px;                 /* 10px gap from left */
   width: 246px;
   height: calc(100vh - 20px); /* leaves 10px top + 10px bottom gap */
-   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(80, 80, 80, 0.24);
-  /* Card/nav */
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  background: #FFFFFF;
+  box-shadow: 0px 0px 2px rgba(145,158,171,.2), 0px 12px 24px -4px rgba(145,158,171,.12);
   backdrop-filter: blur(75px);
-  /* Note: backdrop-filter has minimal browser support */
-  border-radius: 16px;
+  border-radius: 40px;
   overflow: hidden;
   z-index: 1000; /* High z-index for overlay */
   transition: transform 0.3s ease;
@@ -180,8 +177,8 @@
   position: absolute;
   top: -5px; /* small top gap */
   right: -12px; /* sticks slightly outside sidebar */
-  width: 32px;
-  height: 32px;
+  width: 36.5px;
+  height: 36.5px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px; 

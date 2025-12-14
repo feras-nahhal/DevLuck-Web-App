@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useSidebar } from "@/src/lib/sidebarContext";
 
+
 const LeftSidebar = ({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen: (open: boolean) => void }) => {
   const pathname = usePathname();
   const { isCollapsed, setIsCollapsed } = useSidebar();
@@ -39,20 +40,19 @@ const LeftSidebar = ({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMo
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
-  const mainMenuItems = [
-  { name: "Dashboard", path: "/Company/dashboard", icon: "/icons/dashboard.svg" },
-  { name: "Opportunity", path: "/Company/opportunity", icon: "/icons/opportunity.svg" },
-  { name: "Applicant", path: "/Company/applicant", icon: "/icons/applicant.svg" },
-  { name: "Contract List", path: "/Company/contract-list", icon: "/icons/contract.svg" },
-  { name: "Contract Template", path: "/Company/contract-template", icon: "/icons/template.svg" },
-  { name: "Payment", path: "/Company/payment", icon: "/icons/payment.svg" },
-  { name: "Top Company", path: "/Company/top-company", icon: "/icons/company.svg" },
-  { name: "Top University", path: "/Company/top-university", icon: "/icons/university.svg" },
-  { name: "Top Applicant", path: "/Company/top-applicant", icon: "/icons/top-applicant.svg" },
+ const mainMenuItems = [
+  { name: "Dashboard", path: "/Student/dashboard", icon: "/icons/dashboard.svg" },
+  { name: "Opportunity", path: "/Student/opportunity", icon: "/icons/opportunityStudent.svg" },
+  { name: "Applied Opportunity", path: "/Student/applied-Opportunity", icon: "/icons/opportunity.svg" },
+  { name: "Profile", path: "/Student/profile", icon: "/icons/profile.svg" },
+  { name: "Contracts", path: "/Student/contract", icon: "/icons/contract.svg"},
+  { name: "Top10 Student", path: "/Student/top-applicant", icon: "/icons/top-applicant.svg" },
+  { name: "Top Company", path: "/Student/top-company", icon: "/icons/company.svg" },
+  { name: "Top University", path: "/Student/top-university", icon: "/icons/university.svg" },
 ];
 
 const bottomMenuItems = [
-  { name: "Settings", path: "/Company/settings", icon: "/icons/settings.svg" },
+  { name: "Settings", path: "/Student/settings", icon: "/icons/settings.svg" },
 ];
 
 

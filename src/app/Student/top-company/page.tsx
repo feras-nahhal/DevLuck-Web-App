@@ -1,6 +1,6 @@
 // src/app/Company/top-company/page.tsx
 "use client";
-import DashboardLayout from "@/src/components/Company/DashboardLayout";
+import DashboardLayout from "@/src/components/Student/DashboardLayout";
 
 export default function TopCompanyPage() {
   return (
