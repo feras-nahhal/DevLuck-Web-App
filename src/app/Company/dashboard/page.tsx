@@ -19,7 +19,7 @@ const mockJobs = [
     jobNumber: "102",
     jobtype: "Part Time",
     country: "USA",
-    numberOfApplicants: "12",
+    numberOfApplicants: "13",
   },
   {
     jobName: "UI/UX Designer",
