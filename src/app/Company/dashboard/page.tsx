@@ -62,7 +62,7 @@ const mockStudents = [
   },
   {
     studentName: "Charlie Brown",
-    studentNumber: "12",
+    studentNumber: "13",
   },
   {
     studentName: "Diana Prince",
