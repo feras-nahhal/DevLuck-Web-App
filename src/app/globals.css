@@ -141,7 +141,7 @@
   backdrop-filter: blur(75px);
   border-radius: 40px;
   overflow: hidden;
-  z-index: 1000; /* High z-index for overlay */
+  z-index: 50; /* High z-index for overlay */
   transition: transform 0.3s ease;
 }
 
@@ -374,3 +374,141 @@
  
 }
 
+/* ===============================
+   DATE PICKER OVERRIDES
+=============================== */
+
+/* Days hover and selected */
+.rdp-day:hover {
+  background-color: #ffeb9c !important; /* yellow hover */
+  color: #1e1e1e !important;           /* dark text */
+}
+
+.rdp-day_selected {
+  background-color: #ffeb9c !important; /* yellow selected */
+  color: #1e1e1e !important;           /* dark text */
+  font-weight: 600;
+}
+
+/* Remove blue circle around today or selected day */
+.rdp-day_today,
+.rdp-day:focus-visible,
+.rdp-day_selected:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Navigation arrows < and > */
+.rdp-nav button {
+  color: #1e1e1e !important;         /* black arrows */
+  background: transparent;
+  border: none;
+  outline: none;
+  transition: color 0.2s;
+}
+
+/* Hover effect with rounded corners */
+.rdp-nav button:hover {
+  background-color: #ffeb9c;       /* yellow hover */
+  color: #1e1e1e !important;
+  border-color: #ffeb9c;           /* match hover */
+  border-radius: 8px;              /* maintain rounded corners */
+  transform: scale(1.05);          /* slight scale for modern feel */
+}
+/* Optional: increase arrow size */
+.rdp-nav button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Remove blue focus outline and add black shadow on nav buttons */
+.rdp-nav button:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 8px 2px rgba(30, 30, 30, 0.7) !important;
+  border-radius: 8px !important;
+}
+
+/* Ensure no blue outline or shadow on day buttons */
+.rdp-day button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Also target the day cells themselves */
+.rdp-day:focus-visible,
+.rdp-day_selected:focus-visible,
+.rdp-day_today {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Nav buttons basics */
+.rdp-nav button {
+  color: #1e1e1e !important; /* black arrows */
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  transition: color 0.2s, box-shadow 0.2s !important;
+  box-shadow: none !important;
+}
+
+/* Nav button hover */
+.rdp-nav button:hover {
+  background-color: #ffeb9c !important; /* yellow hover */
+  color: #1e1e1e !important;
+  border-radius: 8px !important;
+  transform: scale(1.05);
+}
+
+/* Nav button SVG size */
+.rdp-nav button svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Days hover and selected */
+.rdp-day:hover {
+  background-color: #ffeb9c !important;
+  color: #1e1e1e !important;
+}
+
+.rdp-day_selected {
+  background-color: #ffeb9c !important;
+  color: #1e1e1e !important;
+  font-weight: 600;
+}
+
+/* Disable focus outline on all buttons inside DayPicker */
+.rdp-day button,
+.rdp-nav button {
+  outline: none !important;
+}
+
+
+/* ===== Transparent Scrollbar ===== */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+}
+
+/* Chrome / Edge / Safari */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 9999px;
+}
+
+/* Hover = slightly more visible */
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
