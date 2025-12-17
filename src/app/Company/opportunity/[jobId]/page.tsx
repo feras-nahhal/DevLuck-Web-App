@@ -313,7 +313,7 @@ const goToNext = () => {
         )}
 
         {activeTab === "candidates" && (
-          <div className="bg-white p-6 ">
+    <div className="bg-white p-6 ">
 
            {/* Jobs Section */}
       <div className="flex flex-row pl-2">

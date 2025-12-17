@@ -6,14 +6,10 @@ import { useState, useMemo } from "react";
 import OpportunityModal from "@/src/components/Company/OpportunityModal";
 import { useRouter } from "next/navigation";
 import { mockJobs } from "@/src/mocks/companyJobs";
-import { mockStudents } from "@/src/mocks/students";
-
-
 
 /* ──────────────────────────────────────────────
    Card Component
 ────────────────────────────────────────────── */
-
 const Card = ({
   title,
   value,
@@ -142,6 +138,9 @@ const Card = ({
   );
 };
 
+/* ──────────────────────────────────────────────
+    Job Card Component
+────────────────────────────────────────────── */
 const JobCard = ({
   jobName,
   jobNumber,
@@ -160,107 +159,80 @@ const JobCard = ({
   return (
     <div className="relative w-[437px] h-[217px]">
       {/* SVG Card Body */}
-      <svg
-        viewBox="0 0 437 217"
-        className="absolute inset-0 w-full h-full"
-        aria-hidden
-      >
-        <g filter="url(#cardShadow)">
-          <path
-            d="M324.419 27.0303C324.419 37.5404 332.939 46.0605 343.449 46.0605H392.015C405.269 46.0605 416.015 56.8057 416.015 70.0605V126.183C416.015 133.732 412.463 140.84 406.428 145.373L360.262 180.047C356.106 183.169 351.048 184.856 345.849 184.856H179.133C166.871 184.856 156.93 174.916 156.93 162.653C156.93 150.39 146.989 140.449 134.726 140.449H44C30.7452 140.449 20 129.704 20 116.449V32C20 18.7452 30.7452 8 44 8H305.389C315.899 8 324.419 16.5201 324.419 27.0303Z"
-            fill="white"
-          />
-        </g>
+        <img 
+          src="/cards/opportunityCard.svg" 
+          alt="ContractCard Background"
+        />
 
-        <defs>
-          <filter
-            id="cardShadow"
-            x="0"
-            y="0"
-            width="436.015"
-            height="216.856"
-            filterUnits="userSpaceOnUse"
-            colorInterpolationFilters="sRGB"
-          >
-            {/* Main drop shadow */}
-            <feOffset dy="12" />
-            <feGaussianBlur stdDeviation="12" />
-            <feColorMatrix
-              type="matrix"
-              values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0"
-            />
-
-            {/* Ambient shadow */}
-            <feGaussianBlur stdDeviation="1" />
-            <feColorMatrix
-              type="matrix"
-              values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0"
-            />
-          </filter>
-        </defs>
-      </svg>
-
-      {/* Content Container */}
-      <div className="absolute w-[340px] h-[84px] left-[50%] top-[35%] -translate-x-[50%] -translate-y-[50%] rounded-[24px_0_0_24px] flex flex-col gap-4">
-        {/* Job Title */}
-        <div className="flex flex-col gap-2 w-[312px] h-[28px]">
-          <h6 className="font-semibold text-[18px] leading-[28px] text-[#1E1E1E]">
-            {jobName}
-          </h6>
-        </div>
-
-        {/* Job Tags Row */}
-        <div className="flex flex-row flex-wrap items-center gap-1 w-[370px] h-[40px]">
-          {/* Job Type */}
-          <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-            {/* Icon */}
-            <svg
-              width="32"
-              height="24"
-              viewBox="0 0 32 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* SVG paths unchanged */}
-            </svg>
-
-            <div className="flex flex-col justify-center items-start w-[77px] h-[40px] gap-1">
-              <span className="text-[14px] leading-[22px] text-[#1E1E1E]">
-                {jobtype}
-              </span>
-              <span className="text-[12px] leading-[18px] text-[#00000090]">
-                Job Type
-              </span>
-            </div>
+        <div className="absolute w-[340px] h-[84px] left-[50%] top-[35%] -translate-x-[50%] -translate-y-[50%] rounded-[24px_0_0_24px] flex flex-col gap-4">
+          {/* Text */}
+          {/* Front End Developer */}
+          <div className="flex flex-col gap-2 w-[312px] h-[28px] flex-none">
+            <h6 className="font-semibold text-[18px] leading-[28px] text-[#1E1E1E] flex-none">
+              {jobName}
+            </h6>
           </div>
 
-          {/* Country */}
-          <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-            <svg width="32" height="24" viewBox="0 0 32 24" />
-            <div className="flex flex-col justify-center items-start w-[77px] h-[40px] gap-1">
-              <span className="text-[14px] leading-[22px] text-[#1E1E1E]">
-                {country}
-              </span>
-              <span className="text-[12px] leading-[18px] text-[#00000090]">
-                Country
-              </span>
-            </div>
-          </div>
 
-          {/* Applicants */}
-          <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-            <svg width="32" height="24" viewBox="0 0 32 24" />
-            <div className="flex flex-col justify-center items-start w-[77px] h-[40px] gap-1">
-              <span className="text-[14px] leading-[22px] text-[#1E1E1E]">
-                {numberOfApplicants}
-              </span>
-              <span className="text-[12px] leading-[18px] text-[#00000090]">
-                Applied
-              </span>
+          {/* Frame 271 - Job tags row */}
+          <div className="flex flex-row flex-wrap items-center gap-1 w-[370px] h-[40px]">
+            {/* Job-Tag 1 */}
+            <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+            <img 
+              src="/cards/tag.svg" 
+              alt="Tag Icon"
+            />
+                {/* Frame 97 - Label container */}
+              <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                {/* body2 text */}
+                <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                  {jobtype}
+                </span>
+                {/* caption text */}
+                <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                  Job Type
+                </span>
+              </div>
+            </div>
+
+            {/* Job-Tag 1 */}
+            <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+            <img 
+              src="/cards/tag.svg" 
+              alt="Tag Icon"
+            />
+                {/* Frame 97 - Label container */}
+              <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                {/* body2 text */}
+                <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                  {country}
+                </span>
+                {/* caption text */}
+                <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                  Country
+                </span>
+              </div>
+            </div>
+            {/* Job-Tag 1 */}
+            <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+             <img 
+              src="/cards/tag.svg" 
+              alt="Tag Icon"
+            />
+                {/* Frame 97 - Label container */}
+              <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                {/* body2 text */}
+                <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                  {numberOfApplicants}
+                </span>
+                {/* caption text */}
+                <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                  Applied
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
       {/* Job Number Label */}
       <div className="absolute left-[77%] top-[8%] flex items-center justify-center w-20 bg-black/20 rounded-[6px]">
