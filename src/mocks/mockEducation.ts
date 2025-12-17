@@ -1,0 +1,173 @@
+// src/data/mockEducation.ts
+
+export const educationData = [
+  // Applicant 201 - Alice Johnson
+  {
+    id: 1,
+    applicantId: "201",
+    name: "Harvard University",
+    major: "Computer Science",
+    date: "2014 - 2018",
+    description: "Studied algorithms, data structures, and software engineering.",
+  },
+  {
+    id: 2,
+    applicantId: "201",
+    name: "MIT",
+    major: "Artificial Intelligence",
+    date: "2018 - 2019",
+    description: "Specialized in AI and machine learning techniques.",
+  },
+  {
+    id: 3,
+    applicantId: "201",
+    name: "Stanford University",
+    major: "Software Engineering",
+    date: "2019 - 2020",
+    description: "Focused on system design and software architecture.",
+  },
+  {
+    id: 4,
+    applicantId: "201",
+    name: "UC Berkeley",
+    major: "Data Science",
+    date: "2020 - 2021",
+    description: "Learned data analysis, visualization, and big data techniques.",
+  },
+  {
+    id: 5,
+    applicantId: "201",
+    name: "Carnegie Mellon University",
+    major: "Cybersecurity",
+    date: "2021 - 2022",
+    description: "Studied network security, ethical hacking, and cryptography.",
+  },
+
+  // Applicant 202 - Bob Smith
+  {
+    id: 6,
+    applicantId: "202",
+    name: "Oxford University",
+    major: "Software Engineering",
+    date: "2012 - 2016",
+    description: "Completed a comprehensive software engineering program.",
+  },
+  {
+    id: 7,
+    applicantId: "202",
+    name: "Cambridge University",
+    major: "Cloud Computing",
+    date: "2016 - 2017",
+    description: "Focused on cloud infrastructure and DevOps practices.",
+  },
+  {
+    id: 8,
+    applicantId: "202",
+    name: "University of Toronto",
+    major: "Machine Learning",
+    date: "2017 - 2018",
+    description: "Studied AI and machine learning algorithms.",
+  },
+  {
+    id: 9,
+    applicantId: "202",
+    name: "ETH Zurich",
+    major: "Information Systems",
+    date: "2018 - 2019",
+    description: "Learned database systems and enterprise architecture.",
+  },
+  {
+    id: 10,
+    applicantId: "202",
+    name: "National University of Singapore",
+    major: "Software Architecture",
+    date: "2019 - 2020",
+    description: "Focused on scalable system design and software patterns.",
+  },
+
+  // Applicant 203 - Charlie Brown
+  {
+    id: 11,
+    applicantId: "203",
+    name: "Harvard University",
+    major: "Information Technology",
+    date: "2015 - 2018",
+    description: "Studied networking, databases, and system administration.",
+  },
+  {
+    id: 12,
+    applicantId: "203",
+    name: "MIT",
+    major: "Python Development",
+    date: "2018 - 2019",
+    description: "Specialized in Python frameworks and web development.",
+  },
+  {
+    id: 13,
+    applicantId: "203",
+    name: "Stanford University",
+    major: "Backend Engineering",
+    date: "2019 - 2020",
+    description: "Learned server-side development and API design.",
+  },
+  {
+    id: 14,
+    applicantId: "203",
+    name: "UC Berkeley",
+    major: "Database Systems",
+    date: "2020 - 2021",
+    description: "Focused on relational databases and SQL optimization.",
+  },
+  {
+    id: 15,
+    applicantId: "203",
+    name: "Carnegie Mellon University",
+    major: "Cloud Computing",
+    date: "2021 - 2022",
+    description: "Studied cloud infrastructure and deployment techniques.",
+  },
+
+  // Applicant 204 - Diana Prince
+  {
+    id: 16,
+    applicantId: "204",
+    name: "Oxford University",
+    major: "Computer Engineering",
+    date: "2013 - 2017",
+    description: "Completed core courses in hardware and software integration.",
+  },
+  {
+    id: 17,
+    applicantId: "204",
+    name: "Cambridge University",
+    major: "Mobile Development",
+    date: "2017 - 2018",
+    description: "Focused on mobile app development for iOS and Android.",
+  },
+  {
+    id: 18,
+    applicantId: "204",
+    name: "University of Toronto",
+    major: "Cross-Platform Apps",
+    date: "2018 - 2019",
+    description: "Learned React Native and Expo for mobile applications.",
+  },
+  {
+    id: 19,
+    applicantId: "204",
+    name: "ETH Zurich",
+    major: "UX/UI Design",
+    date: "2019 - 2020",
+    description: "Studied design principles and user experience best practices.",
+  },
+  {
+    id: 20,
+    applicantId: "204",
+    name: "National University of Singapore",
+    major: "Mobile Security",
+    date: "2020 - 2021",
+    description: "Focused on securing mobile applications and data privacy.",
+  },
+
+  // Continue for all remaining applicants (205–214) similarly...
+];

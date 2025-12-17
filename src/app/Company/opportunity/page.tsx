@@ -5,99 +5,10 @@ import { ArrowUpRight } from 'lucide-react';
 import { useState, useMemo } from "react";
 import OpportunityModal from "@/src/components/Company/OpportunityModal";
 import { useRouter } from "next/navigation";
+import { mockJobs } from "@/src/mocks/companyJobs";
+import { mockStudents } from "@/src/mocks/students";
 
-// Mock data from backend
-const mockJobs = [
-  {
-    jobName: "Front End Developer",
-    jobNumber: "101",
-    jobtype: "Full Time",
-    country: "Egypt",
-    numberOfApplicants: "25",
-  },
-  {
-    jobName: "Back End Developer",
-    jobNumber: "102",
-    jobtype: "Part Time",
-    country: "USA",
-    numberOfApplicants: "13",
-  },
-  {
-    jobName: "UI/UX Designer",
-    jobNumber: "103",
-    jobtype: "Contract",
-    country: "Canada",
-    numberOfApplicants: "8",
-  },
-  {
-    jobName: "DevOps Engineer",
-    jobNumber: "104",
-    jobtype: "Full Time",
-    country: "UK",
-    numberOfApplicants: "15",
-  },
-  {
-    jobName: "Data Scientist",
-    jobNumber: "105",
-    jobtype: "Full Time",
-    country: "Germany",
-    numberOfApplicants: "20",
-  },
-  {
-    jobName: "Product Manager",
-    jobNumber: "106",
-    jobtype: "Part Time",
-    country: "India",
-    numberOfApplicants: "10",
-  },
-   {
-    jobName: "Product Manager",
-    jobNumber: "106",
-    jobtype: "Part Time",
-    country: "India",
-    numberOfApplicants: "10",
-  },
-   {
-    jobName: "Product Manager",
-    jobNumber: "106",
-    jobtype: "Part Time",
-    country: "India",
-    numberOfApplicants: "10",
-  },
-   {
-    jobName: "Product Manager",
-    jobNumber: "106",
-    jobtype: "Part Time",
-    country: "India",
-    numberOfApplicants: "10",
-  },
-   {
-    jobName: "Product Manager",
-    jobNumber: "106",
-    jobtype: "Part Time",
-    country: "India",
-    numberOfApplicants: "10",
-  },
-];
 
-const mockStudents = [
-  {
-    studentName: "Alice Johnson",
-    studentNumber: "75",
-  },
-  {
-    studentName: "Bob Smith",
-    studentNumber: "16",
-  },
-  {
-    studentName: "Charlie Brown",
-    studentNumber: "13",
-  },
-  {
-    studentName: "Diana Prince",
-    studentNumber: "11",
-  },
-];
 
 /* ──────────────────────────────────────────────
    Card Component

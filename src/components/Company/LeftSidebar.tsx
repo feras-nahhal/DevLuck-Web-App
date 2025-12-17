@@ -55,8 +55,7 @@ const bottomMenuItems = [
   { name: "Settings", path: "/Company/settings", icon: "/icons/settings.svg" },
 ];
 
-
-  const getClass = (path: string) => (pathname === path ? "menu-item active" : "menu-item");
+  const getClass = (path: string) => pathname.startsWith(path) ? "menu-item active" : "menu-item";
 
   const getIcon = (base: string, isActive: boolean) => {
     if (!isActive) return base;
