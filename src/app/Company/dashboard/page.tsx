@@ -2,11 +2,10 @@
 "use client";
 
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
-
 import { ArrowUpRight } from 'lucide-react';
 import { mockJobs } from "@/src/mocks/companyJobs";
-import { mockStudents } from "@/src/mocks/students";
-
+import { useParams, useRouter } from "next/navigation";
+import { mockApplicants } from "@/src/mocks/mockApplicants";
 
 /* ──────────────────────────────────────────────
    Card Component
@@ -130,174 +129,200 @@ const Card = ({
     );
   };
 
-  const JobCard = ({
-    jobName,
-    jobNumber,
-    jobtype,
-    country,
-    numberOfApplicants,
+  /* ──────────────────────────────────────────────
+        Job Card Component
+    ────────────────────────────────────────────── */
+    const JobCard = ({
+      jobName,
+      jobNumber,
+      jobtype,
+      country,
+      numberOfApplicants,
+      onClick,
+    }: {
+      jobName: string;
+      jobNumber: string;
+      jobtype: string;
+      country: string;
+      numberOfApplicants: string;
+      onClick?: () => void;
+    }) => {
+      return (
+        <div className="relative w-[437px] h-[217px]">
+          {/* SVG Card Body */}
+            <img 
+              src="/cards/opportunityCard.svg" 
+              alt="ContractCard Background"
+            />
 
-  }: {
-    jobName: string;
-    jobNumber: string;
-    jobtype: string;
-    country: string;
-    numberOfApplicants: string;
-  }) => {
-    return (
-      <div className="relative w-[437px] h-[217px]">
-        
-        {/* SVG Card Body */}
-        <img 
-          src="/cards/opportunityCard.svg" 
-          alt="ContractCard Background"
-        />
+            <div className="absolute w-[340px] h-[84px] left-[50%] top-[35%] -translate-x-[50%] -translate-y-[50%] rounded-[24px_0_0_24px] flex flex-col gap-4">
+              {/* Text */}
+              {/* Front End Developer */}
+              <div className="flex flex-col gap-2 w-[312px] h-[28px] flex-none">
+                <h6 className="font-semibold text-[18px] leading-[28px] text-[#1E1E1E] flex-none">
+                  {jobName}
+                </h6>
+              </div>
 
-       <div className="absolute w-[340px] h-[84px] left-[50%] top-[35%] -translate-x-[50%] -translate-y-[50%] rounded-[24px_0_0_24px] flex flex-col gap-4">
-          {/* Text */}
-          {/* Front End Developer */}
-          <div className="flex flex-col gap-2 w-[312px] h-[28px] flex-none">
-            <h6 className="font-semibold text-[18px] leading-[28px] text-[#1E1E1E] flex-none">
-              {jobName}
-            </h6>
+
+              {/* Frame 271 - Job tags row */}
+              <div className="flex flex-row flex-wrap items-center gap-1 w-[370px] h-[40px]">
+                {/* Job-Tag 1 */}
+                <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                <img 
+                  src="/cards/tag.svg" 
+                  alt="Tag Icon"
+                />
+                    {/* Frame 97 - Label container */}
+                  <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                    {/* body2 text */}
+                    <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                      {jobtype}
+                    </span>
+                    {/* caption text */}
+                    <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                      Job Type
+                    </span>
+                  </div>
+                </div>
+
+                {/* Job-Tag 1 */}
+                <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                <img 
+                  src="/cards/tag.svg" 
+                  alt="Tag Icon"
+                />
+                    {/* Frame 97 - Label container */}
+                  <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                    {/* body2 text */}
+                    <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                      {country}
+                    </span>
+                    {/* caption text */}
+                    <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                      Country
+                    </span>
+                  </div>
+                </div>
+                {/* Job-Tag 1 */}
+                <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                <img 
+                  src="/cards/tag.svg" 
+                  alt="Tag Icon"
+                />
+                    {/* Frame 97 - Label container */}
+                  <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                    {/* body2 text */}
+                    <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                      {numberOfApplicants}
+                    </span>
+                    {/* caption text */}
+                    <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                      Applied
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          {/* Job Number Label */}
+          <div className="absolute left-[77%] top-[8%] flex items-center justify-center w-20 bg-black/20 rounded-[6px]">
+            <span className="text-[12px] font-bold leading-[20px] text-[#1E1E1E] text-center">
+              JOB - {jobNumber}
+            </span>
           </div>
 
-
-          {/* Frame 271 - Job tags row */}
-          <div className="flex flex-row flex-wrap items-center gap-1 w-[370px] h-[40px]">
-            {/* Job-Tag 1 */}
-            <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-             <img 
-              src="/cards/tag.svg" 
-              alt="Tag Icon"
-            />
-                {/* Frame 97 - Label container */}
-              <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
-                {/* body2 text */}
-                <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
-                  {jobtype}
-                </span>
-                {/* caption text */}
-                <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
-                  Job Type
-                </span>
-              </div>
-            </div>
-
-            {/* Job-Tag 1 */}
-            <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-             <img 
-              src="/cards/tag.svg" 
-              alt="Tag Icon"
-            />
-                {/* Frame 97 - Label container */}
-              <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
-                {/* body2 text */}
-                <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
-                  {country}
-                </span>
-                {/* caption text */}
-                <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
-                  Country
-                </span>
-              </div>
-            </div>
-            {/* Job-Tag 1 */}
-            <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-             <img 
-              src="/cards/tag.svg" 
-              alt="Tag Icon"
-            />
-                {/* Frame 97 - Label container */}
-              <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
-                {/* body2 text */}
-                <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
-                  {numberOfApplicants}
-                </span>
-                {/* caption text */}
-                <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
-                  Applied
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      {/* Label */}
-      <div className="absolute left-[77%] top-[8%] flex flex-row items-center justify-center gap-1.5 w-20  bg-black/20 rounded-[6px]">
-        {/* Label Text */}
-        <span className=" h-[20px] text-[12px] font-bold leading-[20px] text-[#1E1E1E] flex-none order-1 text-center">
-          JOB - {jobNumber}
-        </span>
-      </div>
-      {/* Button */}
-      <button className="absolute left-[8%] top-[68%] flex flex-row items-center justify-center gap-2 px-3 min-w-[64px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105">
-        {/* Start Icon (hidden) */}
-        <div className="w-5 h-5 hidden flex-none order-0"></div>
-
-        {/* Button Label */}
-        <span className="w-[83px] h-[24px] text-[14px] font-bold leading-[24px] text-[#1E1E1E] flex-none order-1 text-center">
-          View Details
-        </span>
-
-        {/* End Icon (hidden) */}
-        <div className="w-5 h-5 hidden flex-none order-2"></div>
-      </button>
+          {/* Button */}
+          <button className="absolute left-[8%] top-[68%] flex items-center justify-center px-3 min-w-[64px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
+            onClick={onClick}>
+            <span className="text-[14px] font-bold leading-[24px] text-[#1E1E1E]">
+              View Details
+            </span>
+          </button>
         </div>
       );
     };
 
+    // =======================
+    // APPLIED STUDENT CARD COMPONENT
+    // ========================
     const AppliedStudentCard = ({
-    studentName,
-    studentNumber,
-  }: {
-    studentName: string;
-    studentNumber: string;
-  }) => {
-    return (
-      <div className="relative w-[220px] h-[350px]">
-        {/* SVG Card Body */}
-      <img 
-          src="/cards/appliedStudent.svg" 
-          alt="Applied Students"
-        />
-        {/* Placeholder for profile image */}
-            <div
-          className="absolute left-1/2"
-          style={{
-            width: "161.46px",
-            height: "150.38px",
-            borderRadius: "51.8066px",
-            backgroundColor: "#E0E0E0", // placeholder color
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "14px",
-            color: "#888",
-            bottom: "-75px",
-            transform: "translate(-51%, -85%)", // center the div
-            zIndex: 2,
-          }}
-        >
-          No Image
+      studentName,
+      studentNumber,
+      imageUrl,
+      onClick,
+    }: {
+      studentName: string;
+      studentNumber: string;
+      imageUrl?: string; // ✅ ready for backend
+      onClick?: () => void;
+    }) => {
+      return (
+        <div className="relative w-[220px] h-[350px]"
+          onClick={onClick}
+          role="button"
+          tabIndex={0}
+          >
+          {/* =======================
+              SVG CARD BACKGROUND
+          ======================== */}
+          <img
+            src="/cards/appliedStudent.svg"
+            alt="Applied Students"
+          />
+
+          {/* =======================
+              PROFILE IMAGE PLACEHOLDER / IMAGE
+          ======================== */}
           <div
-            className="absolute left-1/2"
+            className="absolute left-1/2 overflow-hidden"
             style={{
-              width: "60px",
-              height: "60px",
-              bottom: "-12px",
-              transform: "translateX(-50%)",
-          
+              width: "161.46px",
+              height: "150.38px",
+              borderRadius: "51.8066px",
+              backgroundColor: "#E0E0E0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bottom: "-75px",
+              transform: "translate(-51%, -85%)",
+              zIndex: 2,
             }}
           >
-            <img
-              src="/cards/appliedStudentIcon.svg"
-              alt="Applied Students"
-              className="w-full h-full object-contain"
-            />
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={studentName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-[14px] text-[#888]">No Image</span>
+            )}
+
+            {/* =======================
+                PROFILE ICON OVERLAY
+            ======================== */}
+            <div
+              className="absolute left-1/2"
+              style={{
+                width: "60px",
+                height: "60px",
+                bottom: "-12px",
+                transform: "translateX(-50%)",
+              }}
+            >
+              <img
+                src="/cards/appliedStudentIcon.svg"
+                alt="Applied Students"
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
-          </div>
-    
-            {/* Student Name */}
+
+
+          {/* =======================
+              STUDENT NAME
+          ======================== */}
           <div
             className="absolute flex items-center justify-center"
             style={{
@@ -310,7 +335,7 @@ const Card = ({
               transform: "translateX(-50%)",
             }}
           >
-            {/* Rotated rectangle */}
+            {/* Rotated yellow square */}
             <div
               style={{
                 width: "7.16px",
@@ -325,54 +350,55 @@ const Card = ({
               style={{
                 width: "130px",
                 height: "48px",
-                fontFamily: "'Rock Salt', cursive", // same font
+                fontFamily: "'Rock Salt', cursive",
                 fontStyle: "normal",
                 fontWeight: 400,
-                fontSize: "20px", // exact size
-                lineHeight: "47px",     // exact line height
+                fontSize: "20px",
+                lineHeight: "47px",
                 display: "flex",
                 alignItems: "center",
                 textAlign: "center",
                 color: "#1C252E",
-                textShadow: "0px 14.2468px 17.4128px rgba(213, 118, 246, 0.33)", // same shadow
+                textShadow:
+                  "0px 14.2468px 17.4128px rgba(213, 118, 246, 0.33)",
               }}
             >
               {studentName}
             </div>
           </div>
-        {/* Student Number */}
-        <div
-          className="absolute flex items-center justify-center"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "4.75px",
-            width: "23px",
-            height: "48px",
-            left: `calc(50% - 23px/2 - 65.12px)`, // matches your design
-            top: "22.91px", // adjust relative to card container
-            fontFamily: "'Public Sans', sans-serif",
-            fontStyle: "normal",
-            fontWeight: 400,
-            fontSize: "15.8298px",
-            lineHeight: "47px",
-            textAlign: "center",
-            color: "#1C252E",
-            flex: "none",
-            order: 0,
-            flexGrow: 0,
-          }}
-        >
-          #{studentNumber}
-        </div>
-        </div>
 
+          {/* =======================
+              STUDENT NUMBER
+          ======================== */}
+          <div
+            className="absolute flex items-center justify-center"
+            style={{
+              flexDirection: "row",
+              gap: "4.75px",
+              width: "23px",
+              height: "48px",
+              left: `calc(50% - 23px/2 - 65.12px)`,
+              top: "22.91px",
+              fontFamily: "'Public Sans', sans-serif",
+              fontStyle: "normal",
+              fontWeight: 400,
+              fontSize: "15.8298px",
+              lineHeight: "47px",
+              textAlign: "center",
+              color: "#1C252E",
+              flex: "none",
+              order: 0,
+              flexGrow: 0,
+            }}
+          >
+            #{studentNumber}
+          </div>
+        </div>
       );
     };
 
 export default function DashboardPage() {
+  const router = useRouter();
   return (
     <DashboardLayout>
        <div className="max-w-[1400px] pl-6">
@@ -413,6 +439,7 @@ export default function DashboardPage() {
                 jobtype={job.jobtype}
                 country={job.country}
                 numberOfApplicants={job.numberOfApplicants}
+                onClick={() => router.push(`/Company/dashboard/job/${job.jobNumber}`)}
               />
             ))}
           </div>
@@ -432,12 +459,16 @@ export default function DashboardPage() {
           </h4>
           {/* Bottom left column */}
           <div className="grid grid-cols-2 gap-8">
-            {mockStudents.map((student, index) => (
+            {mockApplicants.map((applicant, index) => (
               <AppliedStudentCard
-                key={index}
-                studentName={student.studentName}
-                studentNumber={student.studentId}
-              />
+              key={applicant.applicantId}
+              studentName={applicant.name}
+              studentNumber={applicant.applicantId}
+              imageUrl={applicant.image} // 👈 backend-ready
+              onClick={() =>
+                router.push(`/Company/dashboard/applicant/${applicant.applicantId}`)
+              }
+            />
             ))}
           </div>
         </div>

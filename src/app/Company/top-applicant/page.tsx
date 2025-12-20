@@ -10,10 +10,12 @@ import { mockApplicants } from "@/src/mocks/mockApplicants";
 const AppliedStudentCard = ({
   studentName,
   studentNumber,
+  imageUrl,
   onClick,
 }: {
   studentName: string;
   studentNumber: string;
+  imageUrl?: string; // ✅ ready for backend
   onClick?: () => void;
 }) => {
   return (
@@ -31,10 +33,10 @@ const AppliedStudentCard = ({
       />
 
       {/* =======================
-          PROFILE IMAGE PLACEHOLDER
+          PROFILE IMAGE PLACEHOLDER / IMAGE
       ======================== */}
       <div
-        className="absolute left-1/2"
+        className="absolute left-1/2 overflow-hidden"
         style={{
           width: "161.46px",
           height: "150.38px",
@@ -43,15 +45,20 @@ const AppliedStudentCard = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "14px",
-          color: "#888",
           bottom: "-75px",
           transform: "translate(-51%, -85%)",
           zIndex: 2,
         }}
       >
-        {/* Placeholder text */}
-        No Image
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={studentName}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="text-[14px] text-[#888]">No Image</span>
+        )}
 
         {/* =======================
             PROFILE ICON OVERLAY
@@ -72,6 +79,7 @@ const AppliedStudentCard = ({
           />
         </div>
       </div>
+
 
       {/* =======================
           STUDENT NAME
@@ -163,12 +171,13 @@ export default function TopApplicantPage() {
         {/* =======================
             APPLIED STUDENTS GRID
         ======================== */}
-        <div className="grid grid-cols-5 gap-x-2 gap-y-10">
-          {mockApplicants.slice(0, 10).map((applicant) => (
+        <div className="grid grid-cols-6 gap-x-2 gap-y-10">
+          {mockApplicants.slice(0, 12).map((applicant) => (
             <AppliedStudentCard
               key={applicant.applicantId}
               studentName={applicant.name}
               studentNumber={applicant.applicantId}
+              imageUrl={applicant.image} // 👈 backend-ready
               onClick={() => router.push(`/Company/top-applicant/${applicant.applicantId}`)}
             />
           ))}
