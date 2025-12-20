@@ -2,10 +2,11 @@
 "use client";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { ArrowUpRight } from 'lucide-react';
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import OpportunityModal from "@/src/components/Company/OpportunityModal";
 import { useRouter } from "next/navigation";
 import { mockJobs } from "@/src/mocks/companyJobs";
+import { createPortal } from "react-dom";
 
 /* ──────────────────────────────────────────────
    Card Component
@@ -252,13 +253,195 @@ const JobCard = ({
   );
 };
 
+type ContractRowProps = {
+  job: typeof mockJobs[0];
+  onMainClick?: () => void;
+  onSideClick?: () => void;
+  showCheckbox?: boolean;
+};
+
+const ContractRow = ({ job,onMainClick,onSideClick,showCheckbox = false }: ContractRowProps) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [checked, setChecked] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
+
+
+  // Close when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div className="flex w-full gap-4">
+      {/* Main 80% section */}
+      <div
+        className="flex items-center w-9/10 skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg  bg-white cursor-pointer hover:bg-gray-50"
+        onClick={onMainClick}
+      >
+        {/* Left spacer */}
+        <div className="w-6 h-full flex-none"></div>
+
+       {/* Checkbox */}
+        {showCheckbox && (
+          <div
+            className="flex items-center skew-x-[12deg] justify-center w-11 h-full pl-2 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation(); // 🔥 prevent row click
+              setChecked((prev) => !prev);
+            }}
+          >
+            {checked ? (
+              /* ✅ SELECTED SVG */
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path
+                  d="M15.0537 9.16113C16.6809 7.53396 19.3191 7.53395 20.9463 9.16113L26.8389 15.0537C28.4659 16.6809 28.466 19.3192 26.8389 20.9463L20.9463 26.8389C19.3192 28.466 16.6809 28.4659 15.0537 26.8389L9.16113 20.9463C7.53395 19.3191 7.53396 16.6809 9.16113 15.0537L15.0537 9.16113Z"
+                  fill="#FFEB9C"
+                />
+                <path
+                  d="M31.5873 8.96738C25.7014 13.6017 22.2888 16.641 18.7083 22.3035C18.6366 22.4169 18.4767 22.4333 18.3856 22.3348L12.7212 16.2001C12.6426 16.115 12.6504 15.9817 12.7383 15.9064L15.8265 13.2606C15.9194 13.181 16.0609 13.2004 16.129 13.3019L18.3444 16.6048C24.2049 11.4469 29.2798 9.33343 31.3963 8.61265C31.6142 8.53845 31.7681 8.82499 31.5873 8.96738Z"
+                  fill="#1E1E1E"
+                />
+              </svg>
+            ) : (
+              /* ⬜ UNSELECTED SVG */
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M20.9463 9.16112C19.3191 7.53394 16.6809 7.53394 15.0537 9.16112L9.16117 15.0537C7.53398 16.6809 7.53398 19.319 9.16117 20.9462L15.0537 26.8388C16.6809 28.466 19.3191 28.466 20.9463 26.8388L26.8388 20.9462C28.466 19.319 28.466 16.6809 26.8388 15.0537L20.9463 9.16112ZM20.357 10.3396C19.0553 9.03789 16.9447 9.03789 15.643 10.3396L10.3397 15.6429C9.03793 16.9447 9.03793 19.0552 10.3397 20.357L15.643 25.6603C16.9447 26.962 19.0553 26.962 20.357 25.6603L25.6603 20.357C26.9621 19.0552 26.9621 16.9447 25.6603 15.6429L20.357 10.3396Z"
+                  fill="#637381"
+                />
+              </svg>
+            )}
+          </div>
+        )}
+
+
+        {/* Applicant Info */}
+        <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
+
+          {/* Name */}
+          <div className="flex flex-col justify-center w-[200px]">
+            <span className="text-sm font-semibold text-gray-900">{job.jobNumber}</span>
+            <span className="text-xs text-gray-400">Job Number</span>
+          </div>
+
+          {/* Next Payment */}
+          <div className="flex flex-col justify-center w-[200px]">
+            <span className="text-sm font-semibold text-gray-900">{job.jobName}</span>
+            <span className="text-xs text-gray-400">Job Name</span>
+          </div>
+
+          {/* Monthly Allowance */}
+          <div className="flex flex-col justify-center w-[200px]">
+            <span className="text-sm font-semibold text-gray-900">{job.jobtype}</span>
+            <span className="text-xs text-gray-400">Job Type</span>
+          </div>
+
+          {/* Transfer ID */}
+          <div className="flex flex-col justify-center w-[200px]">
+            <span className="text-sm font-semibold text-gray-900">{job.country}</span>
+            <span className="text-xs text-gray-400">Country</span>
+          </div>
+
+           {/* Note ID */}
+          <div className="flex flex-col justify-center w-[200px]">
+            <span className="text-sm font-semibold text-gray-900">{job.description.split(" ").slice(0, 3).join(" ")}</span>
+            <span className="text-xs text-gray-400">Description</span>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Second 20% section beside the main card */}
+      <div
+        className="relative  flex items-center w-1/10 skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg bg-[#FFF9E0] cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation();
+
+          const rect = e.currentTarget.getBoundingClientRect();
+
+         setMenuPos({
+            top: rect.top + window.scrollY -60,
+            left: rect.right + window.scrollX - 230,
+          });
+
+
+
+          setMenuOpen((prev) => !prev);
+        }}
+      >
+
+        <div className="flex items-center justify-center skew-x-[12deg] w-full h-full">
+          {/* Example Frame 295 content */}
+          <div className="flex flex-col items-center justify-center gap-1">
+            <svg width="77" height="72" viewBox="0 0 77 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="76.4667" height="72" fill="#FFF9E0"/>
+              <path d="M27.7333 20H23.0852C18.1121 20 13.5891 22.8805 11.486 27.3871L7.08281 36.8226C3.78263 43.8944 8.94481 52 16.7488 52H27.7333" stroke="#1E1E1E" strokeWidth="1.06667"/>
+              <path d="M24.7334 20V20.5H48.7334V20V19.5H24.7334V20ZM48.7334 52V51.5H24.7334V52V52.5H48.7334V52Z" fill="#1E1E1E"/>
+              <path d="M36.7334 38C37.838 38 38.7334 37.1046 38.7334 36C38.7334 34.8954 37.838 34 36.7334 34C35.6288 34 34.7334 34.8954 34.7334 36C34.7334 37.1046 35.6288 38 36.7334 38Z" fill="#1E1E1E"/>
+              <path d="M36.7334 31C37.838 31 38.7334 30.1046 38.7334 29C38.7334 27.8954 37.838 27 36.7334 27C35.6288 27 34.7334 27.8954 34.7334 29C34.7334 30.1046 35.6288 31 36.7334 31Z" fill="#1E1E1E"/>
+              <path d="M36.7334 45C37.838 45 38.7334 44.1046 38.7334 43C38.7334 41.8954 37.838 41 36.7334 41C35.6288 41 34.7334 41.8954 34.7334 43C34.7334 44.1046 35.6288 45 36.7334 45Z" fill="#1E1E1E"/>
+              <path d="M45.7335 52L50.3816 52C55.3547 52 59.8777 49.1195 61.9808 44.6129L66.384 35.1774C69.6842 28.1056 64.522 20 56.718 20L45.7335 20" stroke="#1E1E1E" strokeWidth="1.06667"/>
+            </svg>
+
+            {menuOpen && menuPos &&
+            createPortal(
+              <div
+                ref={menuRef}
+                className="
+                  fixed
+                  w-[180px]
+                  skew-x-[-12deg]
+                  rounded-xl
+                  bg-white
+                  shadow-2xl
+                  border
+                  py-2
+                "
+                style={{
+                  top: menuPos.top,
+                  left: menuPos.left,
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
+                  Filter by Status
+                </button>
+
+                <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
+                  Filter by Date
+                </button>
+
+                <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
+                  Show Running Only
+                </button>
+              </div>,
+              document.body
+            )}
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 /* ──────────────────────────────────────────────
    Main Opportunity Page Component
 ────────────────────────────────────────────── */
   const ITEMS_PER_PAGE = 9;
 
 export default function OpportunityPage() {
-
+const [showApplicants, setShowApplicants] = useState(true);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<any>(null);
@@ -379,7 +562,9 @@ export default function OpportunityPage() {
             {/* Filter Buttons – Parallelogram on right */}
             <div className="flex gap-2 ml-auto">
               {/* First Filter Button */}
-              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all">
+              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+              onClick={() => setShowApplicants(!showApplicants)}
+              >
                 <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
                   <svg width="24" height="41" viewBox="0 0 24 41" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 0.5V1H24V0.5V0H0V0.5ZM24 40.5V40H0V40.5V41H24V40.5Z" fill="#141A21"/>
@@ -392,7 +577,8 @@ export default function OpportunityPage() {
               </button>
 
               {/* Second Filter Button */}
-              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all">
+              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+              >
                 <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M14 16.5C14.3852 16.5002 14.7556 16.6486 15.0344 16.9144C15.3132 17.1802 15.479 17.5431 15.4975 17.9279C15.516 18.3127 15.3858 18.6898 15.1338 18.9812C14.8818 19.2726 14.5274 19.4558 14.144 19.493L14 19.5H10C9.61478 19.4998 9.24441 19.3514 8.96561 19.0856C8.68682 18.8198 8.52099 18.4569 8.50248 18.0721C8.48396 17.6873 8.61419 17.3102 8.86618 17.0188C9.11816 16.7274 9.47258 16.5442 9.856 16.507L10 16.5H14ZM17 10.5C17.3978 10.5 17.7794 10.658 18.0607 10.9393C18.342 11.2206 18.5 11.6022 18.5 12C18.5 12.3978 18.342 12.7794 18.0607 13.0607C17.7794 13.342 17.3978 13.5 17 13.5H7C6.60218 13.5 6.22064 13.342 5.93934 13.0607C5.65804 12.7794 5.5 12.3978 5.5 12C5.5 11.6022 5.65804 11.2206 5.93934 10.9393C6.22064 10.658 6.60218 10.5 7 10.5H17ZM20 4.5C20.3978 4.5 20.7794 4.65804 21.0607 4.93934C21.342 5.22064 21.5 5.60218 21.5 6C21.5 6.39782 21.342 6.77936 21.0607 7.06066C20.7794 7.34196 20.3978 7.5 20 7.5H4C3.60218 7.5 3.22064 7.34196 2.93934 7.06066C2.65804 6.77936 2.5 6.39782 2.5 6C2.5 5.60218 2.65804 5.22064 2.93934 4.93934C3.22064 4.65804 3.60218 4.5 4 4.5H20Z" fill="#1E1E1E"/>
@@ -402,7 +588,9 @@ export default function OpportunityPage() {
             </div>
             </div>
             
-          {/* Cards Grid: 3 rows × 3 columns */}
+
+        {/* Applicants Grid */}
+        {showApplicants && (
           <div className="grid grid-cols-3 grid-rows-3 gap-2">
             {paginatedJobs.map((job, index) => (
               <JobCard
@@ -416,6 +604,23 @@ export default function OpportunityPage() {
               />
             ))}
           </div>
+        )}
+
+         {/* Contracts Grid */}
+      {!showApplicants && (
+        <div className="flex flex-col gap-2 mt-4">
+          {paginatedJobs.map((job, index) => (
+            <ContractRow
+              key={index}
+              job={job}
+              showCheckbox={true} // optional
+              onMainClick={() => router.push(`/Company/opportunity/${job.jobNumber}`)}
+            />
+          ))}
+        </div>
+      )}
+
+
         </div>
       </div>
       {totalPages > 1 && (
