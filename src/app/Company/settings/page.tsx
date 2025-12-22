@@ -178,9 +178,25 @@ export default function SettingsPage() {
   return (
     <DashboardLayout>
       <div className="max-w-[1400px] pl-6 pr-6 py-6">
-        <h1 className="text-[28px] font-bold text-[#1E1E1E] mb-8">
-          Setting
-        </h1>
+    
+        <div className="flex items-center justify-between mb-8">
+          {/* Left: Title */}
+          <h1 className="text-[28px] font-bold text-[#1E1E1E] mb-8">
+            Setting
+          </h1>
+
+          {/* Right: Button group */}
+          <div className="flex items-center gap-4">
+            {/* Example Button 1 */}
+            <button
+              className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105">
+              <span className="skew-x-[12deg] font-bold text-[#1E1E1E] flex items-center justify-center">
+                Log Out
+              </span>
+            </button>
+
+          </div>
+        </div>
 
         {/* Tabs */}
         <div className="flex gap-4 mb-6">
