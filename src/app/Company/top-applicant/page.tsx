@@ -165,9 +165,8 @@ export default function TopApplicantPage() {
     <DashboardLayout>
       <div className="max-w-[1400px] pl-6">
         <h1 className="text-[28px] font-bold text-[#1E1E1E] mb-8">
-          Top 10 Applicants
+          Top Applicants
         </h1>
-
         {/* =======================
             APPLIED STUDENTS GRID
         ======================== */}
