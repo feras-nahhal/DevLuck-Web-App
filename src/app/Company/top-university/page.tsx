@@ -518,7 +518,7 @@ export default function TopUniversityPage() {
         };
   return (
       <DashboardLayout>
-      <div className="max-w-[1350px] pl-4">
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
         {/* =====================
             Page Title
         ====================== */}

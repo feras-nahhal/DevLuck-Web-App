@@ -613,7 +613,7 @@ export default function PaymentPage() {
 
 return (
   <DashboardLayout>
-    <div className="max-w-[1300px] pl-4">
+    <div className="px-4 sm:px-6 lg:px-8 py-6">
       {/* Page Title */}
       <div className=" mb-8">
         <h1 className="text-[28px] font-bold text-[#1E1E1E]">

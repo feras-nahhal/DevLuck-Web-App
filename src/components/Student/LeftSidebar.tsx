@@ -46,7 +46,7 @@ const LeftSidebar = ({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMo
   { name: "Applied Opportunity", path: "/Student/applied-Opportunity", icon: "/icons/opportunity.svg" },
   { name: "Profile", path: "/Student/profile", icon: "/icons/profile.svg" },
   { name: "Contracts", path: "/Student/contract", icon: "/icons/contract.svg"},
-  { name: "Top10 Student", path: "/Student/top-applicant", icon: "/icons/top-applicant.svg" },
+  { name: "Top10 Student", path: "/Student/top-student", icon: "/icons/top-applicant.svg" },
   { name: "Top Company", path: "/Student/top-company", icon: "/icons/company.svg" },
   { name: "Top University", path: "/Student/top-university", icon: "/icons/university.svg" },
 ];
@@ -56,7 +56,7 @@ const bottomMenuItems = [
 ];
 
 
-  const getClass = (path: string) => (pathname === path ? "menu-item active" : "menu-item");
+  const getClass = (path: string) => pathname.startsWith(path) ? "menu-item active" : "menu-item";
 
   const getIcon = (base: string, isActive: boolean) => {
     if (!isActive) return base;

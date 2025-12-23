@@ -428,7 +428,7 @@ export default function ApplicantPage() {
   return (
     <DashboardLayout>
       <div
-        className="relative max-w-[1400px] pl-6 p-4 min-h-[800px]"
+        className="px-4 sm:px-6 lg:px-8 py-6 min-h-[800px]"
         style={{
           backgroundImage: "url('/pages/applicantInfoBackground.svg')",
           backgroundPosition: "65% top",
@@ -765,8 +765,9 @@ export default function ApplicantPage() {
             </div>
           </div>
       </div>
-{/* Payment section  */}
-          <div className="max-w-[1300px] pl-4 mt-10 mb-20">
+          {/* Payment section  */}
+          <div className="px-4 sm:px-6 lg:px-8 py-6">
+
             {/* Page Title */}
             <div className="flex items-center justify-between mb-8">
               {/* Left: Title */}

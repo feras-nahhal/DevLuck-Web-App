@@ -1,7 +1,6 @@
 "use client";
 
-import DashboardLayout from "@/src/components/Company/DashboardLayout";
-import React from "react";
+import DashboardLayout from "@/src/components/Student/DashboardLayout";
 import { mockReviews } from "@/src/mocks/mockReviews";
 import { mockCompanies } from "@/src/mocks/mockCompanies";
 import { useRouter, useParams } from "next/navigation";
@@ -971,19 +970,6 @@ export default function TopCompanyPage() {
 
                 </div>
                 </div>
-
-
-
-
-
-                
-
-
-
-
-
-
-           
         </div>
 
     </DashboardLayout>

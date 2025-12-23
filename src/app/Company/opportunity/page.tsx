@@ -482,7 +482,7 @@ const [showApplicants, setShowApplicants] = useState(true);
 
   return (
     <DashboardLayout>
-    <div className="max-w-[1400px] pl-6">
+    <div className="px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex items-center justify-between mb-8">
         {/* Left: Title */}
         <h1 className="text-[28px] font-bold text-[#1E1E1E]">

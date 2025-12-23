@@ -383,7 +383,7 @@ const goToNext = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1400px] pl-6 pr-6 py-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
 
         {/* Tabs */}
         <div className="flex gap-4 mb-6">
@@ -579,7 +579,7 @@ const goToNext = () => {
             <ApplicantCard
               key={index}
               applicant={applicant}
-              onClick={() => router.push(`/Company/opportunity/${jobId}/${applicant.applicantId}`)}
+              onClick={() => router.push(`/Company/dashboard/job/${jobId}/${applicant.applicantId}`)}
             />
           ))}
         </div>

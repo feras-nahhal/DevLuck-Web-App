@@ -1,18 +1,14 @@
 "use client";
 
-import DashboardLayout from "@/src/components/Company/DashboardLayout";
-import React from "react";
+import DashboardLayout from "@/src/components/Student/DashboardLayout";
 import { mockUniversities } from "@/src/mocks/mockUniversities";
-import { useRouter, useParams } from "next/navigation";
-import { useState } from "react";
+import { useParams } from "next/navigation";
 
 export default function TopUniversityPage() {
     const params = useParams(); 
     const {universityId } = params;
     const university = mockUniversities.find(a => a.id === universityId);
   
-
-   
   return (
     <DashboardLayout>
                 <div className="relative w-full min-h-[1000px] p-4 overflow-hidden">

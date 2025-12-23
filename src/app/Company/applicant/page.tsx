@@ -572,7 +572,7 @@ export default function ApplicantPage() {
 
   return (
     <DashboardLayout>
-     <div className="max-w-[1350px] pl-4">
+     <div className="px-4 sm:px-6 lg:px-8 py-6">
         <h1 className="text-[28px] font-bold text-[#1E1E1E] mb-8">
           Applicant
         </h1>

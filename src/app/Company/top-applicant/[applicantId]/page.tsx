@@ -34,7 +34,7 @@ export default function ApplicantPage() {
   return (
     <DashboardLayout>
       <div
-        className="relative max-w-[1400px] pl-6 p-4 min-h-[800px]"
+        className="px-4 sm:px-6 lg:px-8 py-6 min-h-[800px]"
         style={{
           backgroundImage: "url('/pages/applicantInfoBackground.svg')",
           backgroundPosition: "65% top",
