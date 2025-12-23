@@ -23,6 +23,8 @@ export const mockApplicants = [
     contractTitle: "Apple Inc",
     paymentStatus: "Paid",
     image: "/images/A1.jpeg",
+    image1: "/images/A11.jpeg",
+    city:"R i y a d h"
   },
   {
     applicantId: "202",
@@ -53,6 +55,8 @@ export const mockApplicants = [
     contractTitle: "Microsoft",
     paymentStatus: "Pending",
     image: "/images/A2.jpeg",
+    image1: "/images/A8.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "203",
@@ -94,6 +98,8 @@ export const mockApplicants = [
     contractTitle: "Google",
     paymentStatus: "Due",
     image: "/images/A3.jpeg",
+    image1: "/images/A10.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "204",
@@ -119,6 +125,8 @@ export const mockApplicants = [
     contractTitle: "Amazon",
     paymentStatus: "Paid",
     image: "/images/A4.jpeg",
+    image1: "/images/A11.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "205",
@@ -144,6 +152,8 @@ export const mockApplicants = [
     contractTitle: "Tesla",
     paymentStatus: "Paid",
     image: "/images/A5.jpeg",
+    image1: "/images/A12.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "206",
@@ -169,6 +179,8 @@ export const mockApplicants = [
     contractTitle: "Apple Inc",
     paymentStatus: "Due",
     image: "/images/A6.jpeg",
+    image1: "/images/A11.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "207",
@@ -194,6 +206,8 @@ export const mockApplicants = [
     contractTitle: "Microsoft",
     paymentStatus: "Paid",
     image: "/images/A1.jpeg",
+    image1: "/images/A12.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "208",
@@ -219,6 +233,8 @@ export const mockApplicants = [
     contractTitle: "Google",
     paymentStatus: "Pending",
     image: "/images/A2.jpeg",
+    image1: "/images/A10.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "209",
@@ -244,6 +260,8 @@ export const mockApplicants = [
     contractTitle: "Amazon",
     paymentStatus: "Due",
     image: "/images/A3.jpeg",
+    image1: "/images/A8.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "210",
@@ -269,6 +287,8 @@ export const mockApplicants = [
     contractTitle: "Tesla",
     paymentStatus: "Paid",
     image: "/images/A4.jpeg",
+    image1: "/images/A10.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "211",
@@ -294,6 +314,8 @@ export const mockApplicants = [
     contractTitle: "Apple Inc",
     paymentStatus: "Pending",
     image: "/images/A5.jpeg",
+    image1: "/images/A8.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "212",
@@ -319,6 +341,8 @@ export const mockApplicants = [
     contractTitle: "Microsoft",
     paymentStatus: "Due",
     image: "/images/A6.jpeg",
+    image1: "/images/A12.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "213",
@@ -343,7 +367,9 @@ export const mockApplicants = [
     contractStatus: "Running",
     contractTitle: "Google",
     paymentStatus: "Paid",
+    image1: "/images/A11.jpeg",
     image: "/images/A1.jpeg",
+     city:"R i y a d h"
   },
   {
     applicantId: "214",
@@ -369,5 +395,7 @@ export const mockApplicants = [
     contractTitle: "Amazon",
     paymentStatus: "Pending",
     image: "/images/A2.jpeg",
+    image1: "/images/A10.jpeg",
+     city:"R i y a d h"
   },
 ];
