@@ -19,18 +19,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="app-container flex">
       <LeftSidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
-      <main
-        className={`flex-1 p-5 transition-all duration-300 overflow-x-hidden ${
-          !isMobile
-            ? isCollapsed
-              ? "pl-[100px]"
-              : "pl-[246px]"
-            : "pl-0"
-        }`}
-      >
-        <div className="max-w-[1400px] mx-auto w-full">
-          {children}
-        </div>
+     <main
+  className={`flex-1 p-5 transition-all duration-300 ${
+    !isMobile ? (isCollapsed ? "ml-[100px]" : "ml-[246px]") : "ml-0"
+  }`}
+>
+
+       <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8">
+  {children}
+</div>
+
       </main>
     </div>
   );
