@@ -20,14 +20,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="app-container flex">
       <LeftSidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <main
-        style={{
-          flex: 1,
-          padding: "20px",
-          marginLeft: !isMobile ? (isCollapsed ? "100px" : "246px") : 0,
-          transition: "margin-left 0.25s ease",
-        }}
+        className={`flex-1 p-5 transition-all duration-300 overflow-x-hidden ${
+          !isMobile
+            ? isCollapsed
+              ? "pl-[100px]"
+              : "pl-[246px]"
+            : "pl-0"
+        }`}
       >
-        {children}
+        <div className="max-w-[1400px] mx-auto w-full">
+          {children}
+        </div>
       </main>
     </div>
   );
