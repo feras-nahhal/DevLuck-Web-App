@@ -7,7 +7,10 @@ export const experienceData = [
     companyName: "Tech Solutions Inc.",
     role: "Front-End Developer",
     date: "2022 - 2023",
-    description: "Developed responsive web interfaces using React and Next.js, optimized performance, and collaborated with UI/UX designers."
+    startDate: "2022",
+    endDate: "2023",
+    description:
+      "Developed responsive web interfaces using React and Next.js, optimized performance, and collaborated with UI/UX designers.",
   },
   {
     id: 2,
@@ -15,7 +18,10 @@ export const experienceData = [
     companyName: "Innovatech Ltd.",
     role: "Junior Web Developer",
     date: "2020 - 2022",
-    description: "Worked on maintaining company websites, implementing features, and fixing bugs with JavaScript and CSS."
+    startDate: "2020",
+    endDate: "2022",
+    description:
+      "Worked on maintaining company websites, implementing features, and fixing bugs with JavaScript and CSS.",
   },
   {
     id: 3,
@@ -23,7 +29,10 @@ export const experienceData = [
     companyName: "Creative Apps",
     role: "Intern Developer",
     date: "2019 - 2020",
-    description: "Assisted in developing web applications, learned Agile workflows, and contributed to team projects."
+    startDate: "2019",
+    endDate: "2020",
+    description:
+      "Assisted in developing web applications, learned Agile workflows, and contributed to team projects.",
   },
   {
     id: 4,
@@ -31,7 +40,10 @@ export const experienceData = [
     companyName: "WebWorks",
     role: "Front-End Intern",
     date: "2018 - 2019",
-    description: "Supported UI development, wrote reusable components, and learned version control with Git."
+    startDate: "2018",
+    endDate: "2019",
+    description:
+      "Supported UI development, wrote reusable components, and learned version control with Git.",
   },
   {
     id: 5,
@@ -39,7 +51,10 @@ export const experienceData = [
     companyName: "Startup Lab",
     role: "Junior Intern",
     date: "2017 - 2018",
-    description: "Gained experience in web development, assisted with testing and deployment tasks."
+    startDate: "2017",
+    endDate: "2018",
+    description:
+      "Gained experience in web development, assisted with testing and deployment tasks.",
   },
 
   // Applicant 202 - Bob Smith
@@ -49,7 +64,10 @@ export const experienceData = [
     companyName: "CloudWorks",
     role: "Cloud Engineer",
     date: "2020 - 2025",
-    description: "Managed cloud infrastructure, automated deployments, and optimized server performance."
+    startDate: "2020",
+    endDate: "2025",
+    description:
+      "Managed cloud infrastructure, automated deployments, and optimized server performance.",
   },
   {
     id: 7,
@@ -57,7 +75,10 @@ export const experienceData = [
     companyName: "ServerTech",
     role: "Backend Developer",
     date: "2018 - 2020",
-    description: "Developed REST APIs with Node.js and Express, integrated MongoDB databases, and implemented authentication."
+    startDate: "2018",
+    endDate: "2020",
+    description:
+      "Developed REST APIs with Node.js and Express, integrated MongoDB databases, and implemented authentication.",
   },
   {
     id: 8,
@@ -65,7 +86,10 @@ export const experienceData = [
     companyName: "DataSecure",
     role: "System Administrator",
     date: "2016 - 2018",
-    description: "Maintained servers, monitored system performance, and ensured network security."
+    startDate: "2016",
+    endDate: "2018",
+    description:
+      "Maintained servers, monitored system performance, and ensured network security.",
   },
   {
     id: 9,
@@ -73,7 +97,10 @@ export const experienceData = [
     companyName: "Tech Innovators",
     role: "Junior Developer",
     date: "2015 - 2016",
-    description: "Worked on internal tools, assisted senior developers, and learned software deployment."
+    startDate: "2015",
+    endDate: "2016",
+    description:
+      "Worked on internal tools, assisted senior developers, and learned software deployment.",
   },
   {
     id: 10,
@@ -81,7 +108,10 @@ export const experienceData = [
     companyName: "Startup Hub",
     role: "Intern",
     date: "2014 - 2015",
-    description: "Gained hands-on experience in backend development and cloud technologies."
+    startDate: "2014",
+    endDate: "2015",
+    description:
+      "Gained hands-on experience in backend development and cloud technologies.",
   },
 
   // Applicant 203 - Charlie Brown
@@ -91,7 +121,10 @@ export const experienceData = [
     companyName: "DataSoft",
     role: "Backend Developer",
     date: "2021 - 2023",
-    description: "Built Python/Django APIs, managed PostgreSQL databases, and implemented automated tests."
+    startDate: "2021",
+    endDate: "2023",
+    description:
+      "Built Python/Django APIs, managed PostgreSQL databases, and implemented automated tests.",
   },
   {
     id: 12,
@@ -99,7 +132,10 @@ export const experienceData = [
     companyName: "TechForge",
     role: "Junior Backend Developer",
     date: "2019 - 2021",
-    description: "Developed server-side logic, optimized queries, and collaborated with frontend teams."
+    startDate: "2019",
+    endDate: "2021",
+    description:
+      "Developed server-side logic, optimized queries, and collaborated with frontend teams.",
   },
   {
     id: 13,
@@ -107,7 +143,10 @@ export const experienceData = [
     companyName: "SoftWorks",
     role: "Intern Developer",
     date: "2018 - 2019",
-    description: "Assisted in backend projects, wrote scripts for data processing, and learned deployment processes."
+    startDate: "2018",
+    endDate: "2019",
+    description:
+      "Assisted in backend projects, wrote scripts for data processing, and learned deployment processes.",
   },
   {
     id: 14,
@@ -115,7 +154,10 @@ export const experienceData = [
     companyName: "InfoTech",
     role: "Junior Intern",
     date: "2017 - 2018",
-    description: "Supported database management, debugging, and internal tool development."
+    startDate: "2017",
+    endDate: "2018",
+    description:
+      "Supported database management, debugging, and internal tool development.",
   },
   {
     id: 15,
@@ -123,8 +165,11 @@ export const experienceData = [
     companyName: "Startup Labs",
     role: "Intern",
     date: "2016 - 2017",
-    description: "Learned backend development basics, contributed to small projects, and shadowed senior engineers."
+    startDate: "2016",
+    endDate: "2017",
+    description:
+      "Learned backend development basics, contributed to small projects, and shadowed senior engineers.",
   },
 
-  // ... repeat similarly for applicants 204 - 214
+  // Continue for applicants 204 - 214 similarly...
 ];

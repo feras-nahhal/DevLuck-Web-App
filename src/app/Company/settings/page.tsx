@@ -271,7 +271,7 @@ export default function SettingsPage() {
                     className="relative w-[80px] h-[32px] skew-x-[-12deg]  border border-black flex items-center justify-center rounded-md cursor-pointer duration-200 hover:scale-105  transition"
                   >
                     <button className="skew-x-[12deg] font-semibold text-[14px] text-[#1E1E1E]"
-                      onClick={() => {
+                        onClick={() => {
                         setIsModalOpen(true);        
                       }}
                     >
