@@ -473,38 +473,38 @@ const CompanyRow = ({ company,onMainClick,onSideClick,showCheckbox = false }: Co
           </div>
         )}
 
-        {/* Applicant Info */}
+         {/* Applicant Info */}
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
           {/* Company ID */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">CO-ID-{company.id}</span>
             <span className="text-xs text-gray-400">Company ID</span>
           </div>
           {/* Company Name */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{company.name}</span>
             <span className="text-xs text-gray-400">Company Name</span>
           </div>
           {/* Phone Number */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{company.phoneNumber}</span>
             <span className="text-xs text-gray-400">Phone Number</span>
           </div>
 
           {/* Company City */}
-          <div className="flex flex-col justify-center w-[150px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{company.city}</span>
             <span className="text-xs text-gray-400">Company City</span>
           </div>
 
           {/* Address */}
-          <div className="flex flex-col justify-center w-[200px]">
+          <div className="flex flex-col justify-center w-[180px]">
             <span className="text-sm font-semibold text-gray-900">{company.address}</span>
             <span className="text-xs text-gray-400">Address</span>
           </div>
           
           {/* Employee Number */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{company.employeeNumber}</span>
             <span className="text-xs text-gray-400">Employee Number</span>
           </div>

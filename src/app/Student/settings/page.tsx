@@ -1,8 +1,9 @@
-// src/app/Student/settings/page.tsx
+// src/app/Company/settings/page.tsx
 "use client";
+
 import { useState} from "react";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
-import AddressModal from "@/src/components/Company/AddressModal"; 
+import AddressModal from "@/src/components/common/AddressModal"; 
 
 // src/mocks/mockUniversityAddresses.ts
 export const mockUniversityAddresses = [
@@ -176,8 +177,15 @@ export default function SettingsPage() {
  
   return (
     <DashboardLayout>
-      <div className="px-4 sm:px-6 lg:px-8 py-6">
-    
+      <div
+        className="py-6 min-h-[800px]"
+        style={{
+            transform: "scale(0.96)",
+          transformOrigin: "top center",
+        }}
+      >
+{/* ✅ CONTENT CONTAINER */}
+    <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="flex items-center justify-between mb-8">
           {/* Left: Title */}
           <h1 className="text-[28px] font-bold text-[#1E1E1E] mb-8">
@@ -257,30 +265,30 @@ export default function SettingsPage() {
         {activeTab === "general" && (
           <div className="flex flex-col gap-6">
             {/* Row 1 */}
-            <div className="flex flex-row items-start justify-start gap-10">
+            <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
               {/* Address Card */}
-              <div className="w-[655px] h-auto relative">
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                   Address
                   </h3>
 
                   {/* More Button */}
-                  <div
+                  <button
                     className="relative w-[80px] h-[32px] skew-x-[-12deg]  border border-black flex items-center justify-center rounded-md cursor-pointer duration-200 hover:scale-105  transition"
-                  >
-                    <button className="skew-x-[12deg] font-semibold text-[14px] text-[#1E1E1E]"
-                      onClick={() => {
+                        onClick={() => {
                         setIsModalOpen(true);        
                       }}
-                    >
+                  >
+                    <div className="skew-x-[12deg] font-semibold text-[14px] text-[#1E1E1E]">
                       More
-                    </button>
-                  </div>
+                    </div>
+                  </button>
                 </div>
-                <div className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
+                <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
                   <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                    {mockUniversityAddresses.map((item) => (
+                     {mockUniversityAddresses.length > 0 ? (
+                      mockUniversityAddresses.map((item) => (
                       <div
                         key={item.id}
                         className="flex flex-row items-start gap-5 w-full"
@@ -338,21 +346,26 @@ export default function SettingsPage() {
                           </svg>
                         </div>
                       </div>
-                    ))}
+                   ))
+                    ) : (
+                      <p className="text-[#555] text-[14px] font-publicSans">
+                        No Address available.
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
 
 
               {/* Select Theme Card */}
-              <div className="w-[655px] h-auto relative">
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                     Select Theme
                   </h3>
                 </div>
 
-                <div className="w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] p-6 h-[200px]">
+                <div className="w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] p-6 h-[200px]">
                   <div className="transform  px-8 w-full flex gap-[32px]">
                     
                     {/* Light Theme */}
@@ -375,16 +388,16 @@ export default function SettingsPage() {
             </div>
 
             {/* Row 2 */}
-            <div className="flex flex-row items-start justify-start gap-10">
+            <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
               {/*  Profile Card */}
-              <div className="w-[655px] h-auto relative">
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                   Profile
                   </h3>
                 </div>
-                <div className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
-                  <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
+                <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
+                  <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 ">
                     <div className="w-[485px] h-[113px] flex flex-col justify-center items-start p-[20px] gap-[4px] ">
   
                       {/* Row */}
@@ -410,13 +423,13 @@ export default function SettingsPage() {
               </div>
 
               {/* Select Theme Color Card*/}
-              <div className="w-[655px] h-auto relative">
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                   Select Theme Color
                   </h3>
                 </div>
-                <div className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
+                <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
                   <div className="transform skew-x-12 px-8 w-full h-full flex items-center justify-center">
                     <div className="w-[485px] h-[56px] flex items-center justify-center gap-[16px]">
                           {colors.map((color) => (
@@ -447,16 +460,16 @@ export default function SettingsPage() {
         {activeTab === "notification" && (
           <div className="flex flex-col gap-6">
             {/* Row 1 */}
-            <div className="flex flex-row items-start justify-start gap-10">
+            <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
 
               {/* Activity Card */}
-              <div className="w-[655px] h-auto relative">
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                   Activity
                   </h3>
                 </div>
-                <div className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
+                <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
                   <div className="transform skew-x-12 px-8 w-full flex flex-col">
                      <div className="w-[485px] flex flex-col gap-[17px]">
       
@@ -510,13 +523,13 @@ export default function SettingsPage() {
               </div>
 
               {/* Application Card */}
-              <div className="w-[655px] h-auto relative">
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                   Application
                   </h3>
                 </div>
-                <div className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
+                <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
                   <div className="transform skew-x-12 px-8 w-full flex flex-col">
                      <div className="w-[485px] flex flex-col gap-[17px]">
       
@@ -577,10 +590,10 @@ export default function SettingsPage() {
         {activeTab === "security" && (
           <div className="flex flex-col gap-6">
             {/* Row 1 */}
-            <div className="flex flex-row items-start justify-start gap-10">
+            <div className="flex flex-row items-start xl:items-stretch justify-start gap-10 flex-wrap xl:flex-nowrap w-full">
               
               {/* Password Card */}
-              <div className="w-[655px] h-auto relative">
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                     Password
@@ -588,7 +601,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div
-                  className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[280px]`}
+                  className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[280px]`}
                 >
                   <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 py-2">
                   {/* Reuse ParallelogramInput */}
@@ -626,8 +639,10 @@ export default function SettingsPage() {
               </div>
 
             </div>
+            
           </div>
         )}
+      </div>
       </div>
       <AddressModal
       isOpen={isModalOpen}

@@ -4,6 +4,7 @@ import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import React from "react";
 import { mockReviews } from "@/src/mocks/mockReviews";
 import { mockCompanies } from "@/src/mocks/mockCompanies";
+import { useSidebar } from "@/src/lib/sidebarContext";
 import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
 
@@ -18,6 +19,7 @@ import { useState } from "react";
     const MAX_FILE_SIZE_MB = 5;
     const MAX_FILES = 5;
 export default function TopCompanyPage() {
+    const { isCollapsed } = useSidebar(); // ✅ get collapse state
     const params = useParams(); // { companyId: "456" }
     const {companyId } = params;
     const company = mockCompanies.find(a => a.id === companyId);
@@ -122,7 +124,16 @@ export default function TopCompanyPage() {
 
   return (
     <DashboardLayout>
-        <div className="relative w-full min-h-[1000px] p-4 overflow-hidden">
+         <div
+        className={`relative w-full min-h-[1000px] p-4
+          ${isCollapsed ? "ml-[50px]" : "ml-0"}
+        `}
+        style={{
+          backgroundRepeat: "no-repeat",
+            transform: "scale(0.96)",
+          transformOrigin: "top center",
+        }}
+      >
              <svg
                     width="1292"
                     height="678"

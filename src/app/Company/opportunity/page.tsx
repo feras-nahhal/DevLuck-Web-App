@@ -328,31 +328,31 @@ const ContractRow = ({ job,onMainClick,onSideClick,showCheckbox = false }: Contr
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
 
           {/* Name */}
-          <div className="flex flex-col justify-center w-[200px]">
+          <div className="flex flex-col justify-center w-[180px]">
             <span className="text-sm font-semibold text-gray-900">{job.jobNumber}</span>
             <span className="text-xs text-gray-400">Job Number</span>
           </div>
 
           {/* Next Payment */}
-          <div className="flex flex-col justify-center w-[200px]">
+          <div className="flex flex-col justify-center w-[180px]">
             <span className="text-sm font-semibold text-gray-900">{job.jobName}</span>
             <span className="text-xs text-gray-400">Job Name</span>
           </div>
 
           {/* Monthly Allowance */}
-          <div className="flex flex-col justify-center w-[200px]">
+          <div className="flex flex-col justify-center w-[180px]">
             <span className="text-sm font-semibold text-gray-900">{job.jobtype}</span>
             <span className="text-xs text-gray-400">Job Type</span>
           </div>
 
           {/* Transfer ID */}
-          <div className="flex flex-col justify-center w-[200px]">
+          <div className="flex flex-col justify-center w-[180px]">
             <span className="text-sm font-semibold text-gray-900">{job.country}</span>
             <span className="text-xs text-gray-400">Country</span>
           </div>
 
            {/* Note ID */}
-          <div className="flex flex-col justify-center w-[200px]">
+          <div className="flex flex-col justify-center w-[180px]">
             <span className="text-sm font-semibold text-gray-900">{job.description.split(" ").slice(0, 3).join(" ")}</span>
             <span className="text-xs text-gray-400">Description</span>
           </div>
@@ -576,22 +576,14 @@ const [showApplicants, setShowApplicants] = useState(true);
                 </span>
               </button>
 
-              {/* Second Filter Button */}
-              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
-              >
-                <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 16.5C14.3852 16.5002 14.7556 16.6486 15.0344 16.9144C15.3132 17.1802 15.479 17.5431 15.4975 17.9279C15.516 18.3127 15.3858 18.6898 15.1338 18.9812C14.8818 19.2726 14.5274 19.4558 14.144 19.493L14 19.5H10C9.61478 19.4998 9.24441 19.3514 8.96561 19.0856C8.68682 18.8198 8.52099 18.4569 8.50248 18.0721C8.48396 17.6873 8.61419 17.3102 8.86618 17.0188C9.11816 16.7274 9.47258 16.5442 9.856 16.507L10 16.5H14ZM17 10.5C17.3978 10.5 17.7794 10.658 18.0607 10.9393C18.342 11.2206 18.5 11.6022 18.5 12C18.5 12.3978 18.342 12.7794 18.0607 13.0607C17.7794 13.342 17.3978 13.5 17 13.5H7C6.60218 13.5 6.22064 13.342 5.93934 13.0607C5.65804 12.7794 5.5 12.3978 5.5 12C5.5 11.6022 5.65804 11.2206 5.93934 10.9393C6.22064 10.658 6.60218 10.5 7 10.5H17ZM20 4.5C20.3978 4.5 20.7794 4.65804 21.0607 4.93934C21.342 5.22064 21.5 5.60218 21.5 6C21.5 6.39782 21.342 6.77936 21.0607 7.06066C20.7794 7.34196 20.3978 7.5 20 7.5H4C3.60218 7.5 3.22064 7.34196 2.93934 7.06066C2.65804 6.77936 2.5 6.39782 2.5 6C2.5 5.60218 2.65804 5.22064 2.93934 4.93934C3.22064 4.65804 3.60218 4.5 4 4.5H20Z" fill="#1E1E1E"/>
-                  </svg>
-                </span>
-              </button>
+             
             </div>
             </div>
             
 
         {/* Applicants Grid */}
         {showApplicants && (
-          <div className="grid grid-cols-3 grid-rows-3 gap-2">
+          <div className="grid grid-cols-3  grid-rows-3 gap-2">
             {paginatedJobs.map((job, index) => (
               <JobCard
                 key={index}
@@ -608,7 +600,7 @@ const [showApplicants, setShowApplicants] = useState(true);
 
          {/* Contracts Grid */}
       {!showApplicants && (
-        <div className="flex flex-col gap-2 mt-4">
+        <div className="flex flex-col ml-[45px] gap-2 mt-4">
           {paginatedJobs.map((job, index) => (
             <ContractRow
               key={index}

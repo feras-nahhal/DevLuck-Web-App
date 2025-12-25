@@ -389,27 +389,27 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
         {/* Applicant Info */}
         <div className="flex-1 flex items-center h-full px-4 gap-6">
           {/* CO-ID */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">CO-ID-{applicant.applicantId}</span>
             <span className="text-xs text-gray-400">Job ID</span>
           </div>
           {/* Name */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.name}</span>
             <span className="text-xs text-gray-400">Applicant Name</span>
           </div>
           {/* Contract Title */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.contractTitle}</span>
             <span className="text-xs text-gray-400">Contract Title</span>
           </div>
           {/* Start Date */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.startDate}</span>
             <span className="text-xs text-gray-400">Start Date</span>
           </div>
           {/* End Date */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.endDate}</span>
             <span className="text-xs text-gray-400">End Date</span>
           </div>

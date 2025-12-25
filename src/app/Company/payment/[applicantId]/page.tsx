@@ -225,19 +225,19 @@ const ContractRow = ({ payment,onSideClick,showCheckbox = false }: ContractRowPr
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
 
           {/* Next Payment */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">{payment.nextPayment}</span>
             <span className="text-xs text-gray-400">Next Payment</span>
           </div>
 
           {/* Monthly Allowance */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">{payment.monthlyAllowance}</span>
             <span className="text-xs text-gray-400">Monthly Allowance</span>
           </div>
 
           {/* Transfer ID */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">{payment.transferId}</span>
             <span className="text-xs text-gray-400">Transfer ID</span>
           </div>

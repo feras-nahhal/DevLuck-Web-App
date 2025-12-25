@@ -416,19 +416,19 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
 
           {/* Name */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.name}</span>
             <span className="text-xs text-gray-400">Applicant Name</span>
           </div>
 
           {/* Next Payment */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.startDate}</span>
             <span className="text-xs text-gray-400">Next Payment</span>
           </div>
 
           {/* Monthly Allowance */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.salaryPaid}</span>
             <span className="text-xs text-gray-400">Monthly Allowance</span>
           </div>
