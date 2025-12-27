@@ -6,20 +6,18 @@ import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 
-interface UniversityAddress {
-  id?: string;
-  name: string;
-  tag: string;
-  address: string;
-  phoneNumber: string;
+interface ContractDispute {
+  reason: string;
+  note: string;
 }
 
-interface AddressModalProps {
-  address?: UniversityAddress | null;
+
+interface ContractDisputeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: UniversityAddress) => void;
+  onSave: (data: ContractDispute) => void;
 }
+
 
 
 type ParallelogramSelectProps = {
@@ -243,8 +241,8 @@ const ParallelogramInput = ({
             transform: "skewX(15deg)",
             height: "100%",
             display: "flex",
-            alignItems: "center",
-            padding: "0 20px",
+            alignItems: "flex-start", // Align text at top
+            padding: "10px 20px 0", // Top padding so text doesn't touch border
           }}
         >
           {type === "textarea" ? (
@@ -270,31 +268,28 @@ const ParallelogramInput = ({
 );
 
 // Main payment Modal Component
-const AddressModal: React.FC<AddressModalProps> = ({
-  address,
+const DisputeModal: React.FC<ContractDisputeModalProps> = ({
   isOpen,
   onClose,
   onSave,
 }) => {
-  const [formData, setFormData] = useState<UniversityAddress>({
-    name: "",
-    tag: "",
-    address: "",
-    phoneNumber: "",
-  });
+  const [formData, setFormData] = useState<ContractDispute>({
+  reason: "",
+  note: "",
+});
+
 
   const [loading, setLoading] = useState(false);
 
    useEffect(() => {
-    if (address) {
-      setFormData(address);
-    } else {
-      setFormData({ name: "", tag: "", address: "", phoneNumber: "" });
-    }
-  }, [address, isOpen]);
+  if (isOpen) {
+    setFormData({ reason: "", note: "" });
+  }
+}, [isOpen]);
 
 
-  const handleInputChange = (field: keyof UniversityAddress, value: string) => {
+
+  const handleInputChange = (field: keyof ContractDispute, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -319,7 +314,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
 
         {/* Modal */}
         <div
-        className="relative w-full max-w-[640px] max-h-[95vh] flex flex-col isolate rounded-4xl bg-[rgba(255,255,255,0.04)] overflow-hidden"
+        className="relative w-full max-w-[640px] max-h-[95vh] flex flex-col isolate rounded-4xl bg-[rgba(255,255,255,0.04)] overflow"
         onClick={(e) => e.stopPropagation()}
         >
         {/* Header */}
@@ -344,7 +339,8 @@ const AddressModal: React.FC<AddressModalProps> = ({
                 lineHeight: "36px",
             }}
             >
-            {address ? "Edit Address" : "Add Address"}
+            Send Contract Dispute
+
             </h2>
         </div>
 
@@ -353,30 +349,33 @@ const AddressModal: React.FC<AddressModalProps> = ({
             className="flex-1 flex flex-col gap-4 p-4  bg-white "
             onSubmit={handleSubmit}
         >
-             <ParallelogramInput
-            label="University Name"
-            placeholder="Enter university name"
-            value={formData.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-          />
-          <ParallelogramInput
-            label="Tag"
-            placeholder="Home / Campus / Office"
-            value={formData.tag}
-            onChange={(e) => handleInputChange("tag", e.target.value)}
-          />
-          <ParallelogramInput
-            label="Address"
-            placeholder="Full address"
-            value={formData.address}
-            onChange={(e) => handleInputChange("address", e.target.value)}
-          />
-          <ParallelogramInput
-            label="Phone Number"
-            placeholder="+1 617-253-1000"
-            value={formData.phoneNumber}
-            onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-          />
+            <ParallelogramSelect
+            label="Select Reason"
+            placeholder="Choose dispute reason"
+            value={formData.reason}
+            options={[
+                "Payment Issue",
+                "Contract Terms",
+                "Work Scope Disagreement",
+                "Delay / Deadline Issue",
+                "Other",
+            ]}
+            onChange={(value) =>
+                setFormData((prev) => ({ ...prev, reason: value }))
+            }
+            />
+            <ParallelogramInput
+            label="Note"
+            placeholder="Write your dispute details here..."
+            value={formData.note}
+            type="textarea"
+            onChange={(e) =>
+                setFormData((prev) => ({ ...prev, note: e.target.value }))
+            }
+            />
+
+
+
             
         </form>
 
@@ -401,7 +400,8 @@ const AddressModal: React.FC<AddressModalProps> = ({
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
             >
                 <span className="skew-x-[12deg] font-bold text-black">
-                {loading ? <Loader2 className="animate-spin" /> : address ? "Update" : "Confirm"}
+                {loading ? <Loader2 className="animate-spin" /> : "Send"}
+
                 </span>
             </button>
             </div>
@@ -411,4 +411,4 @@ const AddressModal: React.FC<AddressModalProps> = ({
     );
 };
 
-export default AddressModal;
+export default DisputeModal;
