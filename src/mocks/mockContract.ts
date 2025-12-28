@@ -1,5 +1,10 @@
 export type ContractStatus = "Running" | "Completed" | "Dispute";
 
+export type OpportunityStatus =
+  | "Applied"
+  | "Upcoming Interview"
+  | "Rejected";
+
 export interface Contract {
   id: number;
   applicantId: number;
@@ -7,6 +12,12 @@ export interface Contract {
   startDate: string;
   endDate: string;
   status: ContractStatus;
+
+  /** ✅ NEW */
+  opportunityStatus: OpportunityStatus;
+  deadline: string; // e.g. "2025-07-30"
+  salary: string;
+
   jobDescription: string;
   keyResponsibilities: string[];
   whyYoullLoveWorkingHere: string[];
@@ -24,6 +35,11 @@ export const mockContracts: Contract[] = [
     startDate: "2024-01-10",
     endDate: "2024-07-10",
     status: "Running",
+
+    opportunityStatus: "Applied",
+    deadline: "2025-07-30",
+    salary: "$2,500", 
+
     jobDescription:
       "Build and maintain modern user interfaces using React and Tailwind CSS. You will be responsible for creating intuitive and dynamic front-end experiences, implementing best practices for performance and accessibility, and collaborating closely with cross-functional teams to deliver high-quality software solutions.",
     keyResponsibilities: [
@@ -54,6 +70,11 @@ export const mockContracts: Contract[] = [
     startDate: "2023-11-01",
     endDate: "2024-05-01",
     status: "Completed",
+
+    opportunityStatus: "Upcoming Interview",
+    deadline: "2025-07-30",
+    salary: "$4,000",
+
     jobDescription:
       "Design scalable APIs and services using Node.js and PostgreSQL.",
     keyResponsibilities: [
@@ -78,6 +99,9 @@ export const mockContracts: Contract[] = [
     startDate: "2024-02-01",
     endDate: "2024-08-01",
     status: "Running",
+     opportunityStatus: "Rejected",
+    deadline: "2025-07-30",
+    salary: "$1,800",
     jobDescription:
       "Create intuitive user experiences and polished visual designs.",
     keyResponsibilities: [
@@ -102,6 +126,9 @@ export const mockContracts: Contract[] = [
     startDate: "2023-09-15",
     endDate: "2024-03-15",
     status: "Dispute",
+    opportunityStatus: "Applied",
+    deadline: "2025-07-30",
+    salary: "$3,500",
     jobDescription:
       "Develop and maintain cross-platform mobile applications.",
     keyResponsibilities: [
@@ -126,6 +153,9 @@ export const mockContracts: Contract[] = [
     startDate: "2024-03-01",
     endDate: "2024-09-01",
     status: "Running",
+    opportunityStatus: "Applied",
+    deadline: "2025-07-30",
+    salary: "$3,000",
     jobDescription:
       "Analyze business data to generate insights and reports.",
     keyResponsibilities: [
@@ -150,6 +180,9 @@ export const mockContracts: Contract[] = [
     startDate: "2023-10-01",
     endDate: "2024-04-01",
     status: "Completed",
+    opportunityStatus: "Upcoming Interview",
+    deadline: "2025-07-30",
+    salary: "$4,500",
     jobDescription:
       "Manage CI/CD pipelines and cloud infrastructure.",
     keyResponsibilities: [
@@ -174,6 +207,9 @@ export const mockContracts: Contract[] = [
     startDate: "2024-01-20",
     endDate: "2024-06-20",
     status: "Running",
+    opportunityStatus: "Rejected",
+    deadline: "2025-07-30",
+    salary: "$3000",
     jobDescription:
       "Ensure product quality through automated testing.",
     keyResponsibilities: [
@@ -198,6 +234,9 @@ export const mockContracts: Contract[] = [
     startDate: "2023-08-01",
     endDate: "2024-02-01",
     status: "Completed",
+     opportunityStatus: "Applied",
+    deadline: "2025-07-30",
+    salary: "$6,000",
     jobDescription:
       "Lead product strategy and roadmap execution.",
     keyResponsibilities: [
@@ -222,6 +261,9 @@ export const mockContracts: Contract[] = [
     startDate: "2024-02-15",
     endDate: "2024-08-15",
     status: "Dispute",
+    opportunityStatus: "Upcoming Interview",
+    deadline: "2025-07-30",
+    salary: "$5,000",
     jobDescription:
       "Protect systems and data from security threats.",
     keyResponsibilities: [
@@ -246,6 +288,9 @@ export const mockContracts: Contract[] = [
     startDate: "2024-03-10",
     endDate: "2024-09-10",
     status: "Running",
+     opportunityStatus: "Applied",
+    deadline: "2025-07-30",
+    salary: "$2500",
     jobDescription:
       "Assist in AI model research and experimentation.",
     keyResponsibilities: [
