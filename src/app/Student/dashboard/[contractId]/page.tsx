@@ -1,12 +1,13 @@
 "use client";
 
+import { useParams, useRouter } from "next/navigation";
+import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
+import { mockContracts } from "@/src/mocks/mockContract";
+import { mockPayments } from "@/src/mocks/mockPayments";
 import { mockReviews } from "@/src/mocks/mockReviews";
-import { mockCompanies } from "@/src/mocks/mockCompanies";
-import { useSidebar } from "@/src/lib/sidebarContext";
-import { useRouter, useParams } from "next/navigation";
 import { mockApplicants } from "@/src/mocks/mockApplicants";
-import { useState } from "react";
+import { mockCompanies } from "@/src/mocks/mockCompanies";
 
 interface ClipImageProps {
   src?: string;
@@ -730,936 +731,363 @@ const ApplicantCard = ({
   );
 };
 
-    type UploadItem = {
-    file: File;
-    preview?: string;
-    progress: number;
-    uploading: boolean;
-    error?: string;
-    };
 
-    const MAX_FILE_SIZE_MB = 5;
-    const MAX_FILES = 5;
-export default function TopCompanyPage() {
-    const { isCollapsed } = useSidebar(); // ✅ get collapse state
-    const params = useParams(); // { companyId: "456" }
-    const {companyId } = params;
-    const company = mockCompanies.find(a => a.id === companyId);
-    const reviews = mockReviews.filter(r => r.companyId === company?.id);
+type PaymentRowProps = {
+  payment: typeof mockPayments[0];
+  showCheckbox?: boolean;
 
-    // ============= file upload==============
-    const [files, setFiles] = useState<UploadItem[]>([]);
-    const [dragging, setDragging] = useState(false);
+};
 
-    /* -----------------------------
-        FAKE UPLOAD (SIMULATION)
-    ------------------------------ */
-    const simulateUpload = (index: number) => {
-        setFiles((prev) =>
-        prev.map((f, i) =>
-            i === index ? { ...f, uploading: true, error: undefined } : f
-        )
-        );
+const PaymentRow = ({ payment,showCheckbox = false }: PaymentRowProps) => {
+    const [checked, setChecked] = useState(false);
 
-        let progress = 0;
-
-        const interval = setInterval(() => {
-        progress += 10;
-
-        setFiles((prev) =>
-            prev.map((f, i) =>
-            i === index ? { ...f, progress } : f
-            )
-        );
-
-        if (progress >= 100) {
-            clearInterval(interval);
-
-            // simulate random failure
-            const failed = Math.random() < 0.2;
-
-            setFiles((prev) =>
-            prev.map((f, i) =>
-                i === index
-                ? failed
-                    ? {
-                        ...f,
-                        uploading: false,
-                        progress: 0,
-                        error: "Upload failed. Retry.",
-                    }
-                    : { ...f, uploading: false, progress: 100 }
-                : f
-            )
-            );
-        }
-        }, 300);
-    };
-
-    /* -----------------------------
-        FILE HANDLER
-    ------------------------------ */
-    const handleFiles = (incoming: File[]) => {
-        if (files.length + incoming.length > MAX_FILES) {
-        alert(`Max ${MAX_FILES} files allowed`);
-        return;
-        }
-
-        incoming.forEach((file) => {
-        if (
-            !file.type.startsWith("image/") &&
-            file.type !== "application/pdf"
-        ) {
-            alert("Only images and PDFs allowed");
-            return;
-        }
-
-        if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-            alert(`Max file size ${MAX_FILE_SIZE_MB}MB`);
-            return;
-        }
-
-        const item: UploadItem = {
-            file,
-            preview: file.type.startsWith("image/")
-            ? URL.createObjectURL(file)
-            : undefined,
-            progress: 0,
-            uploading: false,
-        };
-
-        setFiles((prev) => {
-            const index = prev.length;
-            setTimeout(() => simulateUpload(index), 100);
-            return [...prev, item];
-        });
-        });
-    };
-
-    const removeFile = (index: number) => {
-        setFiles((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const clearAll = () => {
-        setFiles([]);
-    };
+    
 
   return (
-    <DashboardLayout>
-        <div
-        className={`relative w-full min-h-[1000px] p-4
-          ${isCollapsed ? "ml-[50px]" : "ml-0"}
-        `}
-        style={{
-          backgroundRepeat: "no-repeat",
-            transform: "scale(0.96)",
-          transformOrigin: "top center",
-        }}
+    <div className="flex flex-col gap-2  ">
+
+
+      {/* Main 80% section */}
+      <div
+        className="flex  items-center skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg  bg-white cursor-pointer hover:bg-gray-50"
       >
-             <svg
-                    width="1292"
-                    height="678"
-                    viewBox="0 0 1292 678"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMid meet"
-                    >
-                    <g filter="url(#filter0_dd_12905_50619)">
-                        <path
-                        d="M1005.62 86.1074C1005.62 108.199 1023.53 126.107 1045.62 126.107H1232C1254.09 126.107 1272 144.016 1272 166.107V364C1272 386.091 1254.09 404 1232 404H594.999C572.908 404 554.999 421.909 554.999 444V606C554.999 628.091 537.09 646 514.999 646H60C37.9086 646 20 628.091 20 606V352.315C20 330.224 37.9086 312.315 60 312.315H284.618C306.71 312.315 324.618 294.407 324.618 272.315V48C324.618 25.9086 342.527 8 364.618 8H965.618C987.71 8 1005.62 25.9086 1005.62 48V86.1074Z"
-                        fill="#FFEB9C"
-                        />
-                    </g>
 
-                    <defs>
-                        <filter
-                        id="filter0_dd_12905_50619"
-                        x="0"
-                        y="0"
-                        width="1292"
-                        height="678"
-                        filterUnits="userSpaceOnUse"
-                        colorInterpolationFilters="sRGB"
-                        >
-                        <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                        <feColorMatrix
-                            in="SourceAlpha"
-                            type="matrix"
-                            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                            result="hardAlpha"
-                        />
-                        <feMorphology
-                            radius="4"
-                            operator="erode"
-                            in="SourceAlpha"
-                            result="effect1_dropShadow_12905_50619"
-                        />
-                        <feOffset dy="12" />
-                        <feGaussianBlur stdDeviation="12" />
-                        <feComposite in2="hardAlpha" operator="out" />
-                        <feColorMatrix
-                            type="matrix"
-                            values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0"
-                        />
-                        <feBlend
-                            mode="normal"
-                            in2="BackgroundImageFix"
-                            result="effect1_dropShadow_12905_50619"
-                        />
-                        <feColorMatrix
-                            in="SourceAlpha"
-                            type="matrix"
-                            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                            result="hardAlpha"
-                        />
-                        <feOffset />
-                        <feGaussianBlur stdDeviation="1" />
-                        <feComposite in2="hardAlpha" operator="out" />
-                        <feColorMatrix
-                            type="matrix"
-                            values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0"
-                        />
-                        <feBlend
-                            mode="normal"
-                            in2="effect1_dropShadow_12905_50619"
-                            result="effect2_dropShadow_12905_50619"
-                        />
-                        <feBlend
-                            mode="normal"
-                            in="SourceGraphic"
-                            in2="effect2_dropShadow_12905_50619"
-                            result="shape"
-                        />
-                        </filter>
-                    </defs>
-                </svg>
-      
+        {/* Left spacer */}
+        <div className="w-6 h-full flex-none"></div>
 
-
-                {/* =======================
-                    ROTATED CARD WITH IMAGE
-                ======================= */}
-                <div
-                className="absolute   overflow-hidden"
-                style={{
-                    top: "25px",
-                    left: "45px",
-                    width: "275px",
-                    height: "277px",
-                    borderRadius: "24px",
-                    backgroundColor: "#FFFFFF",
-                    boxShadow: "0px 0px 2px rgba(145, 158, 171, 0.2), 0px 12px 24px -4px rgba(145, 158, 171, 0.12)",
-                    zIndex: 2,
-                }}
-                >
-                {/* IMAGE */}
-                <div
-                    className="absolute overflow-hidden"
-                    style={{
-                    top: "20px", // adjust inside the rotated card
-                    left: "20px",
-                    width: "85%",
-                    height: "85%",
-                    borderRadius: "20px",
-                    backgroundColor: "#E0E0E0",
-                    zIndex: 3,
-            
-                    }}
-                >
-                    {company?.image ? (
-                    <img
-                        src={company.image}
-                        alt={company.name}
-                        style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        }}
-                    />
-                    ) : (
-                    <div
-                        style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "14px",
-                        color: "#888",
-                        }}
-                    >
-                        No Image
-                    </div>
-                    )}
-                </div>
-                </div>
-
-                {/* =======================
-                   Corporate  CARD
-                ======================= */}
-                <div
-                className="absolute left-[375px] top-[55px] w-[627px] h-[263px] flex flex-col items-start gap-6"
-                >
-                <h4 className="font-publicSans font-bold text-[24px] leading-[36px] text-black m-0">
-                    Corporate
-                </h4>
-                <p className="font-publicSans font-normal text-[16px] leading-[24px] text-black m-0">
-                  {company?.corporate}
-                </p>
-                </div>
-                
-                {/* =======================
-                   Verification  CARD
-                ======================= */}
-                <div
-                className="absolute left-[1050px] top-[25px]"
-                style={{
-                    height: "98.32px",
-                    width: "245.83px",
-                    background: "#FFFFFF",
-                    boxShadow:
-                    "0px 0px 2px rgba(145, 158, 171, 0.2), 0px 12px 24px -4px rgba(145, 158, 171, 0.12)",
-                    borderRadius: "24px",
-                    overflow: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "0",
-                    gap: "3px",
-                }}
-                >
-                {/* Button */}
-                <div
-                    style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: "0px 12px",
-                    gap: "8px",
-                    width: "193px",
-                    minWidth: "64px",
-                    height: "36px",
-                    background: "#FFEB9C",
-                    borderRadius: "8px",
-                    fontFamily: "'Public Sans', sans-serif",
-                    fontWeight: 700,
-                    fontSize: "14px",
-                    lineHeight: "24px",
-                    color: "#1E1E1E",
-                    border: "none",
-                    }}
-                >
-                    {/* Start icon (hidden) */}
-                    <span style={{ display: "none", width: "20px", height: "20px" }} />
-
-                    {/* Label */}
-                    <span
-                    style={{
-                        width: "55px",
-                        height: "24px",
-                        display: "flex",
-                        alignItems: "center",
-                        textAlign: "center",
-                    }}
-                    >
-                    {company?.status}
-                    </span>
-
-                    {/* End icon (hidden) */}
-                    <span style={{ display: "none", width: "20px", height: "20px" }} />
-                </div>
-
-                {/* Caption */}
-                <span
-                    style={{
-                    width: "193px",
-                    height: "18px",
-                    fontFamily: "'Public Sans', sans-serif",
-                    fontWeight: 400,
-                    fontSize: "12px",
-                    lineHeight: "18px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center", // <-- add this
-                    textAlign: "center",
-                    color: "#1C252E",
-                    }}
-                >
-                    Verification
-                </span>
-                </div>
-
-
-                {/* =======================
-                   Address  CARD
-                ======================= */}
-                <div
-                className="absolute left-[1050px] top-[175px]"
-                style={{
-                    width: "245.83px",
-                    overflow: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                    padding: "0",
-                    gap: "10px",
-                }}
-                >
-                    {/* Address Title */}
-                    <h6 className="font-semibold text-[20px] leading-[28px] text-black">
-                    Address
-                    </h6>
-
-                    {/* Frame 338 */}
-                    <div className="flex flex-col items-start  gap-[20px]"
-                        >
-                        {/* Frame 336 - Location */}
-                        <div className="flex items-center  gap-[14px]">
-                            {/* Location Icon */}
-                            <div className="relative w-[24px] h-[24px]">
-                            {/* replace with your actual icon */}
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C14.3869 2 16.6761 2.94821 18.364 4.63604C20.0518 6.32387 21 8.61305 21 11C21 14.074 19.324 16.59 17.558 18.395C16.6755 19.2869 15.7128 20.0956 14.682 20.811L14.256 21.101L14.056 21.234L13.679 21.474L13.343 21.679L12.927 21.921C12.6445 22.0818 12.325 22.1663 12 22.1663C11.675 22.1663 11.3555 22.0818 11.073 21.921L10.657 21.679L10.137 21.359L9.945 21.234L9.535 20.961C8.42298 20.2083 7.38707 19.3489 6.442 18.395C4.676 16.588 3 14.074 3 11C3 8.61305 3.94821 6.32387 5.63604 4.63604C7.32387 2.94821 9.61305 2 12 2ZM12 8C11.606 8 11.2159 8.0776 10.8519 8.22836C10.488 8.37913 10.1573 8.6001 9.87868 8.87868C9.6001 9.15726 9.37913 9.48797 9.22836 9.85195C9.0776 10.2159 9 10.606 9 11C9 11.394 9.0776 11.7841 9.22836 12.1481C9.37913 12.512 9.6001 12.8427 9.87868 13.1213C10.1573 13.3999 10.488 13.6209 10.8519 13.7716C11.2159 13.9224 11.606 14 12 14C12.7956 14 13.5587 13.6839 14.1213 13.1213C14.6839 12.5587 15 11.7956 15 11C15 10.2044 14.6839 9.44129 14.1213 8.87868C13.5587 8.31607 12.7956 8 12 8Z" fill="#1E1E1E"/>
-                            </svg>
-                            </div>
-                            {/* Address Label */}
-                            <span className="text-[14px] leading-[22px] text-[#1E1E1E]">
-                            {company?.address}
-                            </span>
-                        </div>
-
-                        {/* Frame 337 - Phone */}
-                        <div className="flex items-center gap-[14px]">
-                            {/* Phone Icon */}
-                            <div className="relative w-[32px] h-[32px]">
-                            {/* replace with your actual icon */}
-                            <svg width="24" height="23" viewBox="0 0 24 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16.7425 14.5413L16.1358 15.1453C16.1358 15.1453 14.6918 16.58 10.7518 12.6626C6.81181 8.74531 8.25581 7.31064 8.25581 7.31064L8.63714 6.92931C9.57981 5.99331 9.66914 4.48931 8.84647 3.39064L7.16647 1.14664C6.14781 -0.213361 4.18114 -0.393361 3.01448 0.766639L0.921142 2.84664C0.343808 3.42264 -0.0428587 4.16664 0.003808 4.99331C0.123808 7.10931 1.08114 11.66 6.41981 16.9693C12.0825 22.5986 17.3958 22.8226 19.5678 22.62C20.2558 22.556 20.8531 22.2066 21.3345 21.7266L23.2278 19.844C24.5078 18.5733 24.1478 16.3933 22.5105 15.504L19.9638 14.1186C18.8891 13.5346 17.5825 13.7066 16.7425 14.5413Z" fill="#1E1E1E"/>
-                            </svg>
-                            </div>
-                            {/* Phone Label */}
-                            <span className="text-[14px] leading-[22px] text-[#1E1E1E]">
-                            {company?.phoneNumber}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* =======================
-                   Profile Ranking 
-                ======================= */}
-                <div
-                    style={{
-                        position: "absolute",
-                        height: "260px",
-                        width: "500px",
-                        left: "70px",
-                        top: "355px",
-                        overflow: "hidden",
-                        display: "flex",
-                        flexDirection: "row", // Row layout for ranking + programs side by side
-                        gap: "24px",
-                    }}
-                    >
-                    {/* Profile Ranking Section */}
-                    <div
-                        style={{
-                        position: "relative",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "250px",
-                        height: "260px",
-                        }}
-                    >
-                        {/* Background number */}
-                        <div
-                        style={{
-                            fontFamily: "Barlow, sans-serif",
-                            fontWeight: 800,
-                            fontSize: "200px",
-                            lineHeight: "175px",
-                            color: "rgba(23, 23, 23, 0.32)",
-                            width: "225px",
-                            height: "175px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                        >
-                        {company ? company.profileRanking : "N/A"}
-                        </div>
-
-                        {/* Label */}
-                        <h4
-                        style={{
-                            position: "absolute",
-                            left: "70px",
-                            top: "85px",
-                            fontFamily: "'Public Sans', sans-serif",
-                            fontWeight: 700,
-                            fontSize: "24px",
-                            lineHeight: "36px",
-                            color: "#1E1E1E",
-                        }}
-                        >
-                        Profile Ranking
-                        </h4>
-
-                        {/* Progress */}
-                        <div
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            gap: "8px",
-                            width: "220px",
-                            height: "81px",
-                            padding: "5px",
-                            backdropFilter: "blur(17px)",
-                            borderRadius: "21px",
-                        }}
-                        >
-                        <div
-                            style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            width: "154px",
-                            height: "19px",
-                            }}
-                        >
-                            <span
-                            style={{
-                                fontFamily: "'Public Sans', sans-serif",
-                                fontWeight: 700,
-                                fontSize: "12px",
-                                lineHeight: "18px",
-                                textTransform: "uppercase",
-                                color: "#1E1E1E",
-                            }}
-                            >
-                            Profile Complete
-                            </span>
-                            <span
-                            style={{
-                                fontFamily: "'Public Sans', sans-serif",
-                                fontWeight: 700,
-                                fontSize: "12px",
-                                lineHeight: "18px",
-                                textTransform: "uppercase",
-                                color: "#1E1E1E",
-                            }}
-                            >
-                            {company?.progress}%
-                            </span>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div
-                            style={{
-                            position: "relative",
-                            width: "220px",
-                            height: "16px",
-                            background: "#1E1E1E",
-                            transform: "skewX(-20deg)",
-                            borderRadius: "4px",
-                            }}
-                        >
-                            <div
-                            style={{
-                                position: "absolute",
-                                left: "0.5px",
-                                top: "50%",
-                                height: "14px",
-                                transform: "translateY(-50%)",
-                                borderRadius: "4px",
-                                background: "#FFEB9C",
-                                width: `${company?.progress}%`,
-                            }}
-                            />
-                        </div>
-                        </div>
-                    </div>
-
-                    {/* Programs Section */}
-                    <div
-                        style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start",
-                        gap: "16px",
-                        width: "208px",
-                        }}
-                    >
-                        {/* Programs Label */}
-                        <div
-                        style={{
-                            width: "208px",
-                            height: "28px",
-                            fontFamily: "'Public Sans', sans-serif",
-                            fontWeight: 600,
-                            fontSize: "18px",
-                            lineHeight: "28px",
-                            color: "#000000",
-                        }}
-                        >
-                        Programs
-                        </div>
-
-                        {/* Programs Buttons */}
-                        <div
-                        style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        alignItems: "flex-start",
-                        gap: "16px",
-                        width: "208px",
-                        overflowY: "auto",     // ✅ enable vertical scroll
-                        overflowX: "hidden",  // ✅ prevent horizontal scroll
-                        paddingRight: "4px",  // optional: space for scrollbar
-                        }}
-                        >
-                        {company?.programs?.map((program, index) => (
-                            <div
-                            key={index}
-                            style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                padding: "6px 12px",
-                                gap: "8px",
-                                border: "1px solid #1E1E1E",
-                                borderRadius: "8px",
-                                fontFamily: "'Public Sans', sans-serif",
-                                fontWeight: 700,
-                                fontSize: "14px",
-                                lineHeight: "24px",
-                                color: "#1E1E1E",
-                            }}
-                            >
-                            {program}
-                            </div>
-                        ))}
-                        </div>
-                    </div>
-                </div>
-
-              {/* =======================
-                Current Employee
-                ======================= */}
-            <div
-            className="flex flex-row gap-4 overflow-x-auto overflow-y-hidden no-scrollbar"
-            style={{
-                position: "absolute",
-                width: "535px",
-                height: "295px", // container height
-                left: "45px",
-                top: "690px",
-                background: "#FFFFFF",
-                boxShadow:
-                "0px 0px 2px rgba(145, 158, 171, 0.2), 0px 12px 24px -4px rgba(145, 158, 171, 0.12)",
-                borderRadius: "24px",
-                padding: "16px", // optional
-                
+         {/* Checkbox */}
+        {showCheckbox && (
+          <div
+            className="flex items-center skew-x-[12deg] justify-center w-11 h-full pl-2 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation(); // 🔥 prevent row click
+              setChecked((prev) => !prev);
             }}
+          >
+            {checked ? (
+              /* ✅ SELECTED SVG */
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path
+                  d="M15.0537 9.16113C16.6809 7.53396 19.3191 7.53395 20.9463 9.16113L26.8389 15.0537C28.4659 16.6809 28.466 19.3192 26.8389 20.9463L20.9463 26.8389C19.3192 28.466 16.6809 28.4659 15.0537 26.8389L9.16113 20.9463C7.53395 19.3191 7.53396 16.6809 9.16113 15.0537L15.0537 9.16113Z"
+                  fill="#FFEB9C"
+                />
+                <path
+                  d="M31.5873 8.96738C25.7014 13.6017 22.2888 16.641 18.7083 22.3035C18.6366 22.4169 18.4767 22.4333 18.3856 22.3348L12.7212 16.2001C12.6426 16.115 12.6504 15.9817 12.7383 15.9064L15.8265 13.2606C15.9194 13.181 16.0609 13.2004 16.129 13.3019L18.3444 16.6048C24.2049 11.4469 29.2798 9.33343 31.3963 8.61265C31.6142 8.53845 31.7681 8.82499 31.5873 8.96738Z"
+                  fill="#1E1E1E"
+                />
+              </svg>
+            ) : (
+              /* ⬜ UNSELECTED SVG */
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M20.9463 9.16112C19.3191 7.53394 16.6809 7.53394 15.0537 9.16112L9.16117 15.0537C7.53398 16.6809 7.53398 19.319 9.16117 20.9462L15.0537 26.8388C16.6809 28.466 19.3191 28.466 20.9463 26.8388L26.8388 20.9462C28.466 19.319 28.466 16.6809 26.8388 15.0537L20.9463 9.16112ZM20.357 10.3396C19.0553 9.03789 16.9447 9.03789 15.643 10.3396L10.3397 15.6429C9.03793 16.9447 9.03793 19.0552 10.3397 20.357L15.643 25.6603C16.9447 26.962 19.0553 26.962 20.357 25.6603L25.6603 20.357C26.9621 19.0552 26.9621 16.9447 25.6603 15.6429L20.357 10.3396Z"
+                  fill="#637381"
+                />
+              </svg>
+            )}
+          </div>
+        )}
+
+        {/* Applicant Info */}
+        <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 ">
+          {/* CO-ID */}
+          <div className="flex flex-col justify-center w-[160px] ">
+            <span className="text-sm font-semibold text-gray-900">{payment.paymentId}</span>
+            <span className="text-xs text-gray-400">Payment ID</span>
+          </div>
+
+          {/* End Date */}
+          <div className="flex flex-col justify-center w-[160px]">
+            <span className="text-sm font-semibold text-gray-900">{payment.nextPayment}</span>
+            <span className="text-xs text-gray-400">Next Payment</span>
+          </div>
+
+          {/* Contract Status */}
+          <div className="flex flex-col justify-center items-center  ">
+            <div
+              className={`
+                ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8] text-xs font-semibold flex items-center justify-center
+                ${payment.status === "Paid" ? "bg-[#D3FCD2] border border-[#22C55E] text-[#22C55E]" : ""}
+                ${payment.status === "Upcoming" ? "bg-[#DFE3E8] border border-black text-black" : ""}
+              `}
             >
-       
-            {company?.applicantIds
-                ?.map((applicantId) =>
-                mockApplicants.find((a) => a.applicantId === applicantId)
-                )
-                ?.filter(Boolean) // remove undefined
-                .map((applicant) => (
-                <div
-                    key={applicant!.applicantId}
-                    className="flex-shrink-0" // prevents shrinking
-                    style={{
-                    transform: "scale(0.6)", // scale down to fit container
-                    transformOrigin: "top left",
-                    marginRight: "-120px", // tweak this to remove extra gap
-                    }}
-                >
-                    <ApplicantCard
-                    applicant={applicant!}
-                    onClick={() => console.log(applicant!.applicantId)}
-                    />
-                </div>
-                ))}
+              {payment.status}
             </div>
-            
+            <span className="text-xs text-gray-400">payment Status</span>
+          </div>
+
+        </div>
+      </div>
+
+  
+    </div>
+  );
+};
 
 
-               {/* =======================
-                        Documents
-                ======================= */}
-                <div
-                style={{
-                    position: "absolute",
-                    width: "329px",
-                    height: "535.33px",
-                    left: "605px",
-                    top: "450px",
-                    background: "#FFFFFF",
-                    boxShadow:
-                    "0px 0px 2px rgba(145, 158, 171, 0.2), 0px 12px 24px -4px rgba(145, 158, 171, 0.12)",
-                    borderRadius: "24px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    padding: "24px",
-                    boxSizing: "border-box",
-                }}
-                >
-                <div style={{ width: "100%", maxWidth: "420px" }}>
-                    {/* Upload Box */}
-                    <div
-                        onClick={() => document.getElementById("file-input")?.click()}
-                        onDragOver={(e) => {
-                        e.preventDefault();
-                        setDragging(true);
-                        }}
-                        onDragLeave={() => setDragging(false)}
-                        onDrop={(e) => {
-                        e.preventDefault();
-                        setDragging(false);
-                        handleFiles(Array.from(e.dataTransfer.files));
-                        }}
-                        style={{
-                        height: "130px",
-                        borderRadius: "16px",
-                        background: dragging ? "#FFF7CC" : "#F5F5F5",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        cursor: "pointer",
-                        }}
+
+
+export default function contractDetailPage() {
+    const [review, setReview] = useState("");
+    const [starRating, setStarRating] = useState(0);
+
+
+    
+   const { contractId } = useParams();
+  const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState<"Description" | "Company Details">(
+    "Description"
+  );
+
+  // Find contract by ID from mockContracts
+  const contract = mockContracts.find(
+    (c) => c.id.toString() === contractId
+  );
+
+  if (!contract) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 text-center">
+          <h2 className="text-xl font-bold">contract Not Found</h2>
+          <button
+            className="mt-4 px-4 py-2 bg-yellow-300 rounded hover:bg-yellow-400"
+            onClick={() => router.back()}
+          >
+            Go Back
+          </button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+
+    const payments = useMemo(() => {
+  return mockPayments.filter(
+    (p) => p.contractId.toString() === contractId
+  );
+}, [contractId]);
+
+
+const reviews = mockReviews
+
+  return (
+    
+    <DashboardLayout>
+        <div className="px-4 sm:px-6 lg:px-6 py-6">
+            <div className="flex gap-6">
+            <div className="w-1/2">
+                {/* Tabs */}
+                <div className="flex gap-4 mb-6">
+                    {/* Description */}
+                    <button
+                    onClick={() => setActiveTab("Description")}
+                    className={
+                        activeTab === "Description"
+                        ? "relative w-[180px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center rounded-md transition hover:scale-105"
+                        : "w-[180px] h-[40px] flex items-center justify-center text-black/60 hover:text-black"
+                    }
                     >
-                        <input
-                        id="file-input"
-                        type="file"
-                        multiple
-                        accept="image/*,application/pdf"
-                        style={{ display: "none" }}
-                        onChange={(e) =>
-                            e.target.files && handleFiles(Array.from(e.target.files))
-                        }
-                        />
+                    <span className={activeTab === "Description" ? "skew-x-[12deg] font-semibold" : ""}>
+                        Description
+                    </span>
+                    </button>
 
-                        <img
-                        src="/illustrations/upload.svg"
-                        alt="Upload"
-                        style={{ width: "90px", pointerEvents: "none" }}
-                        />
+                    {/* Job Details */}
+                    <button
+                    onClick={() => setActiveTab("Company Details")}
+                    className={
+                        activeTab === "Company Details"
+                        ? "relative w-[180px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center rounded-md transition hover:scale-105"
+                        : "w-[180px] h-[40px] flex items-center justify-center text-black/60 hover:text-black"
+                    }
+                    >
+                    <span className={activeTab === "Company Details" ? "skew-x-[12deg] font-semibold" : ""}>
+                        Company Details
+                    </span>
+                    </button>
+                </div>
 
-                        <div style={{ fontWeight: 600, marginTop: "8px" }}>
-                        Drop or select files
-                        </div>
+                {/* Content */}
+                {activeTab === "Description" && (
+                    <div className="flex flex-col gap-6">
+                      <section>
+                          <h2 className="font-semibold text-xl mb-2">Job Description</h2>
+                          <p>{contract.jobDescription}</p>
+                      </section>
+
+                      <section>
+                          <h3 className="font-semibold mb-2">Key Responsibilities</h3>
+                          <ul className="list-disc pl-6 space-y-1">
+                          {contract.keyResponsibilities.map((item, i) => (
+                              <li key={i}>{item}</li>
+                          ))}
+                          </ul>
+                      </section>
+
+                      <section>
+                          <h3 className="font-semibold mb-2">Why You'll Love Working Here</h3>
+                          <ul className="list-disc pl-6 space-y-1">
+                          {contract.whyYoullLoveWorkingHere.map((item, i) => (
+                              <li key={i}>{item}</li>
+                          ))}
+                          </ul>
+                      </section>
+
+                      {/* Skills */}
+                        <section>
+                          <h3 className="font-semibold mb-2">Skills</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {contract.skills.map((skill, i) => (
+                              <span
+                                key={i}
+                                className="px-3 py-1 text-sm skew-x-[-12deg]  rounded-[6px] border border-black "
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </section>
+
+                        {/* Benefits */}
+                        <section>
+                          <h3 className="font-semibold mb-2">Benefits</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {contract.benefits.map((benefit, i) => (
+                              <span
+                                key={i}
+                                className="px-3 py-1 text-sm skew-x-[-12deg]  rounded-[6px] border border-black "
+                              >
+                                {benefit}
+                              </span>
+                            ))}
+                          </div>
+                        </section>
+
+
                     </div>
+                )}
+                {/* Content */}
+                {activeTab === "Company Details" && (() => {
+                  // Find the company for this contract
+                  const company = mockCompanies.find(c => c.id === contract.companyId);
 
-                    {/* Clear All */}
-                    {files.length > 0 && (
-                        <button
-                        onClick={clearAll}
-                        style={{
-                            marginTop: "12px",
-                            background: "none",
-                            border: "none",
-                            color: "#D32F2F",
-                            cursor: "pointer",
-                        }}
-                        >
-                        Clear all
-                        </button>
-                    )}
+                  if (!company) {
+                    return <div>Company not found</div>;
+                  }
 
-                        {/* File List */}
-                        <div
-                        style={{
-                            marginTop: "16px",
+                  return (
+                    <div>
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={company.image}
+                          alt={company.name}
+                          className="w-24 h-24 rounded-lg object-cover"
+                        />
+                        <div>
+                          <h2 className="text-xl font-bold">{company.name}</h2>
+                          <p className="text-sm text-gray-600">{company.city}</p>
+                          <p className="text-sm text-gray-600">{company.address}</p>
+                          <p className="text-sm text-gray-600">Email: {company.email}</p>
+                          <p className="text-sm text-gray-600">Phone: {company.phoneNumber}</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="font-semibold mt-4 mb-2">Corporate Info</h3>
+                        <p className="text-sm text-gray-700">{company.corporate}</p>
+                      </div>
+
+                      <div className="flex flex-wrap  gap-2 mt-4">
+                        <span className="px-3 py-1 text-sm  rounded-[6px] bg-[#FFEB9C] ">
+                          Employees: {company.employeeNumber}
+                        </span>
+                        <span className="px-3 py-1 text-sm  rounded-[6px] bg-[#FFEB9C] ">
+                          Profile Ranking: {company.profileRanking}
+                        </span>
+                        <span className="px-3 py-1 text-sm  rounded-[6px] bg-[#FFEB9C] ">
+                          Status: {company.status}
+                        </span>
+                      </div>
+
+                      <div className="mt-4">
+                        <h3 className="font-semibold mb-2">Programs</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {company.programs.map((program, i) => (
+                            <span
+                              key={i}
+                              className="px-3 py-1 text-sm skew-x-[-12deg]  rounded-[6px] border border-black "
+                            >
+                              {program}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+            </div>
+
+            <div className="w-1/2 flex items-start">
+                <div className="flex flex-col gap-2 w-full">
+                    <div className="w-full ">
+
+                        {/* Current Employee Label */}
+                        <h3 className="text-lg font-semibold mb-4">
+                        Current Employee
+                        </h3>
+                        {/* Skewed outer box */}
+
+  
+
+                        {/* Unskewed inner container */}
+                        <div className="">
+
+                          {/* Horizontal scroll row */}
+                          <div className="flex scale-[0.9] gap-4 overflow-x-auto no-scrollbar">
+                            {mockApplicants
+                              .filter(applicant =>
+                                contract.applicantIds.includes(Number(applicant.applicantId))
+                              )
+                              .map(applicant => (
+                                <ApplicantCard
+                                  key={applicant.applicantId}
+                                  applicant={applicant}
+                                  onClick={() => console.log(applicant.applicantId)}
+                                />
+                              ))
+                            }
+                          </div>
+
+
+                        </div>
+  
+
+
+                    </div>
+                    {/* Review Label */}
+                        <h3 className="text-lg font-semibold mb-4">
+                        Review
+                        </h3>
+
+                         <div
+                          style={{
+                            maxHeight: "400px",
+                            overflowY: "auto",
                             display: "flex",
                             flexDirection: "column",
-                            gap: "12px",
-                            overflowY: "auto",           // enable vertical scroll
-                            maxHeight: "300px",           // adjust according to your container
-                            width: "100%",                // fill parent width
-                            paddingRight: "4px",          // optional: for scrollbar space
-                        }}
+                            gap: "16px",
+                            padding: "12px",        // ✅ IMPORTANT
+                            paddingLeft: "20px",    // extra space for skew
+                            paddingRight: "20px",
+                          }}
                         >
-                        {files.map((item, index) => (
-                        <div
-                        key={index}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "12px",
-                            padding: "12px",
-                            borderRadius: "12px",
 
-                        }}
-                        >
-                            {/* Preview */}
-                            {item.preview ? (
-                            <img
-                                src={item.preview}
-                                style={{
-                                width: "48px",
-                                height: "48px",
-                                objectFit: "cover",
-                                borderRadius: "8px",
-                                }}
-                            />
-                            ) : (
-                            <div
-                                style={{
-                                width: "48px",
-                                height: "48px",
-                                borderRadius: "8px",
-                                background: "#D32F2F",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontWeight: 700,
-                                }}
-                            >
-                               <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19.2895 24.2922H9.66699V25.5217C9.66699 25.9801 9.84904 26.4196 10.1731 26.7437C10.4972 27.0678 10.9367 27.2499 11.395 27.25H24.439C24.8973 27.2499 25.3368 27.0679 25.6608 26.7438C25.9848 26.4198 26.1669 25.9803 26.167 25.522V10.8123L20.1045 4.75H11.395C10.9367 4.75 10.4972 4.93206 10.1731 5.25612C9.84905 5.58018 9.66699 6.01971 9.66699 6.478V15.3322H19.2895C19.5056 15.3322 19.7129 15.4181 19.8658 15.571C20.0186 15.7238 20.1045 15.9311 20.1045 16.1472V23.4772C20.1044 23.6934 20.0185 23.9006 19.8657 24.0535C19.7129 24.2063 19.5056 24.2922 19.2895 24.2922Z" fill="#EAEAE4"/>
-                                <path d="M26.167 10.8123L20.1045 4.75V9.08425C20.1046 9.54252 20.2866 9.98201 20.6107 10.3061C20.9347 10.6301 21.3742 10.8122 21.8325 10.8123H26.167Z" fill="#BABAB9"/>
-                                <path d="M19.2895 15.332H6.64703C6.19692 15.332 5.83203 15.6969 5.83203 16.147V23.477C5.83203 23.9271 6.19692 24.292 6.64703 24.292H19.2895C19.7396 24.292 20.1045 23.9271 20.1045 23.477V16.147C20.1045 15.6969 19.7396 15.332 19.2895 15.332Z" fill="#F24646"/>
-                                <path d="M9.20891 20.4443C9.99091 20.4443 10.5684 19.9405 10.5684 19.2265C10.5684 18.5125 9.99091 18.0088 9.20891 18.0088H7.58691V21.615H8.35866V20.4443H9.20891ZM8.35891 18.7175H9.12416C9.50741 18.7175 9.76966 18.9175 9.76966 19.2265C9.76966 19.5355 9.50741 19.7358 9.12416 19.7358H8.35866L8.35891 18.7175Z" fill="#FFFCEE"/>
-                                <path d="M14.7102 19.8098C14.7102 18.7548 13.8495 18.0098 12.637 18.0098H11.3457V21.6155H12.637C13.849 21.6155 14.7102 20.8648 14.7102 19.8098ZM12.7367 20.9123H12.1172V18.7123H12.7367C12.8871 18.7026 13.0378 18.724 13.1796 18.7749C13.3214 18.8258 13.4513 18.9053 13.5612 19.0084C13.6711 19.1114 13.7587 19.236 13.8186 19.3742C13.8785 19.5125 13.9093 19.6616 13.9093 19.8123C13.9093 19.9629 13.8785 20.112 13.8186 20.2503C13.7587 20.3886 13.6711 20.5131 13.5612 20.6162C13.4513 20.7193 13.3214 20.7987 13.1796 20.8497C13.0378 20.9006 12.8871 20.9219 12.7367 20.9123Z" fill="#FFFCEE"/>
-                                <path d="M18.349 18.707V18.0088H15.5723V21.615H16.349V20.1873H18.16V19.489H16.349V18.707H18.349Z" fill="#FFFCEE"/>
-                                </svg>
-                            </div>
-                            )}
-
-                            {/* Info */}
-                            <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 600 }}>
-                            {item.file.name.length > 15 
-                                ? item.file.name.slice(0, 15) + "..." 
-                                : item.file.name}
-                            </div>
-                            <div style={{ fontSize: "12px", color: "rgba(23,23,23,0.48)" }}>
-                                {(item.file.size / 1024 / 1024).toFixed(2)} MB
-                            </div>
-
-                            {/* Progress */}
-                            <div
-                                style={{
-                                height: "6px",
-                                background: "#E0E0E0",
-                                borderRadius: "4px",
-                                marginTop: "6px",
-                                }}
-                            >
-                                <div
-                                style={{
-                                    width: `${item.progress}%`,
-                                    height: "100%",
-                                    background: item.error
-                                    ? "#D32F2F"
-                                    : item.uploading
-                                    ? "#FFAB00"
-                                    : "#00C853",
-                                }}
-                                />
-                            </div>
-
-                            {item.error && (
-                                <div style={{ color: "#D32F2F", fontSize: "12px" }}>
-                                {item.error}
-                                </div>
-                            )}
-                            </div>
-
-                            {/* Actions */}
-                            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                            {item.error && (
-                                <button
-                                onClick={() => simulateUpload(index)}
-                                style={{
-                                    border: "none",
-                                    background: "#FFAB00",
-                                    borderRadius: "6px",
-                                    padding: "4px 8px",
-                                    cursor: "pointer",
-                                }}
-                                >
-                                Retry
-                                </button>
-                            )}
-
-                            <button
-                                onClick={() => removeFile(index)}
-                                style={{
-                                border: "none",
-                                background: "#D32F2F",
-                                color: "#FFF",
-                                borderRadius: "55px",
-                                padding: "5px 10px",
-                                cursor: "pointer",
-                                }}
-                            >
-                                ✕
-                            </button>
-                            </div>
-                        </div>
-                        ))}
-                    </div>
-                    </div>
-                </div>
-
-
-               {/* =======================
-                    Review CARD
-                ======================= */}
-                <div
-                style={{
-                    position: "absolute",
-                    height: "535.33px",
-                    width: "329px",
-                    left: "965px",
-                    top: "450px",
-                    background: "#FFFFFF",
-                    boxShadow:
-                    "0px 0px 2px rgba(145, 158, 171, 0.2), 0px 12px 24px -4px rgba(145, 158, 171, 0.12)",
-                    borderRadius: "24px",
-                    overflow: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                    padding: "16px",
-                    boxSizing: "border-box",
-                }}
-                >
-                <h4
-                    style={{
-                    fontFamily: "'Public Sans', sans-serif",
-                    fontWeight: 700,
-                    fontSize: "18px",
-                    marginBottom: "12px",
-                    }}
-                >
-                    Reviews
-                </h4>
-
-                <div
-                    style={{
-                    flex: 1,
-                    overflowY: "auto",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "12px",
-                    }}
-                >
                {reviews.map((review) => (
-                    <div
+                    <div className="skew-x-[-12deg] rounded-[8px] max-w-[600px] h-[320px] shadow-lg bg-white  "
                         key={review.id}
                         style={{
                         padding: "12px",
@@ -1671,7 +1099,8 @@ export default function TopCompanyPage() {
                         }}
                     >
                         {/* Reviewer Info + Rating Stars */}
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div className="skew-x-[12deg] "
+                         style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         {/* Reviewer Info */}
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                             <img
@@ -1729,7 +1158,14 @@ export default function TopCompanyPage() {
                     ))}
 
                 </div>
+
+
+            
                 </div>
+            </div>
+
+
+    </div>
         </div>
 
     </DashboardLayout>

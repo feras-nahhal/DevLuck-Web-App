@@ -148,7 +148,7 @@ const Card = ({
       onClick?: () => void;
     }) => {
       return (
-        <div className="relative w-[437px] h-[217px]">
+        <div className="relative w-[400px] h-[200px]">
           {/* SVG Card Body */}
             <img 
               src="/cards/opportunityCard.svg" 
@@ -226,7 +226,7 @@ const Card = ({
             </div>
 
           {/* Job Number Label */}
-          <div className="absolute left-[77%] top-[8%] flex items-center justify-center w-20 bg-black/20 rounded-[6px]">
+          <div className="absolute left-[75%] top-[8%] flex items-center justify-center w-20 bg-black/20 rounded-[6px]">
             <span className="text-[12px] font-bold leading-[20px] text-[#1E1E1E] text-center">
               JOB - {jobNumber}
             </span>

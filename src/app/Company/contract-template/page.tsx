@@ -297,34 +297,31 @@ const ContractRow = ({ contract,onView,showCheckbox = false }: ContractRowProps)
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
 
           {/* Name */}
-          <div className="flex flex-col justify-center w-[150px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{contract.contractTitle.split(" ").slice(0, 2).join(" ")}</span>
             <span className="text-xs text-gray-400">Contract Name</span>
           </div>
 
-          {/* Next Payment */}
-          <div className="flex flex-col justify-center w-[150px]">
-            <span className="text-sm font-semibold text-gray-900">{contract.currency}</span>
-            <span className="text-xs text-gray-400">Currency</span>
+          {/* Monthly Allowance */}
+          <div className="flex flex-col justify-center w-[140px]">
+            <span className="text-sm font-semibold text-gray-900">{contract.monthlyAllowance} {contract.currency} </span>
+            <span className="text-xs text-gray-400">Monthly Allowance</span>
           </div>
+      
 
           {/* Monthly Allowance */}
-          <div className="flex flex-col justify-center w-[150px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{contract.duration}</span>
             <span className="text-xs text-gray-400">Duration</span>
           </div>
 
           {/* Transfer ID */}
-          <div className="flex flex-col justify-center w-[150px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{contract.workLocation}</span>
             <span className="text-xs text-gray-400">Work Location</span>
           </div>
 
-             {/* Monthly Allowance */}
-          <div className="flex flex-col justify-center w-[150px]">
-            <span className="text-sm font-semibold text-gray-900">{contract.monthlyAllowance}</span>
-            <span className="text-xs text-gray-400">Monthly Allowance</span>
-          </div>
+        
 
            {/* Note ID */}
           <div className="flex flex-col justify-center w-[140px]">
@@ -334,7 +331,7 @@ const ContractRow = ({ contract,onView,showCheckbox = false }: ContractRowProps)
 
 
           {/* Contract Status */}
-          <div className="flex flex-col justify-center items-center">
+          <div className="flex flex-col justify-center items-center w-[140px]">
             <div
               className={`
                 ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8] text-xs font-semibold flex items-center justify-center
@@ -420,42 +417,57 @@ export default function ContractTemplatePage() {
     const [showApplicants, setShowApplicants] = useState(true);
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingContract, setEditingContract] = useState<any>(null);
+    const [menuOpen, setMenuOpen] = useState(false);
   
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+   // Multi-select arrays instead of single string
+      type ContractStatus = "Running" | "Hold" | "Reject";
   
+      const CONTRACT_STATUSES: ContractStatus[] = ["Running", "Hold", "Reject"];
+      const [editingContract, setEditingContract] = useState<any>(null);
+      const [selectedContractStatus, setSelectedContractStatus] = useState<(ContractStatus | "All")[]>([]);
     // 🔍 Filter jobs
-    const filteredJobs = useMemo(() => {
-      if (!searchQuery.trim()) return mockContracts;
-  
-      return mockContracts.filter(Contract =>
-        Contract.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        Contract.createdDate.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        Contract.inContractNumber.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }, [searchQuery]);
-  
-    // 📄 Pagination
-    const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
-  
-    const paginatedJobs = filteredJobs.slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
-    );
-  
-    const goToPage = (page: number) => {
-      if (page >= 1 && page <= totalPages) setCurrentPage(page);
-    };
-  
-    const goToPrevious = () => {
-      if (currentPage > 1) setCurrentPage(prev => prev - 1);
-    };
-  
-    const goToNext = () => {
-      if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
-    };
-  
+const filteredJobs = useMemo(() => {
+  return mockContracts.filter(job => {
+    // Search filter
+    const searchMatch =
+      !searchQuery.trim() ||
+      job.contractTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job.inContractNumber.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Status filter (optional, like applicants)
+    const statusMatch =
+      selectedContractStatus.length === 0 || // empty = no filter
+      selectedContractStatus.includes("All") || // "All" = include all
+      selectedContractStatus.includes(job.status as ContractStatus);
+
+    return searchMatch && statusMatch;
+  });
+}, [searchQuery, selectedContractStatus]);
+
+// 📄 Pagination
+const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
+
+const paginatedJobs = filteredJobs.slice(
+  (currentPage - 1) * ITEMS_PER_PAGE,
+  currentPage * ITEMS_PER_PAGE
+);
+
+const goToPage = (page: number) => {
+  if (page >= 1 && page <= totalPages) setCurrentPage(page);
+};
+
+const goToPrevious = () => {
+  if (currentPage > 1) setCurrentPage(prev => prev - 1);
+};
+
+const goToNext = () => {
+  if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+};
+
   return (
     <DashboardLayout>
     <div className="px-4 sm:px-6 lg:px-8 py-6">
@@ -553,13 +565,92 @@ export default function ContractTemplatePage() {
               </button>
 
               {/* Second Filter Button */}
-              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all">
-                <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 16.5C14.3852 16.5002 14.7556 16.6486 15.0344 16.9144C15.3132 17.1802 15.479 17.5431 15.4975 17.9279C15.516 18.3127 15.3858 18.6898 15.1338 18.9812C14.8818 19.2726 14.5274 19.4558 14.144 19.493L14 19.5H10C9.61478 19.4998 9.24441 19.3514 8.96561 19.0856C8.68682 18.8198 8.52099 18.4569 8.50248 18.0721C8.48396 17.6873 8.61419 17.3102 8.86618 17.0188C9.11816 16.7274 9.47258 16.5442 9.856 16.507L10 16.5H14ZM17 10.5C17.3978 10.5 17.7794 10.658 18.0607 10.9393C18.342 11.2206 18.5 11.6022 18.5 12C18.5 12.3978 18.342 12.7794 18.0607 13.0607C17.7794 13.342 17.3978 13.5 17 13.5H7C6.60218 13.5 6.22064 13.342 5.93934 13.0607C5.65804 12.7794 5.5 12.3978 5.5 12C5.5 11.6022 5.65804 11.2206 5.93934 10.9393C6.22064 10.658 6.60218 10.5 7 10.5H17ZM20 4.5C20.3978 4.5 20.7794 4.65804 21.0607 4.93934C21.342 5.22064 21.5 5.60218 21.5 6C21.5 6.39782 21.342 6.77936 21.0607 7.06066C20.7794 7.34196 20.3978 7.5 20 7.5H4C3.60218 7.5 3.22064 7.34196 2.93934 7.06066C2.65804 6.77936 2.5 6.39782 2.5 6C2.5 5.60218 2.65804 5.22064 2.93934 4.93934C3.22064 4.65804 3.60218 4.5 4 4.5H20Z" fill="#1E1E1E"/>
+<button
+  className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+  onClick={(e) => {
+    e.stopPropagation();
+    setMenuOpen((prev) => !prev);
+  }}
+>
+  <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 16.5C14.3852 16.5002 14.7556 16.6486 15.0344 16.9144C15.3132 17.1802 15.479 17.5431 15.4975 17.9279C15.516 18.3127 15.3858 18.6898 15.1338 18.9812C14.8818 19.2726 14.5274 19.4558 14.144 19.493L14 19.5H10C9.61478 19.4998 9.24441 19.3514 8.96561 19.0856C8.68682 18.8198 8.52099 18.4569 8.50248 18.0721C8.48396 17.6873 8.61419 17.3102 8.86618 17.0188C9.11816 16.7274 9.47258 16.5442 9.856 16.507L10 16.5H14ZM17 10.5C17.3978 10.5 17.7794 10.658 18.0607 10.9393C18.342 11.2206 18.5 11.6022 18.5 12C18.5 12.3978 18.342 12.7794 18.0607 13.0607C17.7794 13.342 17.3978 13.5 17 13.5H7C6.60218 13.5 6.22064 13.342 5.93934 13.0607C5.65804 12.7794 5.5 12.3978 5.5 12C5.5 11.6022 5.65804 11.2206 5.93934 10.9393C6.22064 10.658 6.60218 10.5 7 10.5H17ZM20 4.5C20.3978 4.5 20.7794 4.65804 21.0607 4.93934C21.342 5.22064 21.5 5.60218 21.5 6C21.5 6.39782 21.342 6.77936 21.0607 7.06066C20.7794 7.34196 20.3978 7.5 20 7.5H4C3.60218 7.5 3.22064 7.34196 2.93934 7.06066C2.65804 6.77936 2.5 6.39782 2.5 6C2.5 5.60218 2.65804 5.22064 2.93934 4.93934C3.22064 4.65804 3.60218 4.5 4 4.5H20Z"
+        fill="#1E1E1E"
+      />
+    </svg>
+  </span>
+</button>
+
+{/* Action Menu – appears beside the button */}
+{menuOpen && (
+  <div
+    className="absolute top-95 right-20 mt-2 w-[420px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
+    onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+  >
+    <div className="p-2">
+      {/* Contract Status */}
+      <h6 className="px-2 skew-x-[12deg] py-1 font-semibold">Contract Status</h6>
+      <div className="flex gap-2">
+        {["All", ...CONTRACT_STATUSES].map((status) => {
+          const isSelected = selectedContractStatus.includes(status as ContractStatus | "All");
+
+          return (
+            <div
+              key={status}
+              className="flex items-center skew-x-[12deg] px-2 py-1 cursor-pointer hover:bg-gray-100 rounded-md"
+              onClick={() => {
+                if (status === "All") {
+                  setSelectedContractStatus(["All", ...CONTRACT_STATUSES]);
+                } else {
+                  setSelectedContractStatus((prev) =>
+                    prev.includes(status as ContractStatus)
+                      ? prev.filter((s) => s !== status && s !== "All") // remove it
+                      : [...prev.filter((s) => s !== "All"), status as ContractStatus] // add it
+                  );
+                }
+              }}
+            >
+              <div className="flex items-center justify-center w-9 h-9 mr-2">
+                {isSelected ? (
+                  /* ✅ SELECTED SVG */
+                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                    <path
+                      d="M15.0537 9.16113C16.6809 7.53396 19.3191 7.53395 20.9463 9.16113L26.8389 15.0537C28.4659 16.6809 28.466 19.3192 26.8389 20.9463L20.9463 26.8389C19.3192 28.466 16.6809 28.4659 15.0537 26.8389L9.16113 20.9463C7.53395 19.3191 7.53396 16.6809 9.16113 15.0537L15.0537 9.16113Z"
+                      fill="#FFEB9C"
+                    />
+                    <path
+                      d="M31.5873 8.96738C25.7014 13.6017 22.2888 16.641 18.7083 22.3035C18.6366 22.4169 18.4767 22.4333 18.3856 22.3348L12.7212 16.2001C12.6426 16.115 12.6504 15.9817 12.7383 15.9064L15.8265 13.2606C15.9194 13.181 16.0609 13.2004 16.129 13.3019L18.3444 16.6048C24.2049 11.4469 29.2798 9.33343 31.3963 8.61265C31.6142 8.53845 31.7681 8.82499 31.5873 8.96738Z"
+                      fill="#1E1E1E"
+                    />
                   </svg>
-                </span>
-              </button>
+                ) : (
+                  /* ⬜ UNSELECTED SVG */
+                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M20.9463 9.16112C19.3191 7.53394 16.6809 7.53394 15.0537 9.16112L9.16117 15.0537C7.53398 16.6809 7.53398 19.319 9.16117 20.9462L15.0537 26.8388C16.6809 28.466 19.3191 28.466 20.9463 26.8388L26.8388 20.9462C28.466 19.319 28.466 16.6809 26.8388 15.0537L20.9463 9.16112ZM20.357 10.3396C19.0553 9.03789 16.9447 9.03789 15.643 10.3396L10.3397 15.6429C9.03793 16.9447 9.03793 19.0552 10.3397 20.357L15.643 25.6603C16.9447 26.962 19.0553 26.962 20.357 25.6603L25.6603 20.357C26.9621 19.0552 26.9621 16.9447 25.6603 15.6429L20.357 10.3396Z"
+                      fill="#637381"
+                    />
+                  </svg>
+                )}
+              </div>
+              <span className="text-sm">{status}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+)}
+
             </div>
             </div>
             

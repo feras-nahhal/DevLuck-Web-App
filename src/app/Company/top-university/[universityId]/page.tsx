@@ -3,10 +3,12 @@
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import React from "react";
 import { mockUniversities } from "@/src/mocks/mockUniversities";
+import { useSidebar } from "@/src/lib/sidebarContext";
 import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
 
 export default function TopUniversityPage() {
+    const { isCollapsed } = useSidebar(); // ✅ get collapse state
     const params = useParams(); 
     const {universityId } = params;
     const university = mockUniversities.find(a => a.id === universityId);
@@ -15,7 +17,16 @@ export default function TopUniversityPage() {
    
   return (
     <DashboardLayout>
-                <div className="relative w-full min-h-[1000px] p-4 overflow-hidden">
+                 <div
+        className={`relative w-full min-h-[1000px] p-4 overflow-hidden
+          ${isCollapsed ? "ml-[50px]" : "ml-[10px]"}
+        `}
+         style={{
+          backgroundRepeat: "no-repeat",
+            transform: "scale(0.96)",
+          transformOrigin: "top center",
+        }}
+      >
                 <svg width="1252" height="539" viewBox="0 0 1252 539" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1252 506.874C1252 524.547 1237.67 538.874 1220 538.874H889.723C872.05 538.874 857.723 524.547 857.723 506.874V442.722C857.723 425.049 843.396 410.722 825.723 410.722H427.138C409.465 410.722 395.138 425.049 395.138 442.722V506.874C395.138 524.547 380.811 538.874 363.138 538.874L32.0001 538.875C14.3269 538.875 0 524.548 0 506.875V325.001C0 307.328 14.3269 293.001 32 293.001H257C274.673 293.001 289 278.674 289 261.001V32C289 14.3269 303.327 0 321 0H1220C1237.67 0 1252 14.3269 1252 32V506.874Z" fill="#FFEB9C"/>
                 </svg>

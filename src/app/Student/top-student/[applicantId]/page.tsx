@@ -9,6 +9,7 @@ import { languageData  } from "@/src/mocks/mockLanguages";
 import { portfolioData  } from "@/src/mocks/mockPortfolio";
 
 export default function ApplicantPage() {
+  const router = useRouter();
   const params = useParams(); // { applicantId: "456" }
   const {applicantId } = params;
   const [showAll, setShowAll] = useState(false);
@@ -33,23 +34,26 @@ export default function ApplicantPage() {
   return (
     <DashboardLayout>
       <div
-        className="px-4 sm:px-6 lg:px-8 py-6 min-h-[800px]"
+        className="py-6 min-h-[800px]"
         style={{
           backgroundImage: "url('/pages/applicantInfoBackground.svg')",
           backgroundPosition: "65% top",
           backgroundRepeat: "no-repeat",
+            transform: "scale(0.96)",
+          transformOrigin: "top center",
         }}
       >
-        
+        {/* ✅ CONTENT CONTAINER */}
+    <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div
         className="
           flex flex-row items-start
           justify-start
         "
       >
-        <div className="w-[557px] h-auto flex flex-col gap-4"> {/* <-- gap between sections */}
+        <div className="w-[450px] h-auto flex flex-col gap-4"> {/* <-- gap between sections */}
   
-        <div className="flex flex-col gap-[10px] w-[557px]">
+        <div className="flex flex-col gap-[10px] w-[500px]">
   
             {/* Name + Button Row */}
             <div className="flex items-center justify-between w-full">
@@ -139,8 +143,9 @@ export default function ApplicantPage() {
             </div>
           </div>
         </div>
+
         {/* Skills Parallelogram Card */}
-        <div className="absolute top-50 left-90 w-[439px] h-auto relative">
+        <div className="absolute top-50 left-80 w-[460px] h-auto relative">
         <div className="flex items-center justify-between mb-6">
           <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
             Skills
@@ -149,41 +154,48 @@ export default function ApplicantPage() {
 
         {/* Parallelogram background */}
           <div
-            className="w-[439px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden"
+            className="w-full max-w-[655px] min-w-[460px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden"
             style={{ maxHeight: "250px" }} // <-- crucial
           >
-            {/* Inner content (counter-skew) */}
-            <div className="transform skew-x-12 px-8 w-full h-full overflow-y-auto">
-              <div className="flex flex-wrap gap-3">
-                {applicant?.skills?.map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
+              {/* Inner content (counter-skew) */}
+              <div className="transform skew-x-12 px-8 w-full h-full overflow-y-auto">
+              {applicant?.skills?.length ? (
+                <div className="flex flex-wrap gap-3">
+                  {applicant.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[#555] font-publicSans">No skills info available.</p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Skills Parallelogram Card */}
-      <div className="flex flex-col items-start justify-start mt-65 gap-10">
+      <div className="flex flex-col items-center justify-center mt-65 gap-10">
         {/* Row 1 */}
-        <div className="flex flex-row items-start justify-start gap-10">
+        <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
+
+
           {/* Experience Card */}
-          <div className="w-[655px] h-auto relative">
+          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
               Experience
               </h3>
             </div>
-            <div className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllExp ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllExp ? "max-h-[2000px]" : "max-h-[250px]"}`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                {experienceData
-                  .filter((exp) => exp.applicantId === applicant?.applicantId)
+              {experienceData.filter(exp => exp.applicantId === applicant?.applicantId).length ? (
+                experienceData
+                  .filter(exp => exp.applicantId === applicant?.applicantId)
                   .map((exp) => (
                     <div key={exp.id} className="px-4 py-2 w-full">
                       <div className="flex items-center justify-between">
@@ -217,28 +229,29 @@ export default function ApplicantPage() {
                         {exp.description.split(" ").length > 10 ? "..." : ""}
                       </p>
                     </div>
-                  ))}
-              </div>
+                  ))
+              ) : (
+                <p className="text-[#555] font-publicSans py-4">No experience info available.</p>
+              )}
+            </div>
             </div>
           </div>
 
 
           {/* Card 2 */}
-          <div className="w-[655px] h-auto relative">
+          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
             <div className="flex items-center justify-between mb-6">
                <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E] ">
                   Education
                 </h3>
             </div>
-            <div className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAll ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAll ? "max-h-[2000px]" : "max-h-[250px]"}`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                {educationData
-                  .filter((edu) => edu.applicantId === applicant?.applicantId)
+              {educationData.filter(edu => edu.applicantId === applicant?.applicantId).length ? (
+                educationData
+                  .filter(edu => edu.applicantId === applicant?.applicantId)
                   .map((edu) => (
-                    <div
-                      key={edu.id}
-                      className="px-4 py-2  w-full"
-                    >
+                    <div key={edu.id} className="px-4 py-2 w-full">
                       <div className="flex items-center justify-between">
                         {/* Left side: SVG + Major */}
                         <div className="flex items-center gap-2">
@@ -272,25 +285,30 @@ export default function ApplicantPage() {
                         {edu.description.split(" ").length > 10 ? "..." : ""}
                       </p>
                     </div>
-                ))}
-              </div>
+                  ))
+              ) : (
+                <p className="text-[#555] font-publicSans py-4">No education info available.</p>
+              )}
+            </div>
             </div>
           </div>
         </div>
 
         {/* Row 2 */}
-        <div className="flex flex-row items-start justify-start gap-10">
+        <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
+
           {/* Language Card */}
-          <div className="w-[655px] h-auto relative">
+          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
               Languages
               </h3>
             </div>
-            <div className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllLang ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllLang ? "max-h-[2000px]" : "max-h-[250px]"}`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                {languageData
-                  .filter((lang) => lang.applicantId === applicant?.applicantId)
+              {languageData.filter(lang => lang.applicantId === applicant?.applicantId).length ? (
+                languageData
+                  .filter(lang => lang.applicantId === applicant?.applicantId)
                   .map((lang) => (
                     <div key={lang.id} className="px-4 py-2 w-full">
                       <div className="flex items-center justify-between">
@@ -310,39 +328,43 @@ export default function ApplicantPage() {
                         {lang.level}
                       </p>
                     </div>
-                  ))}
-              </div>
+                  ))
+              ) : (
+                <p className="text-[#555] font-publicSans py-4">No language info available.</p>
+              )}
+            </div>
             </div>
           </div>
 
 
           {/* Portfolio Card */}
-          <div className="w-[655px] h-auto relative">
+          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
               Portfolio
               </h3>
             </div>
-            <div className={`w-[655px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllPortfolio ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllPortfolio ? "max-h-[2000px]" : "max-h-[250px]"}`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                {portfolioData
-                  .filter((port) => port.applicantId === applicant?.applicantId)
-                  .map((port) => (
-                    <div key={port.id} className="px-4 py-2 w-full">
-                      <div className="flex items-center justify-between">
-                        {/* Left side: SVG + Portfolio Name */}
-                        <div className="flex items-center gap-2">
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
-                          </svg>
-                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
-                            {port.name}
-                          </h4>
+                {portfolioData.filter(port => port.applicantId === applicant?.applicantId).length ? (
+                  portfolioData
+                    .filter(port => port.applicantId === applicant?.applicantId)
+                    .map((port) => (
+                      <div key={port.id} className="px-4 py-2 w-full">
+                        <div className="flex items-center justify-between">
+                          {/* Left side: SVG + Portfolio Name */}
+                          <div className="flex items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
+                            </svg>
+                            <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                              {port.name}
+                            </h4>
+                          </div>
                         </div>
-                      </div>
-                      {/* portfolio link */}
-                      <div key={port.id} className=" w-full">
-                        <div className="flex items-center gap-2">
+
+                        {/* Portfolio link */}
+                        <div className="w-full flex items-center gap-2 mt-1">
                           {/* Conditional SVG icon */}
                           {port.name.toLowerCase() === "github" ? (
                             <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -370,8 +392,10 @@ export default function ApplicantPage() {
                           </p>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                ) : (
+                  <p className="text-[#555] font-publicSans py-4">No portfolio info available.</p>
+                )}
               </div>
             </div>
           </div>
@@ -379,7 +403,7 @@ export default function ApplicantPage() {
         </div>
       </div>
 
-       
+       </div>
     </div>
     </DashboardLayout>
   );

@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           !isMobile
             ? isCollapsed
               ? "pl-[100px]"
-              : "pl-[246px]"
+              : "pl-[220px]"
             : "pl-0"
         }`}
       >

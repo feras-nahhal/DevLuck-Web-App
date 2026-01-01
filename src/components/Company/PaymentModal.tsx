@@ -18,6 +18,8 @@ interface PaymentData {
   workLocation: string; // e.g. "2024-12-15"
 
   note?: string; // optional notes or remarks
+
+  paymentStatus:string;
 }
 
 interface PaymentModalProps {
@@ -289,6 +291,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     monthlyAllowance: "",
     workLocation: "",
     note: "",
+    paymentStatus: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -302,6 +305,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         monthlyAllowance: payment.monthlyAllowance || "",
         workLocation: payment.workLocation || "",
         note: payment.note || "",
+        paymentStatus:payment.paymentStatus || "",
       });
     } else {
       setFormData({
@@ -310,7 +314,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         nextPayment: "",
         monthlyAllowance: "",
         workLocation: "",
-        note: ""
+        note: "",
+        paymentStatus: "",
       });
     }
   }, [payment, isOpen]);
@@ -406,6 +411,13 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             placeholder="Enter work location"
             value={formData.workLocation ?? ""}
             onChange={(e) => handleInputChange("workLocation", e.target.value)}
+            />
+            <ParallelogramSelect
+            label="Payment Status"
+            placeholder="Select paymentStatus"
+            value={formData.paymentStatus}
+            options={["Paid", "Due", "Pending"]}
+            onChange={(val) => handleInputChange("paymentStatus", val)}
             />
             <ParallelogramInput
             label="Note"

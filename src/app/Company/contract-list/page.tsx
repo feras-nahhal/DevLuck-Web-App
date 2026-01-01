@@ -6,7 +6,7 @@ import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { mockApplicants } from "@/src/mocks/mockApplicants";
 import { ArrowUpRight, Check } from "lucide-react";
 import ContractModal from "@/src/components/Company/ContractModal";
-
+import { createPortal } from "react-dom";
 
 /* ──────────────────────────────────────────────
    Card Component
@@ -449,11 +449,11 @@ const ApplicantCard = ({
 type ContractRowProps = {
   applicant: typeof mockApplicants[0];
   onMainClick?: () => void;
-  onSideClick?: () => void;
+  onEdit?: () => void;
   showCheckbox?: boolean;
 };
 
-const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }: ContractRowProps) => {
+const ContractRow = ({ applicant,onMainClick,onEdit,showCheckbox = false }: ContractRowProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [checked, setChecked] = useState(false);
@@ -518,29 +518,29 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
         )}
 
         {/* Applicant Info */}
-        <div className="flex-1 flex items-center h-full px-4 gap-6">
+        <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
           {/* CO-ID */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">CO-ID-{applicant.applicantId}</span>
             <span className="text-xs text-gray-400">Job ID</span>
           </div>
           {/* Name */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.name}</span>
             <span className="text-xs text-gray-400">Applicant Name</span>
           </div>
           {/* Contract Title */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.contractTitle}</span>
             <span className="text-xs text-gray-400">Contract Title</span>
           </div>
           {/* Start Date */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.startDate}</span>
             <span className="text-xs text-gray-400">Start Date</span>
           </div>
           {/* End Date */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">{applicant.endDate}</span>
             <span className="text-xs text-gray-400">End Date</span>
           </div>
@@ -565,8 +565,15 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
       <div
         className="flex items-center w-1/10 skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg bg-[#FFF9E0] cursor-pointer"
         onClick={(e) => {
-          e.stopPropagation(); // 🔥 VERY IMPORTANT
-          onSideClick?.();
+          e.stopPropagation();
+
+          const rect = e.currentTarget.getBoundingClientRect();
+
+         setMenuPos({
+            top: rect.top + window.scrollY ,
+            left: rect.right + window.scrollX - 230,
+          });
+          setMenuOpen((prev) => !prev);
         }}
       >
         <div className="flex items-center justify-center w-full h-full">
@@ -581,6 +588,40 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
               <path d="M36.7334 45C37.838 45 38.7334 44.1046 38.7334 43C38.7334 41.8954 37.838 41 36.7334 41C35.6288 41 34.7334 41.8954 34.7334 43C34.7334 44.1046 35.6288 45 36.7334 45Z" fill="#1E1E1E"/>
               <path d="M45.7335 52L50.3816 52C55.3547 52 59.8777 49.1195 61.9808 44.6129L66.384 35.1774C69.6842 28.1056 64.522 20 56.718 20L45.7335 20" stroke="#1E1E1E" strokeWidth="1.06667"/>
             </svg>
+
+            {menuOpen && menuPos &&
+            createPortal(
+              <div
+                ref={menuRef}
+                className="
+                  fixed
+                  w-[180px]
+              
+                  rounded-xl
+                  bg-white
+                  shadow-2xl
+                  border
+                  py-2
+                "
+                style={{
+                  top: menuPos.top,
+                  left: menuPos.left,
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                onClick={onEdit}>
+                  Edit
+                </button>
+
+                <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
+                  Delete
+                </button>
+
+              
+              </div>,
+              document.body
+            )}
 
           </div>
         </div>
@@ -853,7 +894,12 @@ return (
               applicant={applicant}
               onMainClick={() =>
                 router.push(`/Company/contract-list/${applicant.applicantId}`)
+
               }
+               onEdit={() => {
+          setEditingContract(applicant); // set the job to edit
+          setIsModalOpen(true); // open the modal
+        }}
 
               showCheckbox={true} // optional
             />

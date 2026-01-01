@@ -415,22 +415,22 @@ const UniversityRow = ({ university,onMainClick,onSideClick,showCheckbox = false
         {/* Applicant Info */}
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
           {/* CO-ID */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">UN-ID-{university.id}</span>
             <span className="text-xs text-gray-400">university ID</span>
           </div>
           {/* Name */}
-          <div className="flex flex-col justify-center w-[260px]">
+          <div className="flex flex-col justify-center w-[240px]">
             <span className="text-sm font-semibold text-gray-900">{university.name}</span>
             <span className="text-xs text-gray-400">university Name</span>
           </div>
           {/* Contract Title */}
-          <div className="flex flex-col justify-center w-[160px]">
+          <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{university.phoneNumber}</span>
             <span className="text-xs text-gray-400">Phone Number</span>
           </div>
           {/* Start Date */}
-          <div className="flex flex-col justify-center w-[260px]">
+          <div className="flex flex-col justify-center w-[240px]">
             <span className="text-sm font-semibold text-gray-900">{university.address}</span>
             <span className="text-xs text-gray-400">Address</span>
           </div>
