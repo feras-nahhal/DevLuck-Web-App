@@ -257,10 +257,11 @@ type ContractRowProps = {
   job: typeof mockJobs[0];
   onMainClick?: () => void;
   onSideClick?: () => void;
+  onEdit?: () => void;
   showCheckbox?: boolean;
 };
 
-const ContractRow = ({ job,onMainClick,onSideClick,showCheckbox = false }: ContractRowProps) => {
+const ContractRow = ({ job,onMainClick,onEdit,showCheckbox = false }: ContractRowProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [checked, setChecked] = useState(false);
@@ -369,7 +370,7 @@ const ContractRow = ({ job,onMainClick,onSideClick,showCheckbox = false }: Contr
           const rect = e.currentTarget.getBoundingClientRect();
 
          setMenuPos({
-            top: rect.top + window.scrollY -60,
+            top: rect.top + window.scrollY ,
             left: rect.right + window.scrollX - 230,
           });
 
@@ -399,7 +400,7 @@ const ContractRow = ({ job,onMainClick,onSideClick,showCheckbox = false }: Contr
                 className="
                   fixed
                   w-[180px]
-                  skew-x-[-12deg]
+              
                   rounded-xl
                   bg-white
                   shadow-2xl
@@ -412,17 +413,16 @@ const ContractRow = ({ job,onMainClick,onSideClick,showCheckbox = false }: Contr
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
-                  Filter by Status
+                <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100"
+                onClick={onEdit}>
+                  Edit
                 </button>
 
                 <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
-                  Filter by Date
+                  Delete
                 </button>
 
-                <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
-                  Show Running Only
-                </button>
+              
               </div>,
               document.body
             )}
@@ -607,6 +607,10 @@ const [showApplicants, setShowApplicants] = useState(true);
               job={job}
               showCheckbox={true} // optional
               onMainClick={() => router.push(`/Company/opportunity/${job.jobNumber}`)}
+              onEdit={() => {
+          setEditingOpportunity(job); // set the job to edit
+          setIsModalOpen(true); // open the modal
+        }}
             />
           ))}
         </div>

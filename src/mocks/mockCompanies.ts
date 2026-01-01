@@ -14,6 +14,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E101", "E102", "E103", "E104", "E105"],
+    applicantIds: ["201", "202"], // added
     profileRanking: 9,
     progress: 85,
     status: "Verified",
@@ -35,6 +36,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E201", "E202", "E203"],
+    applicantIds: ["203", "204","206","210"], // added
     profileRanking: 8,
     progress: 72,
     status: "Pending",
@@ -56,6 +58,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E301", "E302"],
+    applicantIds: ["205", "206"], // added
     profileRanking: 7,
     progress: 60,
     status: "Verified",
@@ -77,6 +80,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E401", "E402", "E403", "E404"],
+    applicantIds: ["207"], // added
     profileRanking: 10,
     progress: 95,
     status: "Verified",
@@ -98,6 +102,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E501"],
+    applicantIds: ["208"], // added
     profileRanking: 6,
     progress: 40,
     status: "Pending",
@@ -119,6 +124,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E601", "E602", "E603"],
+    applicantIds: ["209", "210"], // added
     profileRanking: 80,
     progress: 78,
     status: "Verified",
@@ -158,6 +164,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E701", "E702"],
+    applicantIds: ["209", "210"], // added
     profileRanking: 7,
     progress: 68,
     status: "Pending",
@@ -179,6 +186,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E801", "E802", "E803"],
+    applicantIds: ["209", "210"], // added
     profileRanking: 6,
     progress: 55,
     status: "Verified",
@@ -200,6 +208,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E901", "E902", "E903", "E904"],
+    applicantIds: ["209", "210"], // added
     profileRanking: 9,
     progress: 90,
     status: "Verified",
@@ -242,6 +251,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E1101", "E1102"],
+    applicantIds: ["209", "210"], // added
     profileRanking: 6,
     progress: 48,
     status: "Pending",
@@ -263,6 +273,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E1201", "E1202", "E1203", "E1204"],
+    applicantIds: ["209", "210"], // added
     profileRanking: 9,
     progress: 88,
     status: "Verified",
@@ -284,6 +295,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E1301", "E1302", "E1303"],
+    applicantIds: ["209", "210"], // added
     profileRanking: 7,
     progress: 65,
     status: "Verified",
@@ -305,6 +317,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E1401", "E1402"],
+    applicantIds: ["209", "210"], // added
     profileRanking: 7,
     progress: 70,
     status: "Pending",

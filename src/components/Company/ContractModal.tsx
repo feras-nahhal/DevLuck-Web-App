@@ -7,11 +7,13 @@ import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 
 interface ContractData {
-  applicantName: string;
+  name: string;
 
   contractTitle: string;
 
   Contract: string;
+
+  contractStatus: string;
 
   startDate: string; // e.g. "2024-01-15"
 
@@ -283,12 +285,13 @@ const ContractModal: React.FC<ContractModalProps> = ({
   onSave,
 }) => {
   const [formData, setFormData] = useState<ContractData>({
-    applicantName: "",
+    name: "",
     contractTitle: "",
     Contract: "",
     startDate: "",
     endDate: "",
     note: "",
+    contractStatus: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -296,21 +299,23 @@ const ContractModal: React.FC<ContractModalProps> = ({
   useEffect(() => {
     if (contract) {
       setFormData({
-        applicantName: contract.applicantName || "",
+        name: contract.name || "",
         contractTitle: contract.contractTitle || "",
         Contract: contract.Contract || "",
         startDate: contract.startDate || "",
         endDate: contract.endDate || "",
         note: contract.note || "",
+        contractStatus: contract.contractStatus || "",
       });
     } else {
       setFormData({
-        applicantName: "",
+        name: "",
         contractTitle: "",
         Contract: "",
         startDate: "",
         endDate: "",
         note: "",
+        contractStatus: "",
       });
     }
   }, [contract, isOpen]);
@@ -378,9 +383,9 @@ const ContractModal: React.FC<ContractModalProps> = ({
             <ParallelogramSelect
             label="Applicant Name"
             placeholder="Select applicant"
-            value={formData.applicantName}
+            value={formData.name}
             options={["Ben", "Alice", "John", "Sarah"]}
-            onChange={(val) => handleInputChange("applicantName", val)}
+            onChange={(val) => handleInputChange("name", val)}
             />
 
             <ParallelogramInput
@@ -388,6 +393,17 @@ const ContractModal: React.FC<ContractModalProps> = ({
             placeholder="Enter contract title"
             value={formData.contractTitle}
             onChange={(e) => handleInputChange("contractTitle", e.target.value)}
+            />
+
+            <ParallelogramSelect
+            label="contractStatus"
+            placeholder="Select contractStatus"
+            value={formData.contractStatus}
+            options={[
+                "Running",
+                "Completed"
+            ]}
+            onChange={(val) => handleInputChange("contractStatus", val)}
             />
         
             <ParallelogramSelect

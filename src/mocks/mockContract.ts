@@ -5,6 +5,8 @@ export type OpportunityStatus =
   | "Upcoming Interview"
   | "Rejected";
 
+export type OpportunityFrom = "Company" | "Investor"; // ✅ NEW
+
 export interface Contract {
   id: number;
   applicantId: number;
@@ -12,11 +14,16 @@ export interface Contract {
   startDate: string;
   endDate: string;
   status: ContractStatus;
+  applicantIds: number[];          // ✅ now a list
+  companyId: string;               // ✅ new
 
-  /** ✅ NEW */
   opportunityStatus: OpportunityStatus;
-  deadline: string; // e.g. "2025-07-30"
+  opportunityFrom: OpportunityFrom; // ✅ NEW
+  deadline: string;
   salary: string;
+
+  skills: string[];        // ✅ NEW
+  benefits: string[];      // ✅ NEW
 
   jobDescription: string;
   keyResponsibilities: string[];
@@ -27,6 +34,7 @@ export interface Contract {
   workProgress: number; // 0 → 100
 }
 
+
 export const mockContracts: Contract[] = [
   {
     id: 1,
@@ -35,10 +43,28 @@ export const mockContracts: Contract[] = [
     startDate: "2024-01-10",
     endDate: "2024-07-10",
     status: "Running",
+    applicantIds: [201,202,214],
+    companyId: "C001",
 
     opportunityStatus: "Applied",
+    opportunityFrom: "Company",
     deadline: "2025-07-30",
-    salary: "$2,500", 
+    salary: "$2,500",
+
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+    ],
+
+    benefits: [
+      "Flexible working hours",
+      "Remote work",
+      "Health insurance",
+      "Career growth opportunities"
+    ],
 
     jobDescription:
       "Build and maintain modern user interfaces using React and Tailwind CSS. You will be responsible for creating intuitive and dynamic front-end experiences, implementing best practices for performance and accessibility, and collaborating closely with cross-functional teams to deliver high-quality software solutions.",
@@ -70,10 +96,28 @@ export const mockContracts: Contract[] = [
     startDate: "2023-11-01",
     endDate: "2024-05-01",
     status: "Completed",
+    applicantIds: [201,202,203,214],
+    companyId: "C001",
 
     opportunityStatus: "Upcoming Interview",
+    opportunityFrom: "Investor",
     deadline: "2025-07-30",
     salary: "$4,000",
+
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+    ],
+
+    benefits: [
+      "Flexible working hours",
+      "Remote work",
+      "Health insurance",
+      "Career growth opportunities"
+    ],
 
     jobDescription:
       "Design scalable APIs and services using Node.js and PostgreSQL.",
@@ -99,11 +143,29 @@ export const mockContracts: Contract[] = [
     startDate: "2024-02-01",
     endDate: "2024-08-01",
     status: "Running",
-     opportunityStatus: "Rejected",
+    applicantIds: [201,202,214,206],
+    companyId: "C001",
+    opportunityStatus: "Rejected",
+    opportunityFrom: "Company",
     deadline: "2025-07-30",
     salary: "$1,800",
     jobDescription:
       "Create intuitive user experiences and polished visual designs.",
+
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+  ],
+
+  benefits: [
+    "Flexible working hours",
+    "Remote work",
+    "Health insurance",
+    "Career growth opportunities"
+  ],
     keyResponsibilities: [
       "Design wireframes and prototypes",
       "Conduct user research",
@@ -127,8 +189,25 @@ export const mockContracts: Contract[] = [
     endDate: "2024-03-15",
     status: "Dispute",
     opportunityStatus: "Applied",
+    opportunityFrom: "Investor",
     deadline: "2025-07-30",
     salary: "$3,500",
+    applicantIds: [201],
+    companyId: "C001",
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+  ],
+
+  benefits: [
+    "Flexible working hours",
+    "Remote work",
+    "Health insurance",
+    "Career growth opportunities"
+  ],
     jobDescription:
       "Develop and maintain cross-platform mobile applications.",
     keyResponsibilities: [
@@ -154,8 +233,25 @@ export const mockContracts: Contract[] = [
     endDate: "2024-09-01",
     status: "Running",
     opportunityStatus: "Applied",
+    opportunityFrom: "Company",
+    applicantIds: [201,202,203,206],
+    companyId: "C001",
     deadline: "2025-07-30",
     salary: "$3,000",
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+  ],
+
+  benefits: [
+    "Flexible working hours",
+    "Remote work",
+    "Health insurance",
+    "Career growth opportunities"
+  ],
     jobDescription:
       "Analyze business data to generate insights and reports.",
     keyResponsibilities: [
@@ -181,8 +277,25 @@ export const mockContracts: Contract[] = [
     endDate: "2024-04-01",
     status: "Completed",
     opportunityStatus: "Upcoming Interview",
+    opportunityFrom: "Investor",
     deadline: "2025-07-30",
     salary: "$4,500",
+    applicantIds: [201,202,204,205],
+    companyId: "C001",
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+  ],
+
+  benefits: [
+    "Flexible working hours",
+    "Remote work",
+    "Health insurance",
+    "Career growth opportunities"
+  ],
     jobDescription:
       "Manage CI/CD pipelines and cloud infrastructure.",
     keyResponsibilities: [
@@ -207,9 +320,26 @@ export const mockContracts: Contract[] = [
     startDate: "2024-01-20",
     endDate: "2024-06-20",
     status: "Running",
+    applicantIds: [201,203,214,209,207],
+    companyId: "C001",
     opportunityStatus: "Rejected",
+    opportunityFrom: "Company",
     deadline: "2025-07-30",
-    salary: "$3000",
+    salary: "$3,000",
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+  ],
+
+  benefits: [
+    "Flexible working hours",
+    "Remote work",
+    "Health insurance",
+    "Career growth opportunities"
+  ],
     jobDescription:
       "Ensure product quality through automated testing.",
     keyResponsibilities: [
@@ -233,10 +363,27 @@ export const mockContracts: Contract[] = [
     contractTitle: "Product Manager",
     startDate: "2023-08-01",
     endDate: "2024-02-01",
+    applicantIds: [201,210,209,207],
+    companyId: "C001",
     status: "Completed",
-     opportunityStatus: "Applied",
+    opportunityStatus: "Applied",
+    opportunityFrom: "Investor",
     deadline: "2025-07-30",
     salary: "$6,000",
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+  ],
+
+  benefits: [
+    "Flexible working hours",
+    "Remote work",
+    "Health insurance",
+    "Career growth opportunities"
+  ],
     jobDescription:
       "Lead product strategy and roadmap execution.",
     keyResponsibilities: [
@@ -262,8 +409,25 @@ export const mockContracts: Contract[] = [
     endDate: "2024-08-15",
     status: "Dispute",
     opportunityStatus: "Upcoming Interview",
+    opportunityFrom: "Company",
     deadline: "2025-07-30",
     salary: "$5,000",
+    applicantIds: [201,204,206,208,214],
+    companyId: "C001",
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+  ],
+
+  benefits: [
+    "Flexible working hours",
+    "Remote work",
+    "Health insurance",
+    "Career growth opportunities"
+  ],
     jobDescription:
       "Protect systems and data from security threats.",
     keyResponsibilities: [
@@ -288,9 +452,26 @@ export const mockContracts: Contract[] = [
     startDate: "2024-03-10",
     endDate: "2024-09-10",
     status: "Running",
-     opportunityStatus: "Applied",
+    applicantIds: [201,202,204,214,211,205],
+    companyId: "C001",
+    opportunityStatus: "Applied",
+    opportunityFrom: "Investor",
     deadline: "2025-07-30",
-    salary: "$2500",
+    salary: "$2,500",
+    skills: [
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "REST APIs",
+    "Git"
+  ],
+
+  benefits: [
+    "Flexible working hours",
+    "Remote work",
+    "Health insurance",
+    "Career growth opportunities"
+  ],
     jobDescription:
       "Assist in AI model research and experimentation.",
     keyResponsibilities: [
@@ -308,4 +489,109 @@ export const mockContracts: Contract[] = [
     company: "NeuroLabs",
     workProgress: 25,
   },
+
+  {
+  id: 11,
+  applicantId: 201,
+  contractTitle: "Full Stack Engineer",
+  startDate: "2024-04-01",
+  endDate: "2024-10-01",
+  status: "Running",
+  applicantIds: [201],
+  companyId: "C002",
+
+  opportunityStatus: "Upcoming Interview",
+  opportunityFrom: "Company",
+  deadline: "2025-07-30",
+  salary: "$4,200",
+
+  skills: ["Next.js", "Node.js", "PostgreSQL", "TypeScript"],
+  benefits: ["Remote work", "Flexible hours", "Stock options"],
+
+  jobDescription:
+    "Build end-to-end features using modern full-stack technologies.",
+  keyResponsibilities: [
+    "Develop frontend and backend features",
+    "Maintain APIs",
+    "Collaborate with product teams",
+  ],
+  whyYoullLoveWorkingHere: [
+    "Modern stack",
+    "Fast-paced team",
+    "Ownership of features",
+  ],
+  jobType: "Full-time",
+  location: "Remote",
+  company: "StackForge",
+  workProgress: 35,
+},
+{
+  id: 12,
+  applicantId: 201,
+  contractTitle: "Technical Product Analyst",
+  startDate: "2024-02-15",
+  endDate: "2024-08-15",
+  status: "Completed",
+  applicantIds: [201,203],
+  companyId: "C003",
+
+  opportunityStatus: "Upcoming Interview",
+  opportunityFrom: "Investor",
+  deadline: "2025-07-30",
+  salary: "$3,800",
+
+  skills: ["Data Analysis", "SQL", "Product Metrics", "Excel"],
+  benefits: ["Hybrid work", "Learning budget"],
+
+  jobDescription:
+    "Analyze product data and support roadmap decisions.",
+  keyResponsibilities: [
+    "Analyze KPIs",
+    "Prepare reports",
+    "Support product strategy",
+  ],
+  whyYoullLoveWorkingHere: [
+    "Strategic role",
+    "Close to decision makers",
+  ],
+  jobType: "Contract",
+  location: "London, UK",
+  company: "InsightCore",
+  workProgress: 100,
+},
+{
+  id: 13,
+  applicantId: 201,
+  contractTitle: "Frontend Performance Engineer",
+  startDate: "2024-05-01",
+  endDate: "2024-11-01",
+  status: "Running",
+  applicantIds: [201,202],
+  companyId: "C004",
+
+  opportunityStatus: "Upcoming Interview",
+  opportunityFrom: "Company",
+  deadline: "2025-07-30",
+  salary: "$3,200",
+
+  skills: ["React", "Web Performance", "Lighthouse", "Tailwind CSS"],
+  benefits: ["Remote", "Flexible schedule"],
+
+  jobDescription:
+    "Optimize frontend performance and improve UX metrics.",
+  keyResponsibilities: [
+    "Improve page load speed",
+    "Audit frontend code",
+    "Work with UI teams",
+  ],
+  whyYoullLoveWorkingHere: [
+    "Performance-focused work",
+    "Technical challenges",
+  ],
+  jobType: "Part-time",
+  location: "Remote",
+  company: "Speedify",
+  workProgress: 60,
+},
+
 ];

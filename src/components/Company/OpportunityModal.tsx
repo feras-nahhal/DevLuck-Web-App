@@ -11,11 +11,15 @@ interface OpportunityData {
   type: string;
   timeLength: string;
   currency: string;
-  allowance?: string;
-  location?: string;
-  details: string;
-  skills: string;
+  allowance: string;
+  location: string;
+  description: string;
   startDate?: string;
+  // NEW FIELDS for multi-input lists
+  skills?: string[];
+  whyYouWillLoveWorkingHere?: string[];          // Why You'll Love Working Here
+  benefits?: string[]; // Key Responsibilities
+  keyResponsibilities?: string[];          // Benefits
 }
 
 interface OpportunityModalProps {
@@ -24,6 +28,72 @@ interface OpportunityModalProps {
   onClose: () => void;
   onSave: (data: OpportunityData) => void;
 }
+
+type MultiInputListProps = {
+  label: string;
+  items: string[];
+  setItems: (items: string[]) => void;
+};
+
+const MultiInputList: React.FC<MultiInputListProps> = ({ label, items, setItems }) => {
+  const [currentValue, setCurrentValue] = useState("");
+
+  const addItem = () => {
+    if (currentValue.trim() !== "") {
+      setItems([...items, currentValue.trim()]);
+      setCurrentValue("");
+    }
+  };
+
+  const removeItem = (index: number) => {
+    setItems(items.filter((_, i) => i !== index));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addItem();
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2  ">
+      <ParallelogramInput
+        label={label}
+        placeholder={`Add ${label.toLowerCase()}`}
+        value={currentValue}
+        onChange={(e) => setCurrentValue(e.target.value)}
+        type="text"
+      />
+      {/* Add button */}
+      <button
+        type="button"
+        onClick={addItem}
+        className="self-start px-3 py-1 rounded-md bg-[#FFEB9C] font-semibold text-black hover:bg-[#FFE066] transition"
+      >
+        Add
+      </button>
+      {/* Display list */}
+      <ul className="flex flex-col gap-1 pl-4">
+        {items.map((item, index) => (
+          <li
+            key={index}
+            className="flex items-center justify-between bg-gray-100 px-2 py-1 rounded"
+          >
+            <span>{item}</span>
+            <button
+              type="button"
+              onClick={() => removeItem(index)}
+              className="text-red-500 font-bold px-2"
+            >
+              ×
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 
 type ParallelogramSelectProps = {
@@ -284,9 +354,12 @@ const OpportunityModal: React.FC<OpportunityModalProps> = ({
     currency: "",
     allowance: "",
     location: "",
-    details: "",
-    skills: "",
+    description: "",
     startDate: "",
+    skills: [],
+    whyYouWillLoveWorkingHere: [],
+    benefits: [],
+    keyResponsibilities: [],
   });
   const [loading, setLoading] = useState(false);
 
@@ -300,9 +373,12 @@ const OpportunityModal: React.FC<OpportunityModalProps> = ({
         currency: "",
         allowance: "",
         location: "",
-        details: "",
-        skills: "",
+        description: "",
         startDate: "",
+        skills: [],
+        whyYouWillLoveWorkingHere: [],
+        benefits: [],
+        keyResponsibilities: [],
       });
   }, [opportunity, isOpen]);
 
@@ -362,14 +438,22 @@ const OpportunityModal: React.FC<OpportunityModalProps> = ({
 
         {/* Form - scrollable */}
         <form
-            className="flex-1 flex flex-col gap-4 p-4  bg-white "
+            className="flex-1 flex flex-col gap-4 p-4 bg-white overflow-y-auto"
+ 
             onSubmit={handleSubmit}
         >
+          <div className="flex flex-col gap-4">
             <ParallelogramInput
             label="Opportunity Title"
             placeholder="Enter title"
             value={formData.title}
             onChange={(e) => handleInputChange("title", e.target.value)}
+            />
+            <ParallelogramInput
+            label="Opportunity Details"
+            placeholder="Enter Details"
+            value={formData.description}
+            onChange={(e) => handleInputChange("description", e.target.value)}
             />
             <ParallelogramSelect
             label="Opportunity Type"
@@ -378,52 +462,66 @@ const OpportunityModal: React.FC<OpportunityModalProps> = ({
             options={["Full-time", "Part-time", "Internship"]}
             onChange={(val) => handleInputChange("type", val)}
             />
-            <ParallelogramSelect
-            label="Opportunity Time Length"
-            placeholder="Select type"
-            value={formData.type}
-            options={["Full-time", "Part-time", "Internship"]}
-            onChange={(val) => handleInputChange("type", val)}
-            />
-            <ParallelogramInput
-            label="Currency"
-            placeholder="USD, EUR"
-            value={formData.currency}
-            onChange={(e) => handleInputChange("currency", e.target.value)}
-            />
-            <ParallelogramSelect
-            label="Allowance"
-            placeholder="Select type"
-            value={formData.type}
-            options={["Full-time", "Part-time", "Internship"]}
-            onChange={(val) => handleInputChange("type", val)}
-            />
-            <ParallelogramSelect
-            label="Work Location"
-            placeholder="Select type"
-            value={formData.type}
-            options={["Full-time", "Part-time", "Internship"]}
-            onChange={(val) => handleInputChange("type", val)}
-            />
-            <ParallelogramSelect
-            label="Opportunity Details"
-            placeholder="Select type"
-            value={formData.type}
-            options={["Full-time", "Part-time", "Internship"]}
-            onChange={(val) => handleInputChange("type", val)}
-            />
-            <ParallelogramInput
-            label="Opportunity Skills"
-            placeholder="Comma-separated skills"
-            value={formData.skills}
-            onChange={(e) => handleInputChange("skills", e.target.value)}
-            />
             <ParallelogramDatePicker
             label="Start Date"
             placeholder="YYYY-MM-DD"
             value={formData.startDate}
             onChange={(val) => handleInputChange("startDate", val)}
             />
+            <ParallelogramInput
+            label="Opportunity Time Length"
+            placeholder="Enter Time"
+            value={formData.timeLength}
+            onChange={(e) => handleInputChange("timeLength", e.target.value)}
+            />
+            <ParallelogramSelect
+            label="Work Location"
+            placeholder="Enter Location"
+            value={formData.location}
+            options={["Hybrid", "Remote", "Onsite"]}
+            onChange={(val) => handleInputChange("location", val)}
+            />
+            <ParallelogramInput
+            label="Allowance"
+            placeholder="Enter Amount"
+            value={formData.allowance}
+            onChange={(e) => handleInputChange("allowance", e.target.value)}
+            />
+            <ParallelogramSelect
+            label="Currency"
+            placeholder="USD, EUR"
+            value={formData.currency}
+            options={["USD", "EUR", "SAR"]}
+            onChange={(val) => handleInputChange("currency", val)}
+            />
+            
+        
+            
+          </div>
+
+            <MultiInputList
+                label="Why You'll Love Working Here"
+                items={formData.whyYouWillLoveWorkingHere || []}
+                setItems={(items) => setFormData((prev) => ({ ...prev, whyYouWillLoveWorkingHere: items }))}
+              />
+
+              <MultiInputList
+                label="Benefits"
+                items={formData.benefits || []}
+                setItems={(items) => setFormData((prev) => ({ ...prev, benefits: items }))}
+              />
+
+              <MultiInputList
+                label="Skills"
+                items={formData.skills || []}
+                setItems={(items) => setFormData((prev) => ({ ...prev, skills: items }))}
+              />
+
+              <MultiInputList
+                label=" Key Responsibilities"
+                items={formData.keyResponsibilities || []}
+                setItems={(items) => setFormData((prev) => ({ ...prev, keyResponsibilities: items }))}
+              />
         </form>
 
         {/* Footer */}

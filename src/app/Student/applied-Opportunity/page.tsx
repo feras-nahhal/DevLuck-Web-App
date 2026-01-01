@@ -105,8 +105,7 @@ const ApplicantCard = ({
             </h3>
 
             {/* Button in top-right corner */}
-            <button className="absolute top-0 right-0 w-11 h-11 flex items-center justify-center rounded-full bg-yellow-200"
-            onClick={() => setMenuOpen(!menuOpen)}>
+            <button className="absolute top-0 right-0 w-11 h-11 flex items-center justify-center rounded-full bg-yellow-200">
               <span className="absolute inset-0 bg-blue-600 opacity-30 hidden"></span>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fillRule="evenodd" clipRule="evenodd" d="M21 11.098V16.091C21 19.187 21 20.736 20.266 21.412C19.916 21.735 19.474 21.938 19.003 21.992C18.016 22.105 16.863 21.085 14.558 19.046C13.538 18.145 13.029 17.694 12.44 17.576C12.1497 17.5167 11.8503 17.5167 11.56 17.576C10.97 17.694 10.461 18.145 9.442 19.046C7.137 21.085 5.984 22.105 4.997 21.991C4.52527 21.9367 4.08299 21.734 3.734 21.412C3 20.736 3 19.188 3 16.091V11.097C3 6.81 3 4.666 4.318 3.333C5.636 2 7.758 2 12 2C16.242 2 18.364 2 19.682 3.332C21 4.664 21 6.81 21 11.098ZM8.25 6C8.25 5.80109 8.32902 5.61032 8.46967 5.46967C8.61032 5.32902 8.80109 5.25 9 5.25H15C15.1989 5.25 15.3897 5.32902 15.5303 5.46967C15.671 5.61032 15.75 5.80109 15.75 6C15.75 6.19891 15.671 6.38968 15.5303 6.53033C15.3897 6.67098 15.1989 6.75 15 6.75H9C8.80109 6.75 8.61032 6.67098 8.46967 6.53033C8.32902 6.38968 8.25 6.19891 8.25 6Z" fill="black"/>
@@ -114,57 +113,7 @@ const ApplicantCard = ({
 
             </button>
              {/* Menu */}
-            {menuOpen && (
-              <div className="absolute top-12 right-0 w-40 bg-white border rounded-md shadow-lg p-2 z-50">
-                <button
-                  className="w-full flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
-                  onClick={onClick}
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M11.6667 18.3337H8.33341C5.19091 18.3337 3.61925 18.3337 2.64341 17.357C1.66675 16.3812 1.66675 14.8095 1.66675 11.667V8.33366C1.66675 5.19116 1.66675 3.61949 2.64341 2.64366C3.61925 1.66699 5.19925 1.66699 8.35841 1.66699C8.86341 1.66699 9.26758 1.66699 9.60841 1.68116C9.59758 1.74783 9.59175 1.81533 9.59175 1.88449L9.58341 4.24616C9.58341 5.16033 9.58341 5.96866 9.67091 6.61949C9.76591 7.32533 9.98341 8.03116 10.5601 8.60783C11.1351 9.18283 11.8417 9.40116 12.5476 9.49616C13.1984 9.58366 14.0067 9.58366 14.9209 9.58366H18.2976C18.3334 10.0287 18.3334 10.5753 18.3334 11.3028V11.667C18.3334 14.8095 18.3334 16.3812 17.3567 17.357C16.3809 18.3337 14.8092 18.3337 11.6667 18.3337ZM4.37508 12.0837C4.37508 11.9179 4.44093 11.7589 4.55814 11.6417C4.67535 11.5245 4.83432 11.4587 5.00008 11.4587H11.6667C11.8325 11.4587 11.9915 11.5245 12.1087 11.6417C12.2259 11.7589 12.2917 11.9179 12.2917 12.0837C12.2917 12.2494 12.2259 12.4084 12.1087 12.5256C11.9915 12.6428 11.8325 12.7087 11.6667 12.7087H5.00008C4.83432 12.7087 4.67535 12.6428 4.55814 12.5256C4.44093 12.4084 4.37508 12.2494 4.37508 12.0837ZM4.37508 15.0003C4.37508 14.8346 4.44093 14.6756 4.55814 14.5584C4.67535 14.4412 4.83432 14.3753 5.00008 14.3753H9.58341C9.74917 14.3753 9.90815 14.4412 10.0254 14.5584C10.1426 14.6756 10.2084 14.8346 10.2084 15.0003C10.2084 15.1661 10.1426 15.3251 10.0254 15.4423C9.90815 15.5595 9.74917 15.6253 9.58341 15.6253H5.00008C4.83432 15.6253 4.67535 15.5595 4.55814 15.4423C4.44093 15.3251 4.37508 15.1661 4.37508 15.0003Z"
-                      fill="#1E1E1E"
-                    />
-                    <path
-                      d="M16.1267 6.34783L12.8267 3.37866C11.8876 2.53283 11.4184 2.10949 10.8409 1.88866L10.8334 4.16699C10.8334 6.13116 10.8334 7.11366 11.4434 7.72366C12.0534 8.33366 13.0359 8.33366 15.0001 8.33366H17.9834C17.6817 7.74699 17.1401 7.26033 16.1267 6.34783Z"
-                      fill="#1E1E1E"
-                    />
-                  </svg>
-
-                  <span>Details</span>
-                </button>
-                <button className="w-full flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
-                onClick={onDisputeClick}>
-                {/* SVG Icon */}
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M9.99526 11.1738L14.7071 15.886C14.8642 16.0378 15.0746 16.1217 15.293 16.1198C15.5114 16.1179 15.7203 16.0303 15.8748 15.8759C16.0292 15.7215 16.1168 15.5125 16.1187 15.2941C16.1206 15.0757 16.0366 14.8653 15.8849 14.7082L11.173 9.99597L15.8849 5.28375C16.0366 5.12664 16.1206 4.91623 16.1187 4.69782C16.1168 4.47941 16.0292 4.27049 15.8748 4.11605C15.7203 3.9616 15.5114 3.874 15.293 3.8721C15.0746 3.8702 14.8642 3.95416 14.7071 4.1059L9.99526 8.81813L5.28337 4.1059C5.12557 3.95792 4.91639 3.87713 4.70009 3.88065C4.48379 3.88416 4.27735 3.97169 4.12443 4.12472C3.97152 4.27775 3.88414 4.48427 3.88078 4.70059C3.87742 4.91691 3.95835 5.12604 4.10643 5.28375L8.81749 9.99597L4.1056 14.7082C4.02605 14.785 3.96259 14.877 3.91894 14.9786C3.87529 15.0802 3.85231 15.1895 3.85135 15.3001C3.85039 15.4107 3.87146 15.5204 3.91334 15.6228C3.95522 15.7252 4.01707 15.8182 4.09528 15.8964C4.17348 15.9746 4.26648 16.0364 4.36885 16.0783C4.47121 16.1202 4.58089 16.1413 4.69149 16.1403C4.80208 16.1394 4.91138 16.1164 5.013 16.0727C5.11462 16.0291 5.20653 15.9656 5.28337 15.886L9.99526 11.1738Z"
-                    fill="#1C252E"
-                  />
-                </svg>
-
-                {/* Text */}
-                <span>Dispute</span>
-              </button>
-
-              </div>
-            )}
+            
           </div>
 
 
@@ -216,7 +165,8 @@ const ApplicantCard = ({
           <div className="w-[320px] h-[80px] p-[16px] flex flex-row  bg-[#FFF9E0] backdrop-blur-[17px] skew-x-[-12deg] rounded-[21px]">
             <div className="skew-x-[12deg] flex flex-row gap-10">
 
-              <button className="relative w-[80px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all">
+              <button className="relative w-[80px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+               onClick={onClick}>
                 <span className="skew-x-[12deg] text-[14px] font-bold leading-[24px] text-[#141A21]">
                     Apply
                   </span>
@@ -713,7 +663,7 @@ return (
                 key={index}
                 applicant={contract}
                 onClick={() =>
-                  router.push(`/Student/contract/${contract.id}`)
+                  router.push(`/Student/applied-Opportunity/${contract.id}`)
                 }
                 onDisputeClick={() => setIsModalOpen(true)}
               />
@@ -731,7 +681,7 @@ return (
               contract={contract}
               applicantName={applicantMap[contract.applicantId]}
               onMainClick={() =>
-                router.push(`/Student/contract/${contract.id}`)
+                router.push(`/Student/applied-Opportunity/${contract.id}`)
               }
               onDisputeClick={() => setIsModalOpen(true)}
 

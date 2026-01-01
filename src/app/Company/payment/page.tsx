@@ -253,6 +253,46 @@ const ApplicantCard = ({
         </defs>
       </svg>
 
+          <div
+          className={` absolute left-[80%] top-[3%] 
+            skew-x-[-12deg]
+            flex items-center justify-center
+            h-[32px]
+            min-w-[60px] px-2
+            px-2
+            rounded-sm
+            
+            font-bold
+            leading-[24px]
+            ${
+              applicant.paymentStatus === "Paid" &&
+              "bg-[#D3FCD2] text-[#22C55E] text-[12px]"
+            }
+            ${
+            applicant.paymentStatus === "Pending" &&
+            "bg-[#FFF4CC] text-[#F59E0B] text-[10px] "
+            }
+            ${
+              applicant.paymentStatus === "Due" &&
+              "bg-[#FFDCDC] text-[#FF4D4F]  text-[12px]"
+            }
+          `}
+        >
+          {/* Unskew text */}
+          <span className="skew-x-[12deg] px-2">
+            {applicant.paymentStatus}
+          </span>
+        </div>
+
+      {/* Button */}
+      <button className="absolute left-[6%] top-[76%] flex items-center skew-x-[-12deg] justify-center px-3 min-w-[120px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
+        onClick={onClick}>
+        <span className="text-[14px] skew-x-[12deg] font-bold leading-[24px] text-[#1E1E1E]">
+          View Details
+        </span>
+      </button>
+
+
 
     <div className="absolute w-[390px] h-[150px] left-[55%] top-[35%] -translate-x-[50%] -translate-y-[50%] flex flex-row gap-10">
       {/* Content Container */}
@@ -338,6 +378,8 @@ const ApplicantCard = ({
         />
       </button>
     </div>
+
+    
   );
 };
 
@@ -451,14 +493,14 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
             <div
               className={`
                 ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8] text-xs font-semibold flex items-center justify-center
-                ${applicant.contractStatus === "Running" ? "bg-[#D3FCD2] border border-[#22C55E] text-[#22C55E]" : ""}
-                ${applicant.contractStatus === "Completed" ? "bg-[#FFDCDC] border border-[#FF4D4F] text-[#FF4D4F]" : ""}
-                ${applicant.contractStatus !== "Running" && applicant.contractStatus !== "Completed" ? "bg-blue-100 border border-blue-200 text-blue-600" : ""}
+                ${applicant.paymentStatus === "Paid" ? "bg-[#D3FCD2] text-[#22C55E] text-[12px]" : ""}
+                ${applicant.paymentStatus === "Pending" ? "bg-[#FFF4CC] text-[#F59E0B] " : ""}
+               ${applicant.paymentStatus === "Due" ? "bg-[#FFDCDC] text-[#FF4D4F]  text-[12px]" : ""}
               `}
             >
-              {applicant.contractStatus}
+              {applicant.paymentStatus}
             </div>
-            <span className="text-xs text-gray-400">Contract Status</span>
+            <span className="text-xs text-gray-400">payment Status</span>
           </div>
         </div>
       </div>
@@ -472,7 +514,7 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
           const rect = e.currentTarget.getBoundingClientRect();
 
          setMenuPos({
-            top: rect.top + window.scrollY -60,
+            top: rect.top + window.scrollY,
             left: rect.right + window.scrollX - 230,
           });
 
@@ -502,7 +544,7 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
                 className="
                   fixed
                   w-[180px]
-                  skew-x-[-12deg]
+                 
                   rounded-xl
                   bg-white
                   shadow-2xl
@@ -516,16 +558,13 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
                 onClick={(e) => e.stopPropagation()}
               >
                 <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
-                  Filter by Status
+                  Edit
                 </button>
 
                 <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
-                  Filter by Date
+                  Delete
                 </button>
 
-                <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100">
-                  Show Running Only
-                </button>
               </div>,
               document.body
             )}
