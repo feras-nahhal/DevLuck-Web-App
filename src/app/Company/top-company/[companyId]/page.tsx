@@ -1,6 +1,6 @@
 "use client";
 
-import DashboardLayout from "@/src/components/Student/DashboardLayout";
+import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { mockReviews } from "@/src/mocks/mockReviews";
 import { mockCompanies } from "@/src/mocks/mockCompanies";
 import { useSidebar } from "@/src/lib/sidebarContext";

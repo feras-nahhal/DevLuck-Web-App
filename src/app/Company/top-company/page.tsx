@@ -557,7 +557,7 @@ export default function TopCompanyPage() {
          const router = useRouter();
          const [searchQuery, setSearchQuery] = useState("");
          const [currentPage, setCurrentPage] = useState(1);
-         const [isModalOpen, setIsModalOpen] = useState(false);
+
      
          // 🔍 Filter applicants
          const filteredApplicants = useMemo(() => {
@@ -596,6 +596,22 @@ export default function TopCompanyPage() {
          const goToNext = () => {
            if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
          };
+
+        const totalCompanies = mockCompanies.length;
+
+        const verifiedCompanies = mockCompanies.filter(
+          (company) => company.status === "Verified"
+        ).length;
+
+        const pendingCompanies = mockCompanies.filter(
+          (company) => company.status === "Pending"
+        ).length;
+
+        const totalEmployees = mockCompanies.reduce(
+          (sum, company) => sum + company.employeeNumber,
+          0
+        );
+
    return (
        <DashboardLayout>
        <div className="px-4 sm:px-6 lg:px-8 py-6">
@@ -606,12 +622,32 @@ export default function TopCompanyPage() {
             Company
          </h1>
          {/* Top row: 4 cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 ">
-          <Card title="Total companies" value="200" subtitle="2+ this week" />
-          <Card title="Total companies" value="345" subtitle="10% growth" />
-          <Card title="Total companies" value="200" subtitle="5% growth" />
-          <Card title="Total companies" value="24" subtitle="2+ this week" />
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+            <Card
+              title="Total Companies"
+              value={totalCompanies.toString()}
+              subtitle="All registered companies"
+            />
+
+            <Card
+              title="Verified Companies"
+              value={verifiedCompanies.toString()}
+              subtitle="Approved profiles"
+            />
+
+            <Card
+              title="Pending Companies"
+              value={pendingCompanies.toString()}
+              subtitle="Awaiting review"
+            />
+
+            <Card
+              title="Total Employees"
+              value={totalEmployees.toLocaleString()}
+              subtitle="Across all companies"
+            />
+          </div>
+
  
          {/* =====================
              Main Column

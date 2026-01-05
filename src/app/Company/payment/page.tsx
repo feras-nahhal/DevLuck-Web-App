@@ -4,6 +4,7 @@ import {useRouter } from "next/navigation";
 import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { mockApplicants } from "@/src/mocks/mockApplicants";
+import { mockApplicantPayments } from "@/src/mocks/mockApplicantPayments";
 import { ArrowUpRight } from "lucide-react";
 import { createPortal } from "react-dom";
 
@@ -649,6 +650,27 @@ export default function PaymentPage() {
     const goToNext = () => {
       if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
     };
+// ----------------card view----------------------------------------------
+    const parseAmount = (amount: string) =>
+    Number(amount.replace("$", "").trim());
+
+    const totalPaid = mockApplicantPayments
+  .filter(p => p.paymentStatus === "Paid")
+  .reduce((sum, p) => sum + parseAmount(p.monthlyAllowance), 0);
+
+  const totalPending = mockApplicantPayments
+    .filter(p => p.paymentStatus === "Pending")
+    .reduce((sum, p) => sum + parseAmount(p.monthlyAllowance), 0);
+
+  const totalDue = mockApplicantPayments
+    .filter(p => p.paymentStatus === "Due")
+    .reduce((sum, p) => sum + parseAmount(p.monthlyAllowance), 0);
+
+  // Optional: Hold = Pending + Due (common dashboard logic)
+  const totalHold = totalPending + totalDue;
+
+
+
 
 return (
   <DashboardLayout>
@@ -661,12 +683,32 @@ return (
       </div>
       
       {/* Top row: 4 cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 ">
-        <Card title="Total Paid" value="500 SAR" subtitle="2+ this week" />
-        <Card title="Pending Payment" value="345 SAR" subtitle="10% growth" />
-        <Card title="Due" value="200" subtitle="5% growth" />
-        <Card title="Hold" value="24" subtitle="2+ this week" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <Card
+          title="Total Paid"
+          value={`${totalPaid.toLocaleString()} SAR`}
+          subtitle="Completed payments"
+        />
+
+        <Card
+          title="Pending Payment"
+          value={`${totalPending.toLocaleString()} SAR`}
+          subtitle="Awaiting processing"
+        />
+
+        <Card
+          title="Due"
+          value={`${totalDue.toLocaleString()} SAR`}
+          subtitle="Invoices sent"
+        />
+
+        <Card
+          title="Hold"
+          value={`${totalHold.toLocaleString()} SAR`}
+          subtitle="Pending + Due"
+        />
       </div>
+
 
       {/* Main Column */}
       <div className="flex flex-col gap-6">
