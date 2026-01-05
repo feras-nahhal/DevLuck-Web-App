@@ -6,7 +6,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { mockJobs } from "@/src/mocks/companyJobs";
 import { useParams, useRouter } from "next/navigation";
 import { mockApplicants } from "@/src/mocks/mockApplicants";
-
+import { mockContracts } from "@/src/mocks/mockContract";
 /* ──────────────────────────────────────────────
    Card Component
 ────────────────────────────────────────────── */
@@ -399,6 +399,33 @@ const Card = ({
 
 export default function DashboardPage() {
   const router = useRouter();
+
+  const parseSalary = (salary: string) =>
+  Number(salary.replace(/[$,]/g, ""));
+
+  // Total Sales = sum of salaries for completed contracts
+  const totalSales = mockContracts
+    .filter(c => c.status === "Completed")
+    .reduce((sum, c) => sum + parseSalary(c.salary), 0);
+
+  // New Users = unique applicants involved in contracts
+  const newUsers = new Set(
+    mockContracts.flatMap(c => c.applicantIds)
+  ).size;
+
+  // Revenue = sum of salaries for running contracts
+  const revenue = mockContracts
+    .filter(c => c.status === "Running")
+    .reduce((sum, c) => sum + parseSalary(c.salary), 0);
+
+  // Opportunities = contracts that are still in opportunity stage
+  const opportunities = mockContracts.filter(
+    c => c.opportunityStatus !== "Rejected"
+  ).length;
+
+
+
+
   return (
     <DashboardLayout>
        <div className="px-4 sm:px-6 lg:px-8 py-6">
@@ -406,12 +433,32 @@ export default function DashboardPage() {
           Dashboard
         </h1>
       {/* Top row: 4 cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 ">
-        <Card title="Total Sales" value="$12.3K" subtitle="2+ this week" />
-        <Card title="New Users" value="345" subtitle="10% growth" />
-        <Card title="Revenue" value="$8.9K" subtitle="5% growth" />
-        <Card title="Opportunities" value="24" subtitle="2+ this week" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <Card
+          title="Total Sales"
+          value={`$${totalSales.toLocaleString()}`}
+          subtitle="Completed contracts"
+        />
+
+        <Card
+          title="New Users"
+          value={newUsers.toString()}
+          subtitle="Active applicants"
+        />
+
+        <Card
+          title="Revenue"
+          value={`$${revenue.toLocaleString()}`}
+          subtitle="Running contracts"
+        />
+
+        <Card
+          title="Opportunities"
+          value={opportunities.toString()}
+          subtitle="Open opportunities"
+        />
       </div>
+
 
       <div className="flex flex-row gap-8 pl-2">
         {/* Bottom left column */}

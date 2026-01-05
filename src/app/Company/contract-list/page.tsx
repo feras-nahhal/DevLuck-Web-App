@@ -697,6 +697,26 @@ export default function ContractListPage() {
       const goToNext = () => {
         if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
       };
+
+      //---------------------card-------------------------------------------
+      const totalContracts = mockApplicants.length;
+
+      const runningContracts = mockApplicants.filter(
+        (a) => a.contractStatus === "Running"
+      ).length;
+
+      // Assuming "Hold" = contracts that are not running yet (business logic)
+      // You can adjust this if your backend defines Hold differently
+      const holdContracts = mockApplicants.filter(
+        (a) => a.contractStatus !== "Running" && a.contractStatus !== "Completed"
+      ).length;
+
+      const expiredContracts = mockApplicants.filter(
+        (a) => a.contractStatus === "Completed"
+      ).length;
+
+
+
   
     
 return (
@@ -727,12 +747,32 @@ return (
         </div>
       </div>
       {/* Top row: 4 cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 ">
-        <Card title="Total Contracts" value="500" subtitle="2+ this week" />
-        <Card title="Running" value="345" subtitle="10% growth" />
-        <Card title="Hold" value="200" subtitle="5% growth" />
-        <Card title="Expired" value="24" subtitle="2+ this week" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <Card
+          title="Total Contracts"
+          value={totalContracts.toString()}
+          subtitle="All contracts"
+        />
+
+        <Card
+          title="Running"
+          value={runningContracts.toString()}
+          subtitle="Active contracts"
+        />
+
+        <Card
+          title="Hold"
+          value={holdContracts.toString()}
+          subtitle="Not started / paused"
+        />
+
+        <Card
+          title="Expired"
+          value={expiredContracts.toString()}
+          subtitle="Completed contracts"
+        />
       </div>
+
 
       {/* Main Column */}
       <div className="flex flex-col gap-6">
