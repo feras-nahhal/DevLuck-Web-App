@@ -78,11 +78,9 @@ const Card = ({
 const ApplicantCard = ({
   applicant,
   onClick,
-  onDisputeClick,
 }: {
   applicant: typeof mockContracts[0];
   onClick?: () => void;
-  onDisputeClick?: () => void;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
@@ -168,7 +166,7 @@ const ApplicantCard = ({
               <button className="relative w-[80px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
                onClick={onClick}>
                 <span className="skew-x-[12deg] text-[14px] font-bold leading-[24px] text-[#141A21]">
-                    Apply
+                    Details
                   </span>
               </button>
               <div className="flex flex-row">
@@ -664,8 +662,7 @@ return (
                 applicant={contract}
                 onClick={() =>
                   router.push(`/Student/applied-Opportunity/${contract.id}`)
-                }
-                onDisputeClick={() => setIsModalOpen(true)}
+                }       
               />
             ))}
           </div>
