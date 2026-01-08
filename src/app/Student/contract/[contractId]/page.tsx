@@ -21,7 +21,7 @@ const ParallelogramInput = ({
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   type?: string;
 }) => (
-  <div className="relative w-120 h-[48px]">
+  <div className="relative w-full sm:w-120 h-[48px]">
     <label
       className="absolute -top-2 left-5 h-[18px] px-3 bg-[#FFEB9C] text-[#1E1E1E] text-xs font-normal select-none flex items-center skew-x-[-12deg] z-20 "
       style={{ borderRadius: "6px" }}
@@ -79,7 +79,7 @@ const PaymentRow = ({ payment,showCheckbox = false }: PaymentRowProps) => {
 
       {/* Main 80% section */}
       <div
-        className="flex  items-center skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg  bg-white cursor-pointer hover:bg-gray-50"
+        className="flex  items-center skew-x-[-12deg] rounded-[8] sm:h-[72px] h-[100px] shadow-lg  bg-white cursor-pointer hover:bg-gray-50"
       >
 
         {/* Left spacer */}
@@ -121,7 +121,7 @@ const PaymentRow = ({ payment,showCheckbox = false }: PaymentRowProps) => {
         )}
 
         {/* Applicant Info */}
-        <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 ">
+         <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 md:flex md:items-center  skew-x-[12deg]">
           {/* CO-ID */}
           <div className="flex flex-col justify-center w-[160px] ">
             <span className="text-sm font-semibold text-gray-900">{payment.paymentId}</span>
@@ -133,13 +133,14 @@ const PaymentRow = ({ payment,showCheckbox = false }: PaymentRowProps) => {
             <span className="text-sm font-semibold text-gray-900">{payment.nextPayment}</span>
             <span className="text-xs text-gray-400">Next Payment</span>
           </div>
+          
 
           {/* Contract Status */}
-          <div className="flex flex-col justify-center items-center  ">
+          <div className="flex flex-col justify-start md:justify-center items-start md:items-center">
             <div
               className={`
-                ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8] text-xs font-semibold flex items-center justify-center
-                ${payment.status === "Paid" ? "bg-[#D3FCD2] border border-[#22C55E] text-[#22C55E]" : ""}
+                ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8] text-xs font-semibold flex justify-start md:justify-center items-start md:items-center 
+                ${payment.status === "Paid" ? "bg-[#D3FCD2] border border-[#22C55E] text-[#22C55E] " : ""}
                 ${payment.status === "Upcoming" ? "bg-[#DFE3E8] border border-black text-black" : ""}
               `}
             >
@@ -206,10 +207,11 @@ export default function contractDetailPage() {
   return (
     <DashboardLayout>
         <div className="px-4 sm:px-6 lg:px-6 py-6">
-            <div className="flex gap-6">
-            <div className="w-1/2">
+
+            <div className="flex flex-col lg:flex-row gap-6">
+            <div className="w-full lg:w-1/2">
                 {/* Tabs */}
-                <div className="flex gap-4 mb-6">
+                <div className="flex gap-4 mb-6 sm:mt-0 mt-4">
                     {/* Contract Details */}
                     <button
                     onClick={() => setActiveTab("Contract Details")}
@@ -264,11 +266,40 @@ export default function contractDetailPage() {
                         ))}
                         </ul>
                     </section>
+                     {/* Skills */}
+                        <section>
+                          <h3 className="font-semibold mb-2">Skills</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {contract.skills.map((skill, i) => (
+                              <span
+                                key={i}
+                                className="px-3 py-1 text-sm skew-x-[-12deg]  rounded-[6px] border border-black "
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </section>
+
+                        {/* Benefits */}
+                        <section>
+                          <h3 className="font-semibold mb-2">Benefits</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {contract.benefits.map((benefit, i) => (
+                              <span
+                                key={i}
+                                className="px-3 py-1 text-sm skew-x-[-12deg]  rounded-[6px] border border-black "
+                              >
+                                {benefit}
+                              </span>
+                            ))}
+                          </div>
+                        </section>
                     </div>
                 )}
             </div>
 
-            <div className="w-1/2 flex items-start">
+            <div className="w-full lg:w-1/2 flex items-start">
                 <div className="flex flex-col gap-2 w-full">
                     <div className="w-full ">
 
@@ -300,12 +331,12 @@ export default function contractDetailPage() {
                         <h3 className="text-lg font-semibold mb-4">
                         Review
                         </h3>
-                    <div className="flex w-full skew-x-[-12deg] max-w-[560px] h-[320px] shadow-lg bg-white items-start rounded-[8] overflow-hidden mt-5 flex-col p-10">
+                    <div className="flex w-full md:skew-x-[-12deg] max-w-[560px] h-[320px] shadow-lg bg-white sm:items-start items-center rounded-[8] overflow-hidden mt-5 flex-col p-10">
 
                         <div className="flex flex-col ">
   
                         {/* Input */}
-                        <div className="w-full flex justify-center mb-25">
+                        <div className="w-full flex justify-center  mb-25">
                             <div className="w-full max-w-md">
                             <ParallelogramInput
                                 label="Write your comments"
@@ -318,7 +349,7 @@ export default function contractDetailPage() {
                         </div>
 
                         {/* Stars */}
-                        <div className="flex justify-start  skew-x-[12deg] gap-2 mb-5">
+                        <div className="flex justify-start  md:skew-x-[12deg] gap-2 mb-5">
                             {[1,2,3,4,5].map((star) => (
                             <button
                                 key={star}
@@ -331,20 +362,25 @@ export default function contractDetailPage() {
                         </div>
 
                       {/* Buttons */}
-                        <div className="flex w-full   justify-between px-4">
+                        <div className="flex w-full flex-row gap-5 sm:flex-row sm:justify-between px-4">
                             <button
-                                className="px-6 py-2  border border-black rounded-md transition hover:scale-105"
+                                className="px-6 py-2  border border-black rounded-md transition hover:scale-105 "
                                 onClick={() => {
                                 setReview("");
                                 setStarRating(0);
                                 }}
                             >
+                              <div className=" md:skew-x-[12deg]">
                                 Cancel
+                              </div>
+
+                                
                             </button>
                             <button
                                 className="px-6 py-2 bg-[#FFEB9C] rounded-md transition hover:scale-105"
-                            >
+                            > <div className=" md:skew-x-[12deg]">
                                 Send
+                                </div>
                             </button>
                         </div>
 

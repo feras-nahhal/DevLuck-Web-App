@@ -531,8 +531,6 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
 };
 
 
-
-const ITEMS_PER_PAGE = 10;
 export default function ApplicantPage() {
     //--------------------------------Action menu--------------------------
       const [menuOpen, setMenuOpen] = useState(false);
@@ -579,24 +577,44 @@ export default function ApplicantPage() {
   
       
       // 📄 Pagination
-      const totalPages = Math.ceil(filteredApplicants.length / ITEMS_PER_PAGE);
+        const [itemsPerPage, setItemsPerPage] = useState(10); // default 10 for desktop
+
+        useEffect(() => {
+          const updateItemsPerPage = () => {
+            if (window.innerWidth < 640) { // mobile
+              setItemsPerPage(5);
+            } else {
+              setItemsPerPage(10); // desktop
+            }
+          };
+
+          updateItemsPerPage(); // run once on mount
+          window.addEventListener("resize", updateItemsPerPage); // run on resize
+
+          return () => window.removeEventListener("resize", updateItemsPerPage);
+        }, []);
+
+     
       
-      const paginatedApplicants = filteredApplicants.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-      );
-      
-      const goToPage = (page: number) => {
-        if (page >= 1 && page <= totalPages) setCurrentPage(page);
-      };
-      
-      const goToPrevious = () => {
-        if (currentPage > 1) setCurrentPage(prev => prev - 1);
-      };
-      
-      const goToNext = () => {
-        if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
-      };
+        const totalPages = Math.ceil(filteredApplicants.length / itemsPerPage);
+
+        const paginatedApplicants = filteredApplicants.slice(
+          (currentPage - 1) * itemsPerPage,
+          currentPage * itemsPerPage
+        );
+
+        const goToPage = (page: number) => {
+          if (page >= 1 && page <= totalPages) setCurrentPage(page);
+        };
+
+        const goToPrevious = () => {
+          if (currentPage > 1) setCurrentPage(prev => prev - 1);
+        };
+
+        const goToNext = () => {
+          if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+        };
+
   
 
   return (
@@ -651,7 +669,7 @@ export default function ApplicantPage() {
             {/* Filter Buttons – Parallelogram on right */}
             <div className="flex gap-2 ml-auto">
               {/* First Filter Button */}
-              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+              <button className="hidden sm:flex relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
               onClick={() => setShowApplicants(!showApplicants)}
               >
                 <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
@@ -680,7 +698,7 @@ export default function ApplicantPage() {
               {/* Action Menu – appears beside the button */}
               {menuOpen && (
                 <div
-                  className="absolute top-36 right-20 mt-2 w-[400px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
+                  className="absolute sm:top-[20%]  sm:left-[70%] top-[18%] left-[5%]  mt-2 sm:w-[400px]  w-[360px]  skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
                   onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
                 >
                   <div className="p-2">
@@ -741,7 +759,7 @@ export default function ApplicantPage() {
             
            {/* Applicants Grid */}
           {showApplicants && (
-          <div className="grid grid-cols-5 grid-rows-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 max-w-[1200px] mx-auto">
           {paginatedApplicants.map((applicant, index) => (
             <ApplicantCard
               key={index}

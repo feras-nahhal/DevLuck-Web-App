@@ -166,8 +166,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999; /* Behind sidebar */
+  z-index: 45; /* Behind sidebar */
 }
 
 /* ===============================

@@ -1,9 +1,9 @@
 // src/app/Company/top-university/page.tsx
 "use client";
-import { useParams, useRouter } from "next/navigation";
+import {useRouter } from "next/navigation";
 import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
-import { createPortal } from "react-dom";
+
 import { mockUniversities } from "@/src/mocks/mockUniversities";
 
 const UniversityCard = ({
@@ -14,10 +14,10 @@ const UniversityCard = ({
   onClick?: () => void;
 }) => {
   return (
-    <div className="relative w-[265px] h-[455px]">
+    <div className="relative w-[230px] h-[455px]">
       {/* SVG Card Body */}
       <svg
-        width="436"
+        width="400"
         height="419"
         viewBox="0 0 436 419"
         fill="none"
@@ -185,10 +185,10 @@ const UniversityCard = ({
       <div
         className="absolute overflow-hidden"
         style={{
-          top: "15px",
-          left: "11.6%",
-          height: "140px",
-          width: "145px",
+          top: "32px",
+          left: "12%",
+          height: "130px",
+          width: "135px",
           borderRadius: "20px",
           backgroundColor: "#E0E0E0",
           zIndex: 2,
@@ -225,8 +225,8 @@ const UniversityCard = ({
       <div
         className="absolute flex flex-col items-start gap-[15px]"
         style={{
-          left: "85%",
-          top: "5.92%",
+          left: "87%",
+          top: "7%",
           bottom: "53.71%",
           width: "65%",
         }}
@@ -257,7 +257,7 @@ const UniversityCard = ({
           {/* Frame 337 - Phone */}
           <div className="flex items-center gap-[14px]">
             {/* Phone Icon */}
-            <div className="relative w-[32px] h-[32px]">
+            <div className="relative w-[24px] h-[24px]">
               {/* replace with your actual icon */}
               <svg width="24" height="23" viewBox="0 0 24 23" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M16.7425 14.5413L16.1358 15.1453C16.1358 15.1453 14.6918 16.58 10.7518 12.6626C6.81181 8.74531 8.25581 7.31064 8.25581 7.31064L8.63714 6.92931C9.57981 5.99331 9.66914 4.48931 8.84647 3.39064L7.16647 1.14664C6.14781 -0.213361 4.18114 -0.393361 3.01448 0.766639L0.921142 2.84664C0.343808 3.42264 -0.0428587 4.16664 0.003808 4.99331C0.123808 7.10931 1.08114 11.66 6.41981 16.9693C12.0825 22.5986 17.3958 22.8226 19.5678 22.62C20.2558 22.556 20.8531 22.2066 21.3345 21.7266L23.2278 19.844C24.5078 18.5733 24.1478 16.3933 22.5105 15.504L19.9638 14.1186C18.8891 13.5346 17.5825 13.7066 16.7425 14.5413Z" fill="#1E1E1E"/>
@@ -276,7 +276,7 @@ const UniversityCard = ({
         className="absolute flex flex-col items-start"
         style={{
           left: "15%",
-          top: "50%",
+          top: "47%",
           width: "120%",
         }}
       >
@@ -300,13 +300,13 @@ const UniversityCard = ({
         className="
           absolute
           flex items-center
-          w-[90px] h-[32px]
+          w-[80px] h-[32px]
           skew-x-[-12deg]
           rounded-MD
         "
         style={{
-          top: "170px",
-          left: "24%",
+          top: "175px",
+          left: "25%",
           zIndex: 2,
           borderRadius: "8px", // Your desired radius
           overflow: "hidden",  // Makes skewed inner content clipped to rounded corners
@@ -331,7 +331,7 @@ const UniversityCard = ({
       </div>
 
       {/* Button */}
-      <button className="absolute left-[110%] top-[77%] flex items-center skew-x-[-12deg] justify-center px-3 min-w-[120px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
+      <button className="absolute left-[116%] top-[74%] flex items-center skew-x-[-12deg] justify-center px-3 min-w-[110px] h-[36px] bg-[#FFEB9C] rounded-lg transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
         onClick={onClick}>
         <span className="text-[14px] skew-x-[12deg] font-bold leading-[24px] text-[#1E1E1E]">
           View Details
@@ -459,28 +459,18 @@ const UniversityRow = ({ university,onMainClick,onSideClick,showCheckbox = false
   );
 };
 
-const ITEMS_PER_PAGE = 6;
+
 export default function TopUniversityPage() {
-      //--------------------------------Action menu--------------------------
-        const [menuOpen, setMenuOpen] = useState(false);
-        const menuRef = useRef<HTMLDivElement>(null);
-        const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
-        // ---------------------------------------------------------------------
+
     //---------------------filter----------------------------------
-        // Multi-select arrays instead of single string
-        type ContractStatus = "Running" | "Completed" | "All";
-    
-        const CONTRACT_STATUSES: ContractStatus[] = ["Running", "Completed", "All"];
-        const [editingContract, setEditingContract] = useState<any>(null);
-        const [selectedContractStatus, setSelectedContractStatus] = useState<ContractStatus[]>([]);
-        const [showApplicants, setShowApplicants] = useState(true);
+        const [showUniversities, setShowUniversities] = useState(true);
         const router = useRouter();
         const [searchQuery, setSearchQuery] = useState("");
         const [currentPage, setCurrentPage] = useState(1);
-        const [isModalOpen, setIsModalOpen] = useState(false);
+
     
         // 🔍 Filter applicants
-        const filteredApplicants = useMemo(() => {
+        const filteredUniversities = useMemo(() => {
           return mockUniversities.filter(applicant => {
             // Search filter
             const searchMatch =
@@ -498,11 +488,27 @@ export default function TopUniversityPage() {
     
         
         // 📄 Pagination
-        const totalPages = Math.ceil(filteredApplicants.length / ITEMS_PER_PAGE);
+        const [itemsPerPage, setItemsPerPage] = useState(6); // default 6 for desktop
+
+        useEffect(() => {
+          const updateItemsPerPage = () => {
+            if (window.innerWidth < 640) { // mobile
+              setItemsPerPage(4);
+            } else {
+              setItemsPerPage(6); // desktop
+            }
+          };
+
+          updateItemsPerPage(); // run once on mount
+          window.addEventListener("resize", updateItemsPerPage); // run on resize
+
+          return () => window.removeEventListener("resize", updateItemsPerPage);
+        }, []);
+        const totalPages = Math.ceil(filteredUniversities.length / itemsPerPage);
         
-        const paginatedApplicants = filteredApplicants.slice(
-          (currentPage - 1) * ITEMS_PER_PAGE,
-          currentPage * ITEMS_PER_PAGE
+        const paginatedUniversities = filteredUniversities.slice(
+          (currentPage - 1) * itemsPerPage,
+          currentPage * itemsPerPage
         );
         
         const goToPage = (page: number) => {
@@ -577,9 +583,9 @@ export default function TopUniversityPage() {
             </div>
 
             {/* -------- Filter Buttons -------- */}
-            <div className="flex gap-2 ml-auto">
+            <div className="ml-auto gap-2 hidden sm:flex">
 
-              {/* Toggle Applicants / Contracts */}
+              {/* Toggle Universities*/}
               <button
                 className="
                   relative w-[60px] h-[40px]
@@ -591,7 +597,7 @@ export default function TopUniversityPage() {
                   hover:bg-black/10
                   transition-all
                 "
-                onClick={() => setShowApplicants(!showApplicants)}
+                onClick={() => setShowUniversities(!showUniversities)}
               >
                 <span className="skew-x-[12deg]">
                   <svg width="24" height="41" viewBox="0 0 24 41" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -603,89 +609,16 @@ export default function TopUniversityPage() {
                   </svg>
                 </span>
               </button>
-              {/* =====================
-                  Filters Dropdown
-              ====================== */}
-              {menuOpen && (
-                <div
-                  className="
-                    absolute top-36 right-20 mt-2
-                    w-[400px]
-                    skew-x-[-12deg]
-                    bg-white
-                    border rounded-lg
-                    shadow-lg
-                    z-50
-                  "
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="p-2">
-
-                    {/* Contract Status */}
-                    <h6 className="px-2 skew-x-[12deg] py-1 font-semibold">
-                      Contract Status
-                    </h6>
-
-                    <div className="flex gap-2">
-                      {CONTRACT_STATUSES.map((status) => {
-                        const isSelected =
-                          selectedContractStatus.includes(status);
-
-                        return (
-                          <div
-                            key={status}
-                            className="
-                              flex items-center
-                              skew-x-[12deg]
-                              px-2 py-1
-                              cursor-pointer
-                              hover:bg-gray-100
-                              rounded-md
-                            "
-                            onClick={() => {
-                              if (status === "All") {
-                                setSelectedContractStatus([
-                                  "Running",
-                                  "Completed",
-                                  "All",
-                                ]);
-                              } else {
-                                setSelectedContractStatus((prev) =>
-                                  prev.includes(status)
-                                    ? prev.filter(
-                                        (s) => s !== status && s !== "All"
-                                      )
-                                    : [...prev.filter((s) => s !== "All"), status]
-                                );
-                              }
-                            }}
-                          >
-                            {/* Checkbox Icon */}
-                            <div className="w-9 h-9 mr-2 flex items-center justify-center">
-                              {isSelected ? (
-                                <> {/* Selected SVG */} </>
-                              ) : (
-                                <> {/* Unselected SVG */} </>
-                              )}
-                            </div>
-
-                            <span className="text-sm">{status}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
           {/* =====================
               universities Grid
           ====================== */}
-          {showApplicants && (
-            <div className="grid grid-cols-3 grid-rows-2 gap-2">
-              {paginatedApplicants.map((university, index) => (
+          {showUniversities && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 grid-rows-2 gap-2">
+
+              {paginatedUniversities.map((university, index) => (
                 <UniversityCard
                   key={index}
                   university={university}
@@ -702,9 +635,9 @@ export default function TopUniversityPage() {
           {/* =====================
               universities List
           ====================== */}
-          {!showApplicants && (
+          {!showUniversities && (
             <div className="flex flex-col gap-2 mt-4">
-              {paginatedApplicants.map((university, index) => (
+              {paginatedUniversities.map((university, index) => (
                 <UniversityRow
                   key={index}
                   university={university}

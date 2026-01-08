@@ -160,12 +160,34 @@ const JobCard = ({
   onClick?: () => void;
 }) => {
   return (
-    <div className="relative w-[437px] h-[217px]">
+    <div className="relative w-[410px] h-[220px]">
       {/* SVG Card Body */}
-        <img 
-          src="/cards/opportunityCard.svg" 
-          alt="ContractCard Background"
-        />
+
+        <svg width="410" height="220" viewBox="0 0 437 217" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#filter0_dd_12779_51761)">
+        <path d="M324.419 27.0303C324.419 37.5404 332.939 46.0605 343.449 46.0605H392.015C405.269 46.0605 416.015 56.8057 416.015 70.0605V126.183C416.015 133.732 412.463 140.84 406.428 145.373L360.262 180.047C356.106 183.169 351.048 184.856 345.849 184.856H179.133C166.871 184.856 156.93 174.916 156.93 162.653C156.93 150.39 146.989 140.449 134.726 140.449H44C30.7452 140.449 20 129.704 20 116.449V32C20 18.7452 30.7452 8 44 8H305.389C315.899 8 324.419 16.5201 324.419 27.0303Z" fill="white"/>
+        </g>
+        <defs>
+        <filter id="filter0_dd_12779_51761" x="0" y="0" width="436.015" height="216.856" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+        <feFlood floodOpacity="0" result="BackgroundImageFix"/>
+        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+        <feMorphology radius="4" operator="erode" in="SourceAlpha" result="effect1_dropShadow_12779_51761"/>
+        <feOffset dy="12"/>
+        <feGaussianBlur stdDeviation="12"/>
+        <feComposite in2="hardAlpha" operator="out"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0"/>
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_12779_51761"/>
+        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+        <feOffset/>
+        <feGaussianBlur stdDeviation="1"/>
+        <feComposite in2="hardAlpha" operator="out"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0"/>
+        <feBlend mode="normal" in2="effect1_dropShadow_12779_51761" result="effect2_dropShadow_12779_51761"/>
+        <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_12779_51761" result="shape"/>
+        </filter>
+        </defs>
+        </svg>
+
 
         <div className="absolute w-[340px] h-[84px] left-[50%] top-[35%] -translate-x-[50%] -translate-y-[50%] rounded-[24px_0_0_24px] flex flex-col gap-4">
           {/* Text */}
@@ -238,14 +260,14 @@ const JobCard = ({
         </div>
 
       {/* Job Number Label */}
-      <div className="absolute left-[77%] top-[8%] flex items-center justify-center w-20 bg-black/20 rounded-[6px]">
+      <div className="absolute left-[75.5%] top-[10%] flex items-center justify-center w-20 bg-black/20 rounded-[6px]">
         <span className="text-[12px] font-bold leading-[20px] text-[#1E1E1E] text-center">
           JOB - {jobNumber}
         </span>
       </div>
 
       {/* Button */}
-      <button className="absolute left-[8%] top-[68%] flex items-center justify-center px-3 min-w-[64px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
+      <button className="absolute left-[7%] top-[67%] flex items-center justify-center px-3 min-w-[64px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
         onClick={onClick}>
         <span className="text-[14px] font-bold leading-[24px] text-[#1E1E1E]">
           View Details
@@ -477,7 +499,7 @@ const ContractRow = ({ job,onMainClick,onEdit,showCheckbox = false }: ContractRo
 /* ──────────────────────────────────────────────
    Main Opportunity Page Component
 ────────────────────────────────────────────── */
-  const ITEMS_PER_PAGE = 9;
+
 
 export default function OpportunityPage() {
 const [showApplicants, setShowApplicants] = useState(true);
@@ -500,11 +522,28 @@ const [showApplicants, setShowApplicants] = useState(true);
   }, [searchQuery]);
 
   // 📄 Pagination
-  const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
+  const [itemsPerPage, setItemsPerPage] = useState(9); // default 10 for desktop
+
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      if (window.innerWidth < 640) { // mobile
+        setItemsPerPage(5);
+      } else {
+        setItemsPerPage(9); // desktop
+      }
+    };
+
+    updateItemsPerPage(); // run once on mount
+    window.addEventListener("resize", updateItemsPerPage); // run on resize
+
+    return () => window.removeEventListener("resize", updateItemsPerPage);
+  }, []);
+
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
   const paginatedJobs = filteredJobs.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const goToPage = (page: number) => {
@@ -574,7 +613,7 @@ const [showApplicants, setShowApplicants] = useState(true);
       </div>
 
       {/* Top row: 4 cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 place-items-center">
         <Card
           title="Total Sales"
           value={`$${totalSales.toLocaleString()}`}
@@ -646,7 +685,7 @@ const [showApplicants, setShowApplicants] = useState(true);
               </div>
             </div>
             {/* Filter Buttons – Parallelogram on right */}
-            <div className="flex gap-2 ml-auto">
+            <div className="ml-auto gap-2 hidden sm:flex">
               {/* First Filter Button */}
               <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
               onClick={() => setShowApplicants(!showApplicants)}
@@ -669,7 +708,8 @@ const [showApplicants, setShowApplicants] = useState(true);
 
         {/* Applicants Grid */}
         {showApplicants && (
-          <div className="grid grid-cols-3  grid-rows-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center ">
+
             {paginatedJobs.map((job, index) => (
               <JobCard
                 key={index}

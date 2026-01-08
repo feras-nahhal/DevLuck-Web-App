@@ -345,7 +345,7 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
     <div className="flex w-full gap-4">
       {/* Main 80% section */}
       <div
-        className="flex items-center w-9/10 skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg  bg-white cursor-pointer hover:bg-gray-50"
+        className="flex items-center w-full skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg  bg-white cursor-pointer hover:bg-gray-50"
         onClick={onMainClick}
       >
 
@@ -388,34 +388,34 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
         )}
 
         {/* Applicant Info */}
-        <div className="flex-1 flex items-center h-full px-4 gap-6">
+        <div className="flex-1 flex items-center h-full px-4 gap-30 skew-x-[12deg]">
           {/* CO-ID */}
-          <div className="flex flex-col justify-center w-[140px]">
+          <div className="flex flex-col justify-center ">
             <span className="text-sm font-semibold text-gray-900">CO-ID-{applicant.applicantId}</span>
             <span className="text-xs text-gray-400">Job ID</span>
           </div>
           {/* Name */}
-          <div className="flex flex-col justify-center w-[140px]">
+          <div className="flex flex-col justify-center ">
             <span className="text-sm font-semibold text-gray-900">{applicant.name}</span>
             <span className="text-xs text-gray-400">Applicant Name</span>
           </div>
           {/* Contract Title */}
-          <div className="flex flex-col justify-center w-[140px]">
+          <div className="flex flex-col justify-center ">
             <span className="text-sm font-semibold text-gray-900">{applicant.contractTitle}</span>
             <span className="text-xs text-gray-400">Contract Title</span>
           </div>
           {/* Start Date */}
-          <div className="flex flex-col justify-center w-[140px]">
+          <div className="flex flex-col justify-center ">
             <span className="text-sm font-semibold text-gray-900">{applicant.startDate}</span>
             <span className="text-xs text-gray-400">Start Date</span>
           </div>
           {/* End Date */}
-          <div className="flex flex-col justify-center w-[140px]">
+          <div className="flex flex-col justify-center ">
             <span className="text-sm font-semibold text-gray-900">{applicant.endDate}</span>
             <span className="text-xs text-gray-400">End Date</span>
           </div>
           {/* Contract Status */}
-          <div className="flex flex-col justify-center items-center w-[140px]">
+          <div className="flex flex-col justify-center items-center ">
             <div
               className={`
                 ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8] text-xs font-semibold flex items-center justify-center
@@ -431,35 +431,11 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
         </div>
       </div>
 
-      {/* Second 20% section beside the main card */}
-      <div
-        className="flex items-center w-1/10 skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg bg-[#FFF9E0] cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation(); // 🔥 VERY IMPORTANT
-          onSideClick?.();
-        }}
-      >
-        <div className="flex items-center justify-center w-full h-full">
-          {/* Example Frame 295 content */}
-          <div className="flex flex-col items-center justify-center gap-1">
-            <svg width="77" height="72" viewBox="0 0 77 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="76.4667" height="72" fill="#FFF9E0"/>
-              <path d="M27.7333 20H23.0852C18.1121 20 13.5891 22.8805 11.486 27.3871L7.08281 36.8226C3.78263 43.8944 8.94481 52 16.7488 52H27.7333" stroke="#1E1E1E" strokeWidth="1.06667"/>
-              <path d="M24.7334 20V20.5H48.7334V20V19.5H24.7334V20ZM48.7334 52V51.5H24.7334V52V52.5H48.7334V52Z" fill="#1E1E1E"/>
-              <path d="M36.7334 38C37.838 38 38.7334 37.1046 38.7334 36C38.7334 34.8954 37.838 34 36.7334 34C35.6288 34 34.7334 34.8954 34.7334 36C34.7334 37.1046 35.6288 38 36.7334 38Z" fill="#1E1E1E"/>
-              <path d="M36.7334 31C37.838 31 38.7334 30.1046 38.7334 29C38.7334 27.8954 37.838 27 36.7334 27C35.6288 27 34.7334 27.8954 34.7334 29C34.7334 30.1046 35.6288 31 36.7334 31Z" fill="#1E1E1E"/>
-              <path d="M36.7334 45C37.838 45 38.7334 44.1046 38.7334 43C38.7334 41.8954 37.838 41 36.7334 41C35.6288 41 34.7334 41.8954 34.7334 43C34.7334 44.1046 35.6288 45 36.7334 45Z" fill="#1E1E1E"/>
-              <path d="M45.7335 52L50.3816 52C55.3547 52 59.8777 49.1195 61.9808 44.6129L66.384 35.1774C69.6842 28.1056 64.522 20 56.718 20L45.7335 20" stroke="#1E1E1E" strokeWidth="1.06667"/>
-            </svg>
-
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
 
-const ITEMS_PER_PAGE = 10;
+
 export default function JobDetailPage() {
   const { jobId } = useParams();
   const router = useRouter();
@@ -480,12 +456,28 @@ const filteredApplicants = useMemo(() => {
   );
 }, [searchQuery]);
 
-// 📄 Pagination
-const totalPages = Math.ceil(filteredApplicants.length / ITEMS_PER_PAGE);
+ // 📄 Pagination
+const [itemsPerPage, setItemsPerPage] = useState(10); // default 10 for desktop
+
+useEffect(() => {
+  const updateItemsPerPage = () => {
+    if (window.innerWidth < 640) { // mobile
+      setItemsPerPage(5);
+    } else {
+      setItemsPerPage(10); // desktop
+    }
+  };
+
+  updateItemsPerPage(); // run once on mount
+     window.addEventListener("resize", updateItemsPerPage); // run on resize
+
+  return () => window.removeEventListener("resize", updateItemsPerPage);
+}, []);
+const totalPages = Math.ceil(filteredApplicants.length / itemsPerPage);
 
 const paginatedApplicants = filteredApplicants.slice(
-  (currentPage - 1) * ITEMS_PER_PAGE,
-  currentPage * ITEMS_PER_PAGE
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
 );
 
 const goToPage = (page: number) => {
@@ -529,7 +521,7 @@ const goToNext = () => {
       <div className="px-4 sm:px-6 lg:px-8 py-6">
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-6">
+        <div className="flex gap-4 mb-6 mt-4">
           {/* Description Tab */}
           <button
             onClick={() => setActiveTab("description")}
@@ -577,8 +569,6 @@ const goToNext = () => {
         {/* TAB CONTENT */}
         {activeTab === "description" && (
           <div className="flex flex-col gap-6">
-
-
             <section>
               <h2 className="font-semibold text-xl mb-2">Job Description</h2>
               <p>{job.description}</p>
@@ -644,11 +634,8 @@ const goToNext = () => {
         )}
 
         {activeTab === "candidates" && (
-    <div className="bg-white p-6 ">
-
-           {/* Jobs Section */}
-      <div className="flex flex-row pl-2">
-        {/* Main column */}
+        <div>
+        {/* Jobs Section */}
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-2">
           {/* Search Input – Parallelogram */}
@@ -693,7 +680,7 @@ const goToNext = () => {
             {/* Filter Buttons – Parallelogram on right */}
             <div className="flex gap-2 ml-auto">
               {/* First Filter Button */}
-              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+              <button className="hidden sm:flex relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
               onClick={() => setShowApplicants(!showApplicants)}>
                 <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
                   <svg width="24" height="41" viewBox="0 0 24 41" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -712,7 +699,7 @@ const goToNext = () => {
             
           {/* Applicants Grid */}
       {showApplicants && (
-        <div className="grid grid-cols-5 grid-rows-2 gap-2 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 max-w-[1200px] mx-auto">
           {paginatedApplicants.map((applicant, index) => (
             <ApplicantCard
               key={index}
@@ -740,7 +727,7 @@ const goToNext = () => {
         </div>
       )}
 
-        </div>
+       
       </div>
             {totalPages > 1 && (
                     <div className="flex items-center justify-center gap-3 mt-10">

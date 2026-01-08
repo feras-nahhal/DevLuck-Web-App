@@ -175,10 +175,10 @@ const ApplicantCard = ({
   onClick?: () => void;
 }) => {
   return (
-    <div className="relative w-[439px] h-[299px]">
+    <div className="relative w-[400px] h-[299px]">
       {/* SVG Card Body */}
       <svg
-        width="439"
+        width="400"
         height="299"
         viewBox="0 0 439 299"
         fill="none"
@@ -255,10 +255,10 @@ const ApplicantCard = ({
       </svg>
 
           <div
-          className={` absolute left-[80%] top-[3%] 
+          className={` absolute left-[80%] top-[8%] 
             skew-x-[-12deg]
             flex items-center justify-center
-            h-[32px]
+            h-[25px]
             min-w-[60px] px-2
             px-2
             rounded-sm
@@ -271,7 +271,7 @@ const ApplicantCard = ({
             }
             ${
             applicant.paymentStatus === "Pending" &&
-            "bg-[#FFF4CC] text-[#F59E0B] text-[10px] "
+            "bg-[#FFF4CC] text-[#F59E0B] text-[8px] "
             }
             ${
               applicant.paymentStatus === "Due" &&
@@ -286,9 +286,9 @@ const ApplicantCard = ({
         </div>
 
       {/* Button */}
-      <button className="absolute left-[6%] top-[76%] flex items-center skew-x-[-12deg] justify-center px-3 min-w-[120px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
+      <button className="absolute left-[5%] top-[73%] flex items-center  justify-center px-3 min-w-[120px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
         onClick={onClick}>
-        <span className="text-[14px] skew-x-[12deg] font-bold leading-[24px] text-[#1E1E1E]">
+        <span className="text-[14px]  font-bold leading-[24px] text-[#1E1E1E]">
           View Details
         </span>
       </button>
@@ -672,11 +672,28 @@ export default function PaymentPage() {
 
     
     // 📄 Pagination
-    const totalPages = Math.ceil(filteredApplicants.length / ITEMS_PER_PAGE);
+    const [itemsPerPage, setItemsPerPage] = useState(6); // default 6 for desktop
+
+    useEffect(() => {
+      const updateItemsPerPage = () => {
+        if (window.innerWidth < 640) { // mobile
+          setItemsPerPage(5);
+        } else {
+          setItemsPerPage(6); // desktop
+        }
+      };
+
+      updateItemsPerPage(); // run once on mount
+      window.addEventListener("resize", updateItemsPerPage); // run on resize
+
+      return () => window.removeEventListener("resize", updateItemsPerPage);
+    }, []);
+
+    const totalPages = Math.ceil(filteredApplicants.length / itemsPerPage);
     
     const paginatedApplicants = filteredApplicants.slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
     );
     
     const goToPage = (page: number) => {
@@ -723,7 +740,7 @@ return (
       </div>
       
       {/* Top row: 4 cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 place-items-center">
         <Card
           title="Total Paid"
           value={`${totalPaid.toLocaleString()} SAR`}
@@ -798,7 +815,7 @@ return (
           {/* Filter Buttons – Parallelogram on right */}
           <div className="flex gap-2 ml-auto">
             {/* First Filter Button */}
-            <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+            <button className="hidden sm:flex relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             onClick={() => setShowApplicants(!showApplicants)}
             >
               <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
@@ -828,13 +845,13 @@ return (
             {/* Action Menu – appears beside the button */}
               {menuOpen && (
                 <div
-                  className="absolute top-88 right-20 mt-2 w-[400px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
+                  className="absolute sm:top-[47%]  sm:left-[68%] top-[110%] left-[5%] mt-2 sm:w-[420px]  w-[360px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
                   onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
                 >
                   <div className="p-2">
                     {/* Contract Status */}
                     <h6 className="px-2 skew-x-[12deg] py-1 font-semibold">Contract Status</h6>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row">
                       {CONTRACT_STATUSES.map((status) => {
                         const isSelected = selectedContractStatus.includes(status);
 
@@ -882,7 +899,7 @@ return (
                     </div>
                     {/* Payment Status */}
                     <h6 className="px-2 skew-x-[12deg] py-1 font-semibold mt-2">Payment Status</h6>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row">
                       {PAYMENT_STATUSES.map((status) => {
                         const isSelected = selectedPaymentStatus.includes(status);
 
@@ -936,7 +953,7 @@ return (
 
       {/* Applicants Grid */}
       {showApplicants && (
-        <div className="grid grid-cols-3 grid-rows-2 gap-2 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center ">
           {paginatedApplicants.map((applicant, index) => (
             <ApplicantCard
               key={index}

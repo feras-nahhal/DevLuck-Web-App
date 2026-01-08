@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { mockApplicants } from "@/src/mocks/mockApplicants";
-
+import { useState, useMemo, useRef, useEffect } from "react";
 // =======================
 // APPLIED STUDENT CARD COMPONENT
 // ========================
@@ -160,7 +160,61 @@ const AppliedStudentCard = ({
 
 
 export default function TopApplicantPage() {
+  
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredApplicants = useMemo(() => {
+        return mockApplicants.filter(applicant => {
+          // Search filter
+          const searchMatch =
+            !searchQuery.trim() ||
+            applicant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            applicant.applicantId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            applicant.contractTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            applicant.startDate.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            applicant.endDate.toLowerCase().includes(searchQuery.toLowerCase());
+          return searchMatch ;
+        });
+      }, [searchQuery]);
+
+  // 📄 Pagination
+  const [itemsPerPage, setItemsPerPage] = useState(10); // default 10 for desktop
+  
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+              if (window.innerWidth < 640) { // mobile
+                setItemsPerPage(6);
+              } else {
+                setItemsPerPage(10); // desktop
+              }
+    };
+    updateItemsPerPage(); // run once on mount
+    window.addEventListener("resize", updateItemsPerPage); // run on resize
+  
+    return () => window.removeEventListener("resize", updateItemsPerPage);
+  }, []);
+  
+       
+  const totalPages = Math.ceil(filteredApplicants.length / itemsPerPage);
+  
+  const paginatedApplicants = filteredApplicants.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+  
+  const goToPrevious = () => {
+    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+  };
+  
+  const goToNext = () => {
+  if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+  };
+
   return (
     <DashboardLayout>
       <div className="px-4 sm:px-6 lg:px-8 py-6">
@@ -170,8 +224,8 @@ export default function TopApplicantPage() {
         {/* =======================
             APPLIED STUDENTS GRID
         ======================== */}
-        <div className="grid grid-cols-6 gap-x-2 gap-y-10">
-          {mockApplicants.slice(0, 12).map((applicant) => (
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-6 justify-items-center ">
+          {paginatedApplicants.map((applicant, index) => (
             <AppliedStudentCard
               key={applicant.applicantId}
               studentName={applicant.name}
@@ -182,6 +236,64 @@ export default function TopApplicantPage() {
           ))}
         </div>
       </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-10">
+                      {/* Previous */}
+                      <button
+                        onClick={goToPrevious}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1 text-sm font-medium rounded-md 
+                                  disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                      <img 
+                      src="/ic-eva_arrow-ios-back-fill.svg" 
+                      alt="Applied Students"
+                    />
+                      </button>
+
+                    {/* Page numbers */}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                        <button
+                          key={page}
+                          onClick={() => goToPage(page)}
+                          className={`
+                            relative
+                            w-11 h-9
+                            skew-x-[-12deg]
+                            rounded-md
+                            overflow-hidden
+                            text-sm font-semibold
+                            transition-all duration-200
+                            ${
+                              currentPage === page
+                                ? "border border-black text-black"
+                                : "border border-transparent text-black/60 hover:bg-black/10 hover:text-black"
+                            }
+                          `}
+                        >
+                          {/* Un-skew content */}
+                          <span className="flex h-full w-full items-center justify-center skew-x-[12deg]">
+                            {page}
+                          </span>
+                        </button>
+                      ))}
+
+
+
+                      {/* Next */}
+                      <button
+                        onClick={goToNext}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-1 text-sm font-medium rounded-md 
+                                  disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <img 
+                      src="/ic-eva_arrow-ios-forward-fill.svg" 
+                      alt="Applied Students"
+                    />
+                      </button>
+        </div>
+        )}
     </DashboardLayout>
   );
 }

@@ -920,27 +920,12 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
   );
 };
 
-
-
-const ITEMS_PER_PAGE = 10;
 export default function ApplicantPage() {
-    //--------------------------------Action menu--------------------------
-      const [menuOpen, setMenuOpen] = useState(false);
-      const menuRef = useRef<HTMLDivElement>(null);
-      const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
-      // ---------------------------------------------------------------------
+
   //---------------------filter----------------------------------
-      // Multi-select arrays instead of single string
-      type ContractStatus = "Running" | "Completed" | "All";
-  
-      const CONTRACT_STATUSES: ContractStatus[] = ["Running", "Completed", "All"];
-      const [editingContract, setEditingContract] = useState<any>(null);
-      const [selectedContractStatus, setSelectedContractStatus] = useState<ContractStatus[]>([]);
-      const [showApplicants, setShowApplicants] = useState(true);
       const router = useRouter();
       const [searchQuery, setSearchQuery] = useState("");
       const [currentPage, setCurrentPage] = useState(1);
-      const [isModalOpen, setIsModalOpen] = useState(false);
   
       // 🔍 Filter applicants
       const filteredApplicants = useMemo(() => {
@@ -954,26 +939,33 @@ export default function ApplicantPage() {
             applicant.startDate.toLowerCase().includes(searchQuery.toLowerCase()) ||
             applicant.endDate.toLowerCase().includes(searchQuery.toLowerCase());
   
-          // Contract status filter
-          const contractMatch =
-            selectedContractStatus.length === 0 || // empty = no filter
-            selectedContractStatus.includes("All") || // All = include all
-            selectedContractStatus.includes(applicant.contractStatus as "Running" | "Completed");
-  
-      
-  
-          return searchMatch && contractMatch;
+          return searchMatch;
         });
-      }, [searchQuery, selectedContractStatus]);
+      }, [searchQuery]);
   
-  
-      
+
       // 📄 Pagination
-      const totalPages = Math.ceil(filteredApplicants.length / ITEMS_PER_PAGE);
+      const [itemsPerPage, setItemsPerPage] = useState(10); // default 10 for desktop
+      useEffect(() => {
+        const updateItemsPerPage = () => {
+          if (window.innerWidth < 640) { // mobile
+            setItemsPerPage(5);
+          } else {
+            setItemsPerPage(10); // desktop
+          }
+        };
+
+        updateItemsPerPage(); // run once on mount
+        window.addEventListener("resize", updateItemsPerPage); // run on resize
+
+        return () => window.removeEventListener("resize", updateItemsPerPage);
+      }, []);
+
+      const totalPages = Math.ceil(filteredApplicants.length / itemsPerPage);
       
       const paginatedApplicants = filteredApplicants.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
       );
       
       const goToPage = (page: number) => {
@@ -1001,7 +993,7 @@ export default function ApplicantPage() {
           
             
         
-          <div className="grid grid-cols-5 grid-rows-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 max-w-[1400px] mx-auto">
           {paginatedApplicants.map((applicant, index) => (
             <ApplicantCard
               key={index}

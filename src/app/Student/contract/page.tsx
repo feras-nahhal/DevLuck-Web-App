@@ -415,8 +415,6 @@ const ContractRow = ({ contract,onMainClick,onDisputeClick,applicantName,onSideC
 };
 
 
-
-const ITEMS_PER_PAGE = 6;
 export default function ContractListPage() {
 
   const STATUS_LABELS: Record<ContractStatus, string> = {
@@ -476,11 +474,28 @@ export default function ContractListPage() {
   
       
       // 📄 Pagination
-      const totalPages = Math.ceil(filteredApplicants.length / ITEMS_PER_PAGE);
+      const [itemsPerPage, setItemsPerPage] = useState(6); // default 6 for desktop
+
+      useEffect(() => {
+        const updateItemsPerPage = () => {
+          if (window.innerWidth < 640) { // mobile
+            setItemsPerPage(5);
+          } else {
+            setItemsPerPage(6); // desktop
+          }
+        };
+
+        updateItemsPerPage(); // run once on mount
+        window.addEventListener("resize", updateItemsPerPage); // run on resize
+
+        return () => window.removeEventListener("resize", updateItemsPerPage);
+      }, []);
+
+      const totalPages = Math.ceil(filteredApplicants.length / itemsPerPage);
       
       const paginatedApplicants = filteredApplicants.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
       );
       
       const goToPage = (page: number) => {
@@ -599,7 +614,7 @@ return (
           {/* Filter Buttons – Parallelogram on right */}
           <div className="flex gap-2 ml-auto">
             {/* First Filter Button */}
-            <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+            <button className="hidden sm:flex relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             onClick={() => setShowApplicants(!showApplicants)}
             >
               <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
@@ -628,7 +643,7 @@ return (
               {/* Action Menu – appears beside the button */}
               {menuOpen && (
                 <div
-                  className="absolute top-50 right-20 mt-2 w-[400px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
+                  className="absolute sm:top-[26%]  sm:left-[70%] top-[22%] left-[10%] mt-2 sm:w-[400px]  w-[360px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
                   onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
                 >
                  empty
@@ -638,7 +653,7 @@ return (
         </div>
 
             {showApplicants && (
-          <div className="grid grid-cols-3 grid-rows-2 gap-7 mt-4 w-full max-w-[1120px] mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center ">
             {paginatedApplicants.map((contract, index) => (
               <ApplicantCard
                 key={index}
