@@ -5,7 +5,6 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
 import { mockContracts } from "@/src/mocks/mockContract";
 import { mockApplicants } from "@/src/mocks/mockApplicants";
-import DisputeModal from "@/src/components/Student/DisputeModal";
 
 
 const ApplicantCard = ({
@@ -18,7 +17,7 @@ const ApplicantCard = ({
 
 }) => {
   return (
-    <div className="relative w-[436px] h-[389px] cursor-pointer">
+    <div className="relative w-[400px] h-[389px] cursor-pointer">
        <svg
         className="absolute inset-0 w-full h-full"
         viewBox="0 0 436 389"
@@ -51,7 +50,7 @@ const ApplicantCard = ({
 
       <div className="relative w-50 h-50">
         {/* Background Circle */}
-        <div className="absolute top-[68%] left-[175%] w-11 h-11 bg-[#FFEB9C] rounded-full flex items-center justify-center">
+        <div className="absolute top-[70%] left-[160%] w-11 h-11 bg-[#FFEB9C] rounded-full flex items-center justify-center">
           {/* Icon */}
           <div className="w-6 h-6 flex items-center justify-center">
             {/* Replace this with your actual SVG */}
@@ -63,8 +62,8 @@ const ApplicantCard = ({
         </div>
       </div>
 
-      <div className="absolute top-[85%] left-[34%]   ">
-        <button className="relative flex items-center w-[162px] h-[40px] "onClick={onClick}>
+      <div className="absolute top-[82%] left-[33%]   ">
+        <button className="relative flex items-center w-[155px] h-[40px] "onClick={onClick}>
           {/* Center Frame */}
           <div className="flex-1 flex justify-center items-center gap-2 bg-[#FFEB9C] h-[40px] px-2 skew-x-[-12deg] rounded-[12px] transform transition-transform duration-200 hover:scale-105">
             {/* Text */}
@@ -140,7 +139,7 @@ const ApplicantCard = ({
         </div>
       </div>
 
-      <div className="absolute top-[1px] left-[59%] flex items-center w-[90px] h-[40px] ">
+      <div className="absolute top-[3%] left-[59%] flex items-center w-[85px] h-[40px] ">
         {/* Center Frame */}
         <div className="flex-1 flex justify-center items-center gap-2 w-[51px] h-[40px] bg-[#FFEB9C] skew-x-[-12deg] rounded-[12px]">
           {/* Text */}
@@ -299,10 +298,10 @@ return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
 
       {/* Main Row: Search (1/2) + Grid (1/2) */}
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6 sm:mt-0 mt-4">
 
         {/* ================= LEFT COLUMN — SEARCH + LOCATION (1/2) ================= */}
-        <div className="w-1/3">
+        <div className="w-full lg:w-1/3">
           <div className="flex flex-col gap-4">
 
             {/* 🔍 Search */}
@@ -569,9 +568,9 @@ return (
 
 
         {/* ================= RIGHT COLUMN — GRID (3/4) ================= */}
-        <div className="w-2/3 " >
+        <div className="w-full lg:w-2/3 " >
           {showApplicants && (
-             <div className="grid grid-cols-2 grid-rows-2 gap-4 ">
+             <div className="grid grid-cols-1 sm:grid-cols-2 grid-rows-2 gap-4">
             {paginatedApplicants.map((contract, index) => (
               <ApplicantCard
                 key={index}

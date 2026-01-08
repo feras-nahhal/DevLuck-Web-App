@@ -1,9 +1,8 @@
 // src/app/Company/top-company/page.tsx
 "use client";
-import { useParams, useRouter } from "next/navigation";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useMemo,useEffect } from "react";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
-import { createPortal } from "react-dom";
 import { mockCompanies } from "@/src/mocks/mockCompanies";
 import { ArrowUpRight } from 'lucide-react';
 
@@ -409,23 +408,9 @@ type CompanyRowProps = {
   showCheckbox?: boolean;
 };
 
-const CompanyRow = ({ company,onMainClick,onSideClick,showCheckbox = false }: CompanyRowProps) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+const CompanyRow = ({ company,onMainClick,showCheckbox = false }: CompanyRowProps) => {
+
   const [checked, setChecked] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
-
-
-  // Close when clicking outside
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
 
   return (
     <div className="flex w-full gap-4">
@@ -473,7 +458,7 @@ const CompanyRow = ({ company,onMainClick,onSideClick,showCheckbox = false }: Co
           </div>
         )}
 
-         {/* Applicant Info */}
+         {/* Company Info */}
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
           {/* Company ID */}
           <div className="flex flex-col justify-center w-[140px]">
@@ -539,28 +524,17 @@ const CompanyRow = ({ company,onMainClick,onSideClick,showCheckbox = false }: Co
   );
 };
 
-const ITEMS_PER_PAGE = 10;
 export default function TopCompanyPage() {
-  //--------------------------------Action menu--------------------------
-         const [menuOpen, setMenuOpen] = useState(false);
-         const menuRef = useRef<HTMLDivElement>(null);
-         const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
-         // ---------------------------------------------------------------------
-     //---------------------filter----------------------------------
-         // Multi-select arrays instead of single string
-         type ContractStatus = "Running" | "Completed" | "All";
-     
-         const CONTRACT_STATUSES: ContractStatus[] = ["Running", "Completed", "All"];
-         const [editingContract, setEditingContract] = useState<any>(null);
-         const [selectedContractStatus, setSelectedContractStatus] = useState<ContractStatus[]>([]);
-         const [showApplicants, setShowApplicants] = useState(true);
+ 
+        //---------------------filter----------------------------------
+         const [showCompanies, setShowCompanies] = useState(true);
          const router = useRouter();
          const [searchQuery, setSearchQuery] = useState("");
          const [currentPage, setCurrentPage] = useState(1);
 
      
-         // 🔍 Filter applicants
-         const filteredApplicants = useMemo(() => {
+         // 🔍 Filter Companies
+         const filteredCompanies = useMemo(() => {
            return mockCompanies.filter(applicant => {
              // Search filter
              const searchMatch =
@@ -578,11 +552,28 @@ export default function TopCompanyPage() {
      
          
          // 📄 Pagination
-         const totalPages = Math.ceil(filteredApplicants.length / ITEMS_PER_PAGE);
+        const [itemsPerPage, setItemsPerPage] = useState(10); // default 10 for desktop
+
+        useEffect(() => {
+          const updateItemsPerPage = () => {
+            if (window.innerWidth < 640) { // mobile
+              setItemsPerPage(4);
+            } else {
+              setItemsPerPage(10); // desktop
+            }
+          };
+
+          updateItemsPerPage(); // run once on mount
+          window.addEventListener("resize", updateItemsPerPage); // run on resize
+
+          return () => window.removeEventListener("resize", updateItemsPerPage);
+        }, []);
+
+         const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
          
-         const paginatedApplicants = filteredApplicants.slice(
-           (currentPage - 1) * ITEMS_PER_PAGE,
-           currentPage * ITEMS_PER_PAGE
+         const paginatedCompanies = filteredCompanies.slice(
+           (currentPage - 1) * itemsPerPage,
+           currentPage * itemsPerPage
          );
          
          const goToPage = (page: number) => {
@@ -622,7 +613,7 @@ export default function TopCompanyPage() {
             Company
          </h1>
          {/* Top row: 4 cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 place-items-center">
             <Card
               title="Total Companies"
               value={totalCompanies.toString()}
@@ -700,9 +691,9 @@ export default function TopCompanyPage() {
              </div>
  
              {/* -------- Filter Buttons -------- */}
-             <div className="flex gap-2 ml-auto">
+             <div className="ml-auto gap-2 hidden sm:flex">
  
-               {/* Toggle Applicants / Contracts */}
+               {/* Toggle Companies / Contracts */}
                <button
                  className="
                    relative w-[60px] h-[40px]
@@ -714,7 +705,7 @@ export default function TopCompanyPage() {
                    hover:bg-black/10
                    transition-all
                  "
-                 onClick={() => setShowApplicants(!showApplicants)}
+                 onClick={() => setShowCompanies(!showCompanies)}
                >
                  <span className="skew-x-[12deg]">
                    <svg width="24" height="41" viewBox="0 0 24 41" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -726,89 +717,16 @@ export default function TopCompanyPage() {
                    </svg>
                  </span>
                </button>
-               {/* =====================
-                   Filters Dropdown
-               ====================== */}
-               {menuOpen && (
-                 <div
-                   className="
-                     absolute top-36 right-20 mt-2
-                     w-[400px]
-                     skew-x-[-12deg]
-                     bg-white
-                     border rounded-lg
-                     shadow-lg
-                     z-50
-                   "
-                   onClick={(e) => e.stopPropagation()}
-                 >
-                   <div className="p-2">
- 
-                     {/* Contract Status */}
-                     <h6 className="px-2 skew-x-[12deg] py-1 font-semibold">
-                       Contract Status
-                     </h6>
- 
-                     <div className="flex gap-2">
-                       {CONTRACT_STATUSES.map((status) => {
-                         const isSelected =
-                           selectedContractStatus.includes(status);
- 
-                         return (
-                           <div
-                             key={status}
-                             className="
-                               flex items-center
-                               skew-x-[12deg]
-                               px-2 py-1
-                               cursor-pointer
-                               hover:bg-gray-100
-                               rounded-md
-                             "
-                             onClick={() => {
-                               if (status === "All") {
-                                 setSelectedContractStatus([
-                                   "Running",
-                                   "Completed",
-                                   "All",
-                                 ]);
-                               } else {
-                                 setSelectedContractStatus((prev) =>
-                                   prev.includes(status)
-                                     ? prev.filter(
-                                         (s) => s !== status && s !== "All"
-                                       )
-                                     : [...prev.filter((s) => s !== "All"), status]
-                                 );
-                               }
-                             }}
-                           >
-                             {/* Checkbox Icon */}
-                             <div className="w-9 h-9 mr-2 flex items-center justify-center">
-                               {isSelected ? (
-                                 <> {/* Selected SVG */} </>
-                               ) : (
-                                 <> {/* Unselected SVG */} </>
-                               )}
-                             </div>
- 
-                             <span className="text-sm">{status}</span>
-                           </div>
-                         );
-                       })}
-                     </div>
-                   </div>
-                 </div>
-               )}
              </div>
            </div>
  
            {/* =====================
                Company Grid
            ====================== */}
-           {showApplicants && (
-             <div className="grid grid-cols-5 grid-rows-2 gap-2">
-               {paginatedApplicants.map((company, index) => (
+           {showCompanies && (
+      
+              <div className="grid grid-cols-1 grid-rows-2 sm:grid-cols-5 gap-2 justify-items-center">
+               {paginatedCompanies.map((company, index) => (
                  <CompanyCard
                    key={index}
                    company={company}
@@ -825,9 +743,9 @@ export default function TopCompanyPage() {
            {/* =====================
                Company List
            ====================== */}
-           {!showApplicants && (
+           {!showCompanies && (
              <div className="flex flex-col gap-2 mt-4">
-               {paginatedApplicants.map((company, index) => (
+               {paginatedCompanies.map((company, index) => (
                  <CompanyRow
                    key={index}
                    company={company}

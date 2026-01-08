@@ -159,12 +159,32 @@ const ContractCard = ({
   onView: (contract: any) => void;
 }) => {
   return (
-    <div className="relative w-[437px] h-[217px]">
+    <div className="relative w-[410px] h-[220px]">
       {/* SVG Card Body */}
-     <img 
-          src="/cards/ContractCard.svg" 
-          alt="ContractCard Background"
-        />
+      <svg width="410" height="220" viewBox="0 0 439 223" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g filter="url(#filter0_dd_12766_51720)">
+        <path d="M312.624 8C317.795 8 323.634 20.8672 323.634 26.0381C323.634 36.9089 332.447 45.7217 343.317 45.7217H404.804C410.447 45.7217 418.373 49.6268 418.373 55.2699V87.2611C418.373 93.5935 415.394 99.5569 410.331 103.36L300.137 186.124C295.981 189.246 290.923 190.934 285.724 190.934H167.447C155.161 190.934 145.2 180.973 145.2 168.687C145.2 156.4 135.24 146.439 122.953 146.439H44C30.7452 146.439 20 135.694 20 122.439V32C20 18.7452 30.7452 8 44 8H312.624Z" fill="white"/>
+        </g>
+        <defs>
+        <filter id="filter0_dd_12766_51720" x="0" y="0" width="438.373" height="222.934" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+        <feFlood floodOpacity="0" result="BackgroundImageFix"/>
+        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+        <feMorphology radius="4" operator="erode" in="SourceAlpha" result="effect1_dropShadow_12766_51720"/>
+        <feOffset dy="12"/>
+        <feGaussianBlur stdDeviation="12"/>
+        <feComposite in2="hardAlpha" operator="out"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0"/>
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_12766_51720"/>
+        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+        <feOffset/>
+        <feGaussianBlur stdDeviation="1"/>
+        <feComposite in2="hardAlpha" operator="out"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0"/>
+        <feBlend mode="normal" in2="effect1_dropShadow_12766_51720" result="effect2_dropShadow_12766_51720"/>
+        <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_12766_51720" result="shape"/>
+        </filter>
+        </defs>
+      </svg>
 
 
       {/* Content Container */}
@@ -222,14 +242,14 @@ const ContractCard = ({
       </div>
 
       {/* Job Number Label */}
-      <div className="absolute left-[77%] top-[8%] flex items-center justify-center w-20 bg-black/20 rounded-[6px]">
+      <div className="absolute left-[75%] top-[8%] flex items-center justify-center w-20 bg-black/20 rounded-[6px]">
         <span className="text-[12px] font-bold leading-[20px] text-[#1E1E1E] text-center">
           Tp-SN-00{contractId}
         </span>
       </div>
 
       {/* Button */}
-      <button className="absolute left-[6%] top-[70%] flex items-center justify-center px-3 min-w-[64px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
+      <button className="absolute left-[5%] top-[68%] flex items-center justify-center px-3 min-w-[64px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
         onClick={() => onView(contract)}>
         <span className="text-[14px] font-bold leading-[24px] text-[#1E1E1E]">
           View Details
@@ -482,7 +502,7 @@ const ContractRow = ({ contract,onEdit,showCheckbox = false }: ContractRowProps)
   const latestContract = mockContracts.reduce((latest, contract) => 
     new Date(contract.createdDate) > new Date(latest.createdDate) ? contract : latest
   );
-  const ITEMS_PER_PAGE = 9;
+ 
   const totalContracts = mockContracts.length;
   const runningContracts = mockContracts.filter(c => c.status === "Running").length;
   const holdContracts = mockContracts.filter(c => c.status === "Hold").length;
@@ -523,11 +543,28 @@ const filteredJobs = useMemo(() => {
 }, [searchQuery, selectedContractStatus]);
 
 // 📄 Pagination
-const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
+const [itemsPerPage, setItemsPerPage] = useState(9); // default 10 for desktop
+
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      if (window.innerWidth < 640) { // mobile
+        setItemsPerPage(5);
+      } else {
+        setItemsPerPage(9); // desktop
+      }
+    };
+
+    updateItemsPerPage(); // run once on mount
+    window.addEventListener("resize", updateItemsPerPage); // run on resize
+
+    return () => window.removeEventListener("resize", updateItemsPerPage);
+  }, []);
+
+const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
 const paginatedJobs = filteredJobs.slice(
-  (currentPage - 1) * ITEMS_PER_PAGE,
-  currentPage * ITEMS_PER_PAGE
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
 );
 
 const goToPage = (page: number) => {
@@ -570,7 +607,7 @@ const goToNext = () => {
       </div>
 
       {/* Top row: 4 cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 place-items-center">
         <Card title="Total Contract" value={totalContracts} subtitle={`Last created: ${timeAgo(latestContract.createdDate)}`} />
         <Card title="Running" value={runningContracts} subtitle={`Last created: ${timeAgo(latestContract.createdDate)}`} />
         <Card title="Hold" value={holdContracts} subtitle={`Last created: ${timeAgo(latestContract.createdDate)}`} />
@@ -624,7 +661,7 @@ const goToNext = () => {
             {/* Filter Buttons – Parallelogram on right */}
             <div className="flex gap-2 ml-auto">
               {/* First Filter Button */}
-              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+              <button className="hidden sm:flex relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
               onClick={() => setShowApplicants(!showApplicants)}
               >
                 <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
@@ -639,98 +676,98 @@ const goToNext = () => {
               </button>
 
               {/* Second Filter Button */}
-<button
-  className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
-  onClick={(e) => {
-    e.stopPropagation();
-    setMenuOpen((prev) => !prev);
-  }}
->
-  <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M14 16.5C14.3852 16.5002 14.7556 16.6486 15.0344 16.9144C15.3132 17.1802 15.479 17.5431 15.4975 17.9279C15.516 18.3127 15.3858 18.6898 15.1338 18.9812C14.8818 19.2726 14.5274 19.4558 14.144 19.493L14 19.5H10C9.61478 19.4998 9.24441 19.3514 8.96561 19.0856C8.68682 18.8198 8.52099 18.4569 8.50248 18.0721C8.48396 17.6873 8.61419 17.3102 8.86618 17.0188C9.11816 16.7274 9.47258 16.5442 9.856 16.507L10 16.5H14ZM17 10.5C17.3978 10.5 17.7794 10.658 18.0607 10.9393C18.342 11.2206 18.5 11.6022 18.5 12C18.5 12.3978 18.342 12.7794 18.0607 13.0607C17.7794 13.342 17.3978 13.5 17 13.5H7C6.60218 13.5 6.22064 13.342 5.93934 13.0607C5.65804 12.7794 5.5 12.3978 5.5 12C5.5 11.6022 5.65804 11.2206 5.93934 10.9393C6.22064 10.658 6.60218 10.5 7 10.5H17ZM20 4.5C20.3978 4.5 20.7794 4.65804 21.0607 4.93934C21.342 5.22064 21.5 5.60218 21.5 6C21.5 6.39782 21.342 6.77936 21.0607 7.06066C20.7794 7.34196 20.3978 7.5 20 7.5H4C3.60218 7.5 3.22064 7.34196 2.93934 7.06066C2.65804 6.77936 2.5 6.39782 2.5 6C2.5 5.60218 2.65804 5.22064 2.93934 4.93934C3.22064 4.65804 3.60218 4.5 4 4.5H20Z"
-        fill="#1E1E1E"
-      />
-    </svg>
-  </span>
-</button>
-
-{/* Action Menu – appears beside the button */}
-{menuOpen && (
-  <div
-    className="absolute top-95 right-20 mt-2 w-[420px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
-    onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
-  >
-    <div className="p-2">
-      {/* Contract Status */}
-      <h6 className="px-2 skew-x-[12deg] py-1 font-semibold">Contract Status</h6>
-      <div className="flex gap-2">
-        {["All", ...CONTRACT_STATUSES].map((status) => {
-          const isSelected = selectedContractStatus.includes(status as ContractStatus | "All");
-
-          return (
-            <div
-              key={status}
-              className="flex items-center skew-x-[12deg] px-2 py-1 cursor-pointer hover:bg-gray-100 rounded-md"
-              onClick={() => {
-                if (status === "All") {
-                  setSelectedContractStatus(["All", ...CONTRACT_STATUSES]);
-                } else {
-                  setSelectedContractStatus((prev) =>
-                    prev.includes(status as ContractStatus)
-                      ? prev.filter((s) => s !== status && s !== "All") // remove it
-                      : [...prev.filter((s) => s !== "All"), status as ContractStatus] // add it
-                  );
-                }
-              }}
-            >
-              <div className="flex items-center justify-center w-9 h-9 mr-2">
-                {isSelected ? (
-                  /* ✅ SELECTED SVG */
-                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <button
+                className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen((prev) => !prev);
+                }}
+              >
+                <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
-                      d="M15.0537 9.16113C16.6809 7.53396 19.3191 7.53395 20.9463 9.16113L26.8389 15.0537C28.4659 16.6809 28.466 19.3192 26.8389 20.9463L20.9463 26.8389C19.3192 28.466 16.6809 28.4659 15.0537 26.8389L9.16113 20.9463C7.53395 19.3191 7.53396 16.6809 9.16113 15.0537L15.0537 9.16113Z"
-                      fill="#FFEB9C"
-                    />
-                    <path
-                      d="M31.5873 8.96738C25.7014 13.6017 22.2888 16.641 18.7083 22.3035C18.6366 22.4169 18.4767 22.4333 18.3856 22.3348L12.7212 16.2001C12.6426 16.115 12.6504 15.9817 12.7383 15.9064L15.8265 13.2606C15.9194 13.181 16.0609 13.2004 16.129 13.3019L18.3444 16.6048C24.2049 11.4469 29.2798 9.33343 31.3963 8.61265C31.6142 8.53845 31.7681 8.82499 31.5873 8.96738Z"
+                      d="M14 16.5C14.3852 16.5002 14.7556 16.6486 15.0344 16.9144C15.3132 17.1802 15.479 17.5431 15.4975 17.9279C15.516 18.3127 15.3858 18.6898 15.1338 18.9812C14.8818 19.2726 14.5274 19.4558 14.144 19.493L14 19.5H10C9.61478 19.4998 9.24441 19.3514 8.96561 19.0856C8.68682 18.8198 8.52099 18.4569 8.50248 18.0721C8.48396 17.6873 8.61419 17.3102 8.86618 17.0188C9.11816 16.7274 9.47258 16.5442 9.856 16.507L10 16.5H14ZM17 10.5C17.3978 10.5 17.7794 10.658 18.0607 10.9393C18.342 11.2206 18.5 11.6022 18.5 12C18.5 12.3978 18.342 12.7794 18.0607 13.0607C17.7794 13.342 17.3978 13.5 17 13.5H7C6.60218 13.5 6.22064 13.342 5.93934 13.0607C5.65804 12.7794 5.5 12.3978 5.5 12C5.5 11.6022 5.65804 11.2206 5.93934 10.9393C6.22064 10.658 6.60218 10.5 7 10.5H17ZM20 4.5C20.3978 4.5 20.7794 4.65804 21.0607 4.93934C21.342 5.22064 21.5 5.60218 21.5 6C21.5 6.39782 21.342 6.77936 21.0607 7.06066C20.7794 7.34196 20.3978 7.5 20 7.5H4C3.60218 7.5 3.22064 7.34196 2.93934 7.06066C2.65804 6.77936 2.5 6.39782 2.5 6C2.5 5.60218 2.65804 5.22064 2.93934 4.93934C3.22064 4.65804 3.60218 4.5 4 4.5H20Z"
                       fill="#1E1E1E"
                     />
                   </svg>
-                ) : (
-                  /* ⬜ UNSELECTED SVG */
-                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M20.9463 9.16112C19.3191 7.53394 16.6809 7.53394 15.0537 9.16112L9.16117 15.0537C7.53398 16.6809 7.53398 19.319 9.16117 20.9462L15.0537 26.8388C16.6809 28.466 19.3191 28.466 20.9463 26.8388L26.8388 20.9462C28.466 19.319 28.466 16.6809 26.8388 15.0537L20.9463 9.16112ZM20.357 10.3396C19.0553 9.03789 16.9447 9.03789 15.643 10.3396L10.3397 15.6429C9.03793 16.9447 9.03793 19.0552 10.3397 20.357L15.643 25.6603C16.9447 26.962 19.0553 26.962 20.357 25.6603L25.6603 20.357C26.9621 19.0552 26.9621 16.9447 25.6603 15.6429L20.357 10.3396Z"
-                      fill="#637381"
-                    />
-                  </svg>
-                )}
-              </div>
-              <span className="text-sm">{status}</span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  </div>
-)}
+                </span>
+              </button>
+
+              {/* Action Menu – appears beside the button */}
+              {menuOpen && (
+                <div
+                  className="absolute sm:top-[47%]  sm:left-[70%] top-[115%] left-[5%] mt-2 sm:w-[420px]  w-[360px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
+                  onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+                >
+                  <div className="p-2">
+                    {/* Contract Status */}
+                    <h6 className="px-2 skew-x-[12deg] py-1 font-semibold">Contract Status</h6>
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row">
+                      {["All", ...CONTRACT_STATUSES].map((status) => {
+                        const isSelected = selectedContractStatus.includes(status as ContractStatus | "All");
+
+                        return (
+                          <div
+                            key={status}
+                            className="flex items-center skew-x-[12deg] px-2 py-1 cursor-pointer hover:bg-gray-100 rounded-md"
+                            onClick={() => {
+                              if (status === "All") {
+                                setSelectedContractStatus(["All", ...CONTRACT_STATUSES]);
+                              } else {
+                                setSelectedContractStatus((prev) =>
+                                  prev.includes(status as ContractStatus)
+                                    ? prev.filter((s) => s !== status && s !== "All") // remove it
+                                    : [...prev.filter((s) => s !== "All"), status as ContractStatus] // add it
+                                );
+                              }
+                            }}
+                          >
+                            <div className="flex items-center justify-center w-9 h-9 mr-2">
+                              {isSelected ? (
+                                /* ✅ SELECTED SVG */
+                                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                                  <path
+                                    d="M15.0537 9.16113C16.6809 7.53396 19.3191 7.53395 20.9463 9.16113L26.8389 15.0537C28.4659 16.6809 28.466 19.3192 26.8389 20.9463L20.9463 26.8389C19.3192 28.466 16.6809 28.4659 15.0537 26.8389L9.16113 20.9463C7.53395 19.3191 7.53396 16.6809 9.16113 15.0537L15.0537 9.16113Z"
+                                    fill="#FFEB9C"
+                                  />
+                                  <path
+                                    d="M31.5873 8.96738C25.7014 13.6017 22.2888 16.641 18.7083 22.3035C18.6366 22.4169 18.4767 22.4333 18.3856 22.3348L12.7212 16.2001C12.6426 16.115 12.6504 15.9817 12.7383 15.9064L15.8265 13.2606C15.9194 13.181 16.0609 13.2004 16.129 13.3019L18.3444 16.6048C24.2049 11.4469 29.2798 9.33343 31.3963 8.61265C31.6142 8.53845 31.7681 8.82499 31.5873 8.96738Z"
+                                    fill="#1E1E1E"
+                                  />
+                                </svg>
+                              ) : (
+                                /* ⬜ UNSELECTED SVG */
+                                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                                  <path
+                                    fillRule="evenodd"
+                                    clipRule="evenodd"
+                                    d="M20.9463 9.16112C19.3191 7.53394 16.6809 7.53394 15.0537 9.16112L9.16117 15.0537C7.53398 16.6809 7.53398 19.319 9.16117 20.9462L15.0537 26.8388C16.6809 28.466 19.3191 28.466 20.9463 26.8388L26.8388 20.9462C28.466 19.319 28.466 16.6809 26.8388 15.0537L20.9463 9.16112ZM20.357 10.3396C19.0553 9.03789 16.9447 9.03789 15.643 10.3396L10.3397 15.6429C9.03793 16.9447 9.03793 19.0552 10.3397 20.357L15.643 25.6603C16.9447 26.962 19.0553 26.962 20.357 25.6603L25.6603 20.357C26.9621 19.0552 26.9621 16.9447 25.6603 15.6429L20.357 10.3396Z"
+                                    fill="#637381"
+                                  />
+                                </svg>
+                              )}
+                            </div>
+                            <span className="text-sm">{status}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
 
             </div>
             </div>
             
           {/* Cards Grid: 3 rows × 3 columns */}
           {showApplicants && (
-          <div className="grid grid-cols-3 grid-rows-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center ">
             {paginatedJobs.map((contract, index) => (
               <ContractCard
                 key={index}

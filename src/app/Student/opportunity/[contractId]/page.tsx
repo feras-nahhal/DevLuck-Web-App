@@ -877,10 +877,10 @@ const reviews = mockReviews
     
     <DashboardLayout>
         <div className="px-4 sm:px-6 lg:px-6 py-6">
-            <div className="flex gap-6">
-            <div className="w-1/2">
+            <div className="flex flex-col lg:flex-row gap-6">
+            <div className="w-full lg:w-1/2">
                 {/* Tabs */}
-                <div className="flex gap-4 mb-6">
+                <div className="flex gap-4 mb-6 sm:mt-0 mt-4">
                     {/* Description */}
                     <button
                     onClick={() => setActiveTab("Description")}
@@ -909,7 +909,7 @@ const reviews = mockReviews
                     </span>
                     </button>
                     {/* Apply Button */}
-                    <button className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center rounded-lg transition hover:scale-105 ml-22 "
+                    <button className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center rounded-lg transition hover:scale-105 sm:ml-22 ml-5 "
                     onClick={() => router.push(`/Student/opportunity/${contractId}/questions`)}>
                       Apply
                     </button>
@@ -1036,7 +1036,7 @@ const reviews = mockReviews
 
             </div>
 
-            <div className="w-1/2 flex items-start">
+            <div className="w-full lg:w-1/2 flex items-start">
                 <div className="flex flex-col gap-2 w-full">
                     <div className="w-full ">
 

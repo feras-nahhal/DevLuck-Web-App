@@ -232,19 +232,18 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <div
-        className="py-6 min-h-[1000px]"
-        style={{
-          backgroundImage: "url('/pages/applicantInfoBackground.svg')",
-          backgroundPosition: "65% top",
-          backgroundRepeat: "no-repeat",
-        }}
+        className="
+          py-6 min-h-[1000px]
+          bg-none
+          md:bg-[url('/pages/applicantInfoBackground.svg')]
+          md:bg-no-repeat
+          md:bg-[65%_top]
+        "
       >
-
-
         {/* Frame 254 */}
-        <div className="flex flex-row items-start gap-8 w-full h-[278px]">
+        <div className="flex sm:flex-row flex-col items-start gap-10 w-full h-[278px] sm:mb-0 mb-80">
           {/* Left side */}
-          <div className="flex-[8] flex flex-row h-full rounded-[32px] p-6 gap-10">
+          <div className="flex-[8] flex sm:flex-row flex-col h-full rounded-[32px] p-6 gap-10">
             <div className="flex flex-col gap-2">
               {/* Top row: title and buttons */}
               <div className="flex flex-row items-center justify-between w-full h-[48px] gap-6">
@@ -349,7 +348,7 @@ export default function DashboardPage() {
 
 
         {/* Frame 267 */}
-        <div className="flex flex-row  w-full">
+        <div className="flex sm:flex-row flex-col  w-full sm:gap-0 gap-4">
           {/* Frame 266 */}
           <div className="flex-[8] flex flex-col gap-6  ">
                   {/* Skills Parallelogram Card */}
