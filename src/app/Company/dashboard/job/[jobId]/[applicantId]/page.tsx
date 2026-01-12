@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import {useParams } from "next/navigation";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { mockApplicants } from "@/src/mocks/mockApplicants";
 import { educationData } from "@/src/mocks/mockEducation";
@@ -9,89 +9,100 @@ import { languageData  } from "@/src/mocks/mockLanguages";
 import { portfolioData  } from "@/src/mocks/mockPortfolio";
 
 export default function ApplicantPage() {
-  const router = useRouter();
   const params = useParams(); // { applicantId: "456" }
   const {applicantId } = params;
-  const [showAll, setShowAll] = useState(false);
-  const [showAllExp, setShowAllExp] = useState(false);
-  const [showAllLang, setShowAllLang] = useState(false);
-  const [showAllPortfolio, setShowAllPortfolio] = useState(false);
-  const [showAllSkills, setShowAllSkills] = useState(false);
 
   // Find applicant by ID
   const applicant = mockApplicants.find(a => a.applicantId === applicantId);
 
-  if (!applicant) {
-    return (
-      <DashboardLayout>
-        <div className="p-6 text-lg font-semibold text-red-600">
-          Applicant not found
+ if (!applicant) {
+  return (
+    <DashboardLayout>
+      <div className="flex items-center justify-center min-h-[80vh]">
+        <div className="bg-white shadow-md rounded-lg p-8 sm:p-12 text-center max-w-md w-full">
+          <h2 className="text-2xl sm:text-3xl font-bold text-red-600 mb-4 flex items-center justify-center gap-2">
+            ❌ Applicant Not Found
+          </h2>
+          <p className="text-[#555] text-base sm:text-lg">
+            No applicant with ID: <span className="font-semibold text-[#1E1E1E]">{applicantId}</span> was found.
+          </p>
+          <p className="text-[#777] mt-2 text-sm">
+            Please check the ID or go back to the <a href="/Company/dashboard" className="text-blue-500 hover:underline">dashboard</a>.
+          </p>
         </div>
-      </DashboardLayout>
-    );
-  }
+      </div>
+    </DashboardLayout>
+  );
+}
+
+
 
   return (
     <DashboardLayout>
-      <div
-        className="py-6 min-h-[800px]"
-        style={{
-          backgroundImage: "url('/pages/applicantInfoBackground.svg')",
-          backgroundPosition: "65% top",
-          backgroundRepeat: "no-repeat",
-            transform: "scale(0.96)",
-          transformOrigin: "top center",
-        }}
-      >
+  <div
+    className="
+      py-6 min-h-[800px]
+      bg-no-repeat
+      bg-[center_top]
+      bg-[length:340px_auto]
+      sm:bg-[65%_top]
+      sm:bg-auto
+    "
+    style={{
+      backgroundImage: "url('/pages/applicantInfoBackground.svg')",
+      transform: "scale(0.96)",
+      transformOrigin: "top center",
+    }}
+  >
+
+
         {/* ✅ CONTENT CONTAINER */}
     <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div
         className="
           flex flex-row items-start
-          justify-start
+          justify-start mt-80 sm:mt-0
         "
       >
         <div className="w-[450px] h-auto flex flex-col gap-4"> {/* <-- gap between sections */}
   
-        <div className="flex flex-col gap-[10px] w-[500px]">
-  
-            {/* Name + Button Row */}
-            <div className="flex items-center justify-between w-full">
-              <h1 className="font-barlow font-extrabold text-[40px] leading-[64px] text-[#1E1E1E]">
-                {applicant ? applicant.name : applicantId}
-              </h1>
+            <div className="flex flex-col  gap-[10px] w-full max-w-[500px]">
+              {/* Name + Button Row */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-3">
+                <h1 className="font-barlow font-extrabold text-[40px] leading-[64px] text-[#1E1E1E]">
+                  {applicant ? applicant.name : applicantId}
+                </h1>
 
-             <div
-                className="relative w-[120px] h-[35px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
-              >
-                <span className="skew-x-[12deg] font-bold text-[14px] text-[#1E1E1E]">
-                  {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
-                </span>
+                <div
+                  className="relative w-[120px] h-[35px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
+                >
+                  <span className="skew-x-[12deg] font-bold text-[14px] text-[#1E1E1E]">
+                    {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
+                  </span>
+                </div>
+
               </div>
 
+              {/* Description */}
+              <p className="font-publicSans text-[16px] leading-[24px] text-[#1E1E1E] break-words">
+                {applicant
+                  ? applicant.description.length > 250
+                    ? applicant.description.slice(0, 250) + "..."
+                    : applicant.description
+                  : "Applicant description not found."}
+              </p>
             </div>
-
-            {/* Description */}
-            <p className="font-publicSans text-[16px] leading-[24px] text-[#1E1E1E]">
-              {applicant
-                ? applicant.description.length > 250
-                  ? applicant.description.slice(0, 250) + "..."
-                  : applicant.description
-                : "Applicant description not found."}
-            </p>
-
-          </div>
 
 
           {/* Frame 313 example */}
-          <div className="flex flex-row justify-between items-center gap-[10px] w-[557px] h-[175px]"> {/* <-- updated height */}
+          <div className="flex flex-row justify-between items-center gap-20 w-full sm:max-w-[655px] sm:min-w-[400px] h-full"> {/* <-- updated height */}
 
             {/* Profile Ranking Card */}
-            <div className="relative flex flex-col items-center justify-center w-[250px] h-[260px]">
+            <div className="relative flex flex-col items-center justify-center w-[200px] sm:w-[260px] h-[260px]">
 
-              <div className="relative w-[250px] h-[175px]">
+              <div className="relative w-[260px] sm:w-[260px] h-[175px]">
                 {/* Background number or placeholder */}
-                <div className="font-barlow font-extrabold text-[200px] leading-[175px] text-[#C2C2C2] flex  w-[225px] h-[175px]">
+                <div className="font-barlow font-extrabold text-[200px] leading-[175px] text-[#C2C2C2] flex  w-[200px] sm:w-[260px] h-[175px]">
                   {applicant ? applicant.profileRanking : "Applicant Ranking not found."}
                 </div>
 
@@ -100,52 +111,91 @@ export default function ApplicantPage() {
                   Profile Ranking 
                 </h4>
               </div>
-              <div className=" justify-between items-center w-[250px] h-[81px] p-[16px] flex flex-col gap-[8px] bg-white/60 backdrop-blur-[17px] rounded-[21px]">
-              {/* Profile Progress Label */}
-              <div className="flex flex-row justify-between items-center w-[154px] h-[19px]">
-                <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
-                  Profile Progress
-                </span>
-                
-                <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
-                  {applicant.profileComplete}%
-                </span>
-              </div>
+              <div className=" justify-between items-center w-[300px] h-[81px] p-[16px] flex flex-col ">
+                {/* Profile Progress Label */}
+                <div className="flex flex-row justify-between items-center w-[200px] sm:w-[260px] h-[19px]">
+                  <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
+                    Profile Progress
+                  </span>
+                  
+                  <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
+                    {applicant.profileComplete}%
+                  </span>
+                </div>
 
-              {/* Progress Bar Container */}
-              <div className="relative w-[154px] h-[16px] bg-[#1E1E1E] transform -skew-x-[20deg]  rounded-[4px]">
-                {/* Progress Fill */}
-                <div
-                  className="absolute left-0.5 top-1/2 h-[14px] -translate-y-1/2 rounded bg-[#FFEB9C]"
-                  style={{ width: `${applicant.profileComplete}%` }}
-                />
+                {/* Progress Bar Container */}
+                <div className="relative w-[200px] sm:w-[260px] h-[16px] bg-[#1E1E1E] transform -skew-x-[20deg]  rounded-[4px]">
+                  {/* Progress Fill */}
+                  <div
+                    className="absolute left-0.5 top-1/2 h-[14px] -translate-y-1/2 rounded bg-[#FFEB9C]"
+                    style={{ width: `${applicant.profileComplete}%` }}
+                  />
 
-              </div>
+                </div>
               </div>
             </div>
             <div className="flex flex-col gap-4 w-[62px] h-[152px] mx-auto">
               {/* First pair */}
-              <div className="flex flex-col gap-1">
-                <span className="font-publicSans text-[14px] leading-[22px] text-[#1C252E]">Label 1</span>
-                <span className="font-publicSans text-[12px] leading-[18px] text-[#1C252E]">Caption</span>
+              <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                <img 
+                  src="/cards/tag.svg" 
+                  alt="Tag Icon"
+                />
+                  {/* Frame 97 - Label container */}
+                <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                  {/* body2 text */}
+                  <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                    {applicant?.salaryPaid}
+                  </span>
+                  {/* caption text */}
+                  <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                    Salary
+                  </span>
+                </div>
               </div>
 
               {/* Second pair */}
-              <div className="flex flex-col gap-1">
-                <span className="font-publicSans text-[14px] leading-[22px] text-[#1C252E]">Label 2</span>
-                <span className="font-publicSans text-[12px] leading-[18px] text-[#1C252E]">Caption</span>
+              <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                <img 
+                  src="/cards/tag.svg" 
+                  alt="Tag Icon"
+                />
+                  {/* Frame 97 - Label container */}
+                <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                  {/* body2 text */}
+                  <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                    {applicant?.availability}
+                  </span>
+                  {/* caption text */}
+                  <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                    Availability
+                  </span>
+                </div>
               </div>
               {/* Third pair */}
-              <div className="flex flex-col gap-1">
-                <span className="font-publicSans text-[14px] leading-[22px] text-[#1C252E]">Label 3</span>
-                <span className="font-publicSans text-[12px] leading-[18px] text-[#1C252E]">Caption</span>
+              <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                <img 
+                  src="/cards/tag.svg" 
+                  alt="Tag Icon"
+                />
+                  {/* Frame 97 - Label container */}
+                <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                  {/* body2 text */}
+                  <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                    {applicant?.city}
+                  </span>
+                  {/* caption text */}
+                  <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                    City
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Skills Parallelogram Card */}
-        <div className="absolute top-50 left-80 w-[460px] h-auto relative">
+        <div className="hidden sm:block absolute top-50 left-80 w-[460px] h-auto relative">
         <div className="flex items-center justify-between mb-6">
           <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
             Skills
@@ -164,7 +214,7 @@ export default function ApplicantPage() {
                 {applicant.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
+                    className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap transform-none"
                   >
                     {skill}
                   </span>
@@ -179,19 +229,48 @@ export default function ApplicantPage() {
       </div>
 
       {/* Skills Parallelogram Card */}
-      <div className="flex flex-col items-center justify-center mt-65 gap-10">
+      <div className="flex flex-col items-center justify-center mt-10 sm:mt-40 gap-10">
+
+        {/* Skills Card */}
+          <div className="w-full sm:max-w-[655px] sm:min-w-[580px] h-auto relative sm:hidden">
+
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
+              Skills
+              </h3>
+            </div>
+            <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
+              <div className="transform skew-x-12 px-8 w-full h-full overflow-y-auto">
+                {applicant?.skills?.length ? (
+                  <div className="flex flex-wrap gap-3">
+                    {applicant.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap transform-none"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[#555] font-publicSans">No skills info available.</p>
+                )}
+              </div>
+            </div>
+          </div>
+
         {/* Row 1 */}
         <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
 
 
           {/* Experience Card */}
-          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
+          <div className="w-full sm:max-w-[655px] sm:min-w-[580px] h-auto relative">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
               Experience
               </h3>
             </div>
-            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllExp ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+            <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
               {experienceData.filter(exp => exp.applicantId === applicant?.applicantId).length ? (
                 experienceData
@@ -204,12 +283,12 @@ export default function ApplicantPage() {
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
                           </svg>
-                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E] transform-none">
                             {exp.role}
                           </h4>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-[12px] text-[#555]">
+                      <div className="flex items-center gap-2 text-[12px] text-[#555] transform-none">
                         <span className="font-publicSans">{exp.companyName}</span>
                         {/* small rotated square */}
                         <svg
@@ -222,9 +301,9 @@ export default function ApplicantPage() {
                         >
                           <rect x="3.53564" width="5" height="5" fill="black" />
                         </svg>
-                        <span className="font-publicSans">{exp.date}</span>
+                        <span className="font-publicSans transform-none">{exp.date}</span>
                       </div>
-                      <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1 break-words">
+                      <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1 break-words transform-none">
                         {exp.description.split(" ").slice(0, 10).join(" ")}
                         {exp.description.split(" ").length > 10 ? "..." : ""}
                       </p>
@@ -239,13 +318,13 @@ export default function ApplicantPage() {
 
 
           {/* Card 2 */}
-          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
+          <div className="w-full sm:max-w-[655px] sm:min-w-[580px] h-auto relative">
             <div className="flex items-center justify-between mb-6">
-               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E] ">
+               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]  ">
                   Education
                 </h3>
             </div>
-            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAll ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+            <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
               {educationData.filter(edu => edu.applicantId === applicant?.applicantId).length ? (
                 educationData
@@ -258,12 +337,12 @@ export default function ApplicantPage() {
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
                           </svg>
-                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E] transform-none">
                             {edu.major}
                           </h4>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-[12px] text-[#555]">
+                      <div className="flex items-center gap-2 text-[12px] text-[#555] transform-none">
                         <span className="font-publicSans">{edu.name}</span>
                         
                         {/* small rotated square */}
@@ -298,13 +377,13 @@ export default function ApplicantPage() {
         <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
 
           {/* Language Card */}
-          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
+          <div className="w-full sm:max-w-[655px] sm:min-w-[580px] h-auto relative">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
               Languages
               </h3>
             </div>
-            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllLang ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+            <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
               {languageData.filter(lang => lang.applicantId === applicant?.applicantId).length ? (
                 languageData
@@ -317,14 +396,14 @@ export default function ApplicantPage() {
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
                           </svg>
-                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E] transform-none">
                             {lang.name}
                           </h4>
                         </div>
                       </div>
 
                       {/* Level text (optional) */}
-                      <p className="font-publicSans text-[12px] text-[#555] mt-1">
+                      <p className="font-publicSans text-[12px] text-[#555] mt-1 transform-none">
                         {lang.level}
                       </p>
                     </div>
@@ -338,13 +417,13 @@ export default function ApplicantPage() {
 
 
           {/* Portfolio Card */}
-          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
+          <div className="w-full sm:max-w-[655px] sm:min-w-[580px] h-auto relative">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
               Portfolio
               </h3>
             </div>
-            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllPortfolio ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+            <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
                 {portfolioData.filter(port => port.applicantId === applicant?.applicantId).length ? (
                   portfolioData
@@ -386,7 +465,7 @@ export default function ApplicantPage() {
                           )}
 
                           {/* Link text */}
-                          <p className="font-publicSans text-[12px] text-[#555] break-words">
+                          <p className="font-publicSans text-[12px] text-[#555] break-words transform-none">
                             {port.link.split(" ").slice(0, 10).join(" ")}
                             {port.link.split(" ").length > 10 ? "..." : ""}
                           </p>

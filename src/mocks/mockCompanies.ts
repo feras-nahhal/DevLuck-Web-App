@@ -14,7 +14,7 @@ community of problem-solvers and science lovers eager to bring their knowledge t
 has evolved into an educational behemoth, with some 1,000 faculty members and more than 11,000 undergraduate 
 and graduate students.`,
     employeeIds: ["E101", "E102", "E103", "E104", "E105"],
-    applicantIds: ["201", "202"], // added
+    applicantIds: ["201", "202", "203"], // added
     profileRanking: 9,
     progress: 85,
     status: "Verified",

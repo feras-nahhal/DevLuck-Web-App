@@ -704,7 +704,7 @@ const goToNext = () => {
             <ApplicantCard
               key={index}
               applicant={applicant}
-            onClick={() => router.push(`/Company/dashboard/job/${jobId}/${applicant.applicantId}`)}
+            onClick={() => router.push(`/Company/opportunity/${jobId}/${applicant.applicantId}`)}
             />
           ))}
         </div>
@@ -718,7 +718,7 @@ const goToNext = () => {
               key={index}
               applicant={applicant}
               onMainClick={() =>
-                router.push(`/Company/dashboard/job/${jobId}/${applicant.applicantId}`)
+                router.push(`/Company/opportunity/${jobId}/${applicant.applicantId}`)
               }
 
               showCheckbox={true} // optional

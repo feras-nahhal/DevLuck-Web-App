@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useSidebar } from "@/src/lib/sidebarContext";
+import { mockNotifications, type Notification } from "@/src/mocks/notifications.mock";
 
 
 const LeftSidebar = ({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen: (open: boolean) => void }) => {
@@ -14,6 +15,10 @@ const LeftSidebar = ({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMo
 
   const glowRightRef = useRef<HTMLDivElement>(null);
   const glowLeftRef = useRef<HTMLDivElement>(null);
+
+  // Calculate unread notifications
+  const unreadCount = mockNotifications.filter(n => !n.read).length;
+  const unreadLabel = unreadCount > 9 ? "9+" : unreadCount.toString();
 
   // Detect mobile screen
   useEffect(() => {
@@ -52,6 +57,7 @@ const LeftSidebar = ({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMo
 ];
 
 const bottomMenuItems = [
+  { name: "Notification", path: "/Student/notification", icon: "/icons/notification.svg" },
   { name: "Settings", path: "/Student/settings", icon: "/icons/settings.svg" },
 ];
 
@@ -96,12 +102,28 @@ const bottomMenuItems = [
           </nav>
         {/* Bottom menu */}
           <nav className="menu bottom-menu">
-            {bottomMenuItems.map(item => (
-              <Link key={item.name} href={item.path} className={`menu-subitem ${pathname === item.path ? "active" : ""}`}>
-                <Image src={item.icon} alt={item.name} width={24} height={24} />
-                <span>{item.name}</span>
-              </Link>
-            ))}
+            {bottomMenuItems.map(item => {
+              const isNotification = item.name === "Notification";
+              return (
+                <Link
+                  key={item.name}
+                  href={item.path}
+                  className={`menu-subitem ${pathname === item.path ? "active" : ""}`}
+                  onClick={() => isMobile && setMobileOpen(false)}
+                >
+                  <div className="relative flex items-center">
+                    <Image src={item.icon} alt={item.name} width={24} height={24} />
+                    {/* Badge for unread notifications */}
+                    {isNotification && unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-red-500 rounded-full">
+                        {unreadLabel}
+                      </span>
+                    )}
+                  </div>
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
           </nav>
         </div>
         
