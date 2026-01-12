@@ -142,22 +142,19 @@ const Card = ({
         relative w-[189.5px] h-[127.36px]
         bg-white border border-[#F4F6F8]
         rounded-[16px]
-        shadow-[0px_0px_2px_rgba(145,158,171,0.2),0px_12px_24px_-4px_rgba(145,158,171,0.12)]
+        shadow-lg
+        transform -skew-x-12 rounded-[24px]
       "
     >
-   
-
- 
-
       {/* Glass blur overlay (Subtract) */}
-      <div className="absolute inset-0 bg-white/50 backdrop-blur-[10px] rounded-[16px]" />
+      <div className="absolute inset-0 bg-white/50 backdrop-blur-[10px] rounded-[16px] " />
 
       {/* Frame 109 (centered content) */}
       <div
         className="
           absolute top-1/2 left-[9.82%] right-[9.19%]
           -translate-y-1/2
-          flex flex-col gap-[5px]
+          flex flex-col gap-[5px] skew-x-12
         "
       >
         {/* Label */}
@@ -354,42 +351,34 @@ export default function DashboardPage() {
                   {/* Skills Parallelogram Card */}
                   <div className="flex flex-col gap-10">
                     {/* Row 1 */}
-                    <div className="flex flex-row px-6 items-start xl:items-stretch justify-start gap-10 flex-wrap xl:flex-nowrap w-full">
+                    <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
                       {/* Experience Card */}
-                      <div className="w-full max-w-[400px] min-w-[350px] h-auto relative">
+                      <div className="w-full sm:max-w-[360px] sm:min-w-[340px] h-auto relative">
                         <div className="flex items-center justify-between mb-6">
-                           <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
-                        Experience Summary
-                      </h3>
-            
-                          {/* More Button */}
-                          
+                          <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
+                          Experience Summary
+                          </h3>
                         </div>
-                        <div className={`w-full max-w-[400px] min-w-[350px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
-                          <div className="transform  px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                            {experienceData.filter(exp => exp.applicantId === applicant?.applicantId).length ? (
+                        <div className={`w-full sm:max-w-[360px] sm:min-w-[340px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
+                          <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
+                          {experienceData.filter(exp => exp.applicantId === applicant?.applicantId).length ? (
                             experienceData
-                              .filter((exp) => exp.applicantId === applicant?.applicantId)
+                              .filter(exp => exp.applicantId === applicant?.applicantId)
                               .map((exp) => (
                                 <div key={exp.id} className="px-4 py-2 w-full">
                                   <div className="flex items-center justify-between">
                                     {/* Left side: SVG + Role */}
-                                    <div className="flex items-center gap-2"
-                                    >
+                                    <div className="flex items-center gap-2">
                                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
                                       </svg>
-                                      <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                                      <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E] transform-none">
                                         {exp.role}
                                       </h4>
                                     </div>
-            
-                                   
                                   </div>
-            
-                                  <div className="flex items-center gap-2 text-[12px] text-[#555]">
+                                  <div className="flex items-center gap-2 text-[12px] text-[#555] transform-none">
                                     <span className="font-publicSans">{exp.companyName}</span>
-            
                                     {/* small rotated square */}
                                     <svg
                                       width="8"
@@ -401,20 +390,14 @@ export default function DashboardPage() {
                                     >
                                       <rect x="3.53564" width="5" height="5" fill="black" />
                                     </svg>
-            
-                                    <span className="font-publicSans">
-                                    {exp.startDate && exp.endDate
-                                      ? `${exp.startDate} - ${exp.endDate}`
-                                      : exp.startDate || exp.endDate || "No dates"}
-                                  </span>
+                                    <span className="font-publicSans transform-none">{exp.date}</span>
                                   </div>
-            
-                                  <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1 break-words">
+                                  <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1 break-words transform-none">
                                     {exp.description.split(" ").slice(0, 10).join(" ")}
                                     {exp.description.split(" ").length > 10 ? "..." : ""}
                                   </p>
                                 </div>
-                               ))
+                              ))
                           ) : (
                             <p className="text-[#555] font-publicSans py-4">No experience info available.</p>
                           )}
@@ -424,38 +407,31 @@ export default function DashboardPage() {
             
             
                       {/* Card 2 */}
-                      <div className="w-full max-w-[400px] min-w-[350px] h-auto relative">
+                      <div className="w-full sm:max-w-[360px] sm:min-w-[340px] h-auto relative">
                         <div className="flex items-center justify-between mb-6">
-                           <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E] ">
+                          <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]  ">
                               Education Summary
                             </h3>
-                         
-                         
                         </div>
-                        <div className={`w-full max-w-[400px] min-w-[350px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform  rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
-                          <div className="transform  px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                            {educationData.filter(edu => edu.applicantId === applicant?.applicantId).length ? (
+                        <div className={`w-full sm:max-w-[360px] sm:min-w-[340px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
+                          <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
+                          {educationData.filter(edu => edu.applicantId === applicant?.applicantId).length ? (
                             educationData
-                              .filter((edu) => edu.applicantId === applicant?.applicantId)
+                              .filter(edu => edu.applicantId === applicant?.applicantId)
                               .map((edu) => (
-                                <div
-                                  key={edu.id}
-                                  className="px-4 py-2  w-full"
-                                >
+                                <div key={edu.id} className="px-4 py-2 w-full">
                                   <div className="flex items-center justify-between">
                                     {/* Left side: SVG + Major */}
                                     <div className="flex items-center gap-2">
                                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
                                       </svg>
-                                      <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                                      <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E] transform-none">
                                         {edu.major}
                                       </h4>
                                     </div>
-            
-                                   
                                   </div>
-                                  <div className="flex items-center gap-2 text-[12px] text-[#555]">
+                                  <div className="flex items-center gap-2 text-[12px] text-[#555] transform-none">
                                     <span className="font-publicSans">{edu.name}</span>
                                     
                                     {/* small rotated square */}
@@ -469,20 +445,15 @@ export default function DashboardPage() {
                                     >
                                       <rect x="3.53564" width="5" height="5" fill="black" />
                                     </svg>
-            
-                                   <span className="font-publicSans">
-                                    {edu.startDate && edu.endDate
-                                      ? `${edu.startDate} - ${edu.endDate}`
-                                      : edu.startDate || edu.endDate || "No dates"}
-                                  </span>
-            
+
+                                    <span className="font-publicSans">{edu.date}</span>
                                   </div>
                                   <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1">
                                     {edu.description.split(" ").slice(0, 10).join(" ")}
                                     {edu.description.split(" ").length > 10 ? "..." : ""}
                                   </p>
                                 </div>
-                            ))
+                              ))
                           ) : (
                             <p className="text-[#555] font-publicSans py-4">No education info available.</p>
                           )}
@@ -492,9 +463,9 @@ export default function DashboardPage() {
                     </div>
             
                     {/* Row 2 */}
-                    <div className="flex flex-row px-6 items-start xl:items-stretch justify-start gap-10 flex-wrap xl:flex-nowrap w-full">
-                      {/* Language Card */}
-                      <div className="w-full max-w-[400px] min-w-[350px] h-auto relative">
+                    <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
+                      {/* Skill Card */}
+                      <div className="w-full sm:max-w-[360px] sm:min-w-[340px] h-auto relative">
                         <div className="flex items-center justify-between mb-6">
                           <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                           Skill Summary
@@ -503,29 +474,29 @@ export default function DashboardPage() {
                          {/* More Button */}
                           
                         </div>
-                        <div className={`w-full max-w-[400px] min-w-[350px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform  rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
-                          <div className="transform  px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                            {applicant?.skills?.length ? (
-                            <div className="flex flex-wrap gap-3">
-                              {applicant.skills.map((skill) => (
-                                <span
-                                  key={skill}
-                                  className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
-                                >
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-[#555] font-publicSans">No skills info available.</p>
-                          )}
-                        </div>
+                          <div className={`w-full sm:max-w-[360px] sm:min-w-[340px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
+                            <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
+                              {applicant?.skills?.length ? (
+                              <div className="flex flex-wrap gap-3">
+                                {applicant.skills.map((skill) => (
+                                  <span
+                                    key={skill}
+                                    className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
+                                  >
+                                    {skill}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-[#555] font-publicSans">No skills info available.</p>
+                            )}
+                          </div>
                         </div>
                       </div>
             
             
                       {/* Portfolio Card */}
-                      <div className="w-full max-w-[400px] min-w-[350px] h-auto relative">
+                      <div className="w-full sm:max-w-[360px] sm:min-w-[340px] h-auto relative">
                         <div className="flex items-center justify-between mb-6">
                           <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                           Upcoming Interview
@@ -533,8 +504,8 @@ export default function DashboardPage() {
             
                           
                         </div>
-                        <div className={`w-full max-w-[400px] min-w-[350px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform  rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
-                          <div className="transform  px-8 w-full flex flex-col gap-3 overflow-y-auto">
+                        <div className={`w-full sm:max-w-[360px] sm:min-w-[340px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
+                          <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
                             {mockContracts.filter(
                                 (contract) =>
                                   contract.applicantId === applicantIdNum
