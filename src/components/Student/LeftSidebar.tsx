@@ -115,7 +115,7 @@ const bottomMenuItems = [
                     <Image src={item.icon} alt={item.name} width={24} height={24} />
                     {/* Badge for unread notifications */}
                     {isNotification && unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-red-500 rounded-full">
+                      <span className="unread-badge absolute flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-red-500 rounded-full">
                         {unreadLabel}
                       </span>
                     )}
