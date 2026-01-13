@@ -18,9 +18,9 @@ const Card1 = ({
 }) => {
       const isUpcoming = contract.opportunityStatus === "Upcoming Interview";
   return (
-    <div className="relative w-[329px] h-[185px]">
+    <div className="relative w-[400px]">
       {/* SVG Shape */}
-      <svg width="437" height="165" viewBox="0 0 437 165" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="400" height="165" viewBox="0 0 437 165" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_dd_13195_51018)">
       <path d="M349.288 8C356.801 8 362.051 15.8514 362.051 23.3643C362.051 43.5621 376.54 59.9354 394.415 59.9355C403.457 59.9355 417 66.1145 417 75.1563V109.748C417 122.59 406.59 133 393.748 133H52C34.3269 133 20 118.673 20 101V40C20 22.3269 34.3269 8 52 8H349.288Z" fill="white"/>
       </g>
@@ -50,7 +50,7 @@ const Card1 = ({
       <div
         className="
           absolute
-          left-[6.23%]
+          left-[6%]
           top-[14.48%]
           right-[9.69%]
           z-10
@@ -98,7 +98,7 @@ const Card1 = ({
 
       <button onClick={onClick}
         className={`
-          absolute left-[115%] top-[0%]
+          absolute left-[85%] top-[3%]
           w-12 h-12 rounded-full
           flex items-center justify-center
           shadow-md z-20
@@ -228,13 +228,27 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div
+       <div
+          className="
+            py-6 min-h-[800px]
+            bg-no-repeat
+            bg-[center_top]
+            bg-[length:340px_auto]
+            sm:bg-[65%_top]
+            sm:bg-auto
+          "
+          style={{
+            backgroundImage: "url('/pages/applicantInfoBackground.svg')",
+            transform: "scale(0.96)",
+            transformOrigin: "top center",
+          }}
+        >
+                  {/* ✅ CONTENT CONTAINER */}
+    <div className="mx-auto max-w-[1400px] ">
+        <div
         className="
-          py-6 min-h-[1000px]
-          bg-none
-          md:bg-[url('/pages/applicantInfoBackground.svg')]
-          md:bg-no-repeat
-          md:bg-[65%_top]
+          flex flex-col items-start
+          justify-start mt-80 sm:mt-0 px-4 sm:px-0
         "
       >
         {/* Frame 254 */}
@@ -345,15 +359,17 @@ export default function DashboardPage() {
 
 
         {/* Frame 267 */}
-        <div className="flex sm:flex-row flex-col  w-full sm:gap-0 gap-4">
+        <div className="flex flex-col sm:flex-row w-full gap-10 sm:gap-15 mt-10 ">
+
+
           {/* Frame 266 */}
-          <div className="flex-[8] flex flex-col gap-6  ">
+          <div className="flex-[8] flex flex-col gap-6 px-4 sm:px-0  ">
                   {/* Skills Parallelogram Card */}
                   <div className="flex flex-col gap-10">
                     {/* Row 1 */}
                     <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
                       {/* Experience Card */}
-                      <div className="w-full sm:max-w-[360px] sm:min-w-[340px] h-auto relative">
+                      <div className="w-full sm:max-w-[360px] sm:min-w-[320px] h-auto relative">
                         <div className="flex items-center justify-between mb-6">
                           <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                           Experience Summary
@@ -563,7 +579,11 @@ export default function DashboardPage() {
 
          {/* Frame 240 */}
           <div className="flex-[4] flex flex-col ">
-            <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E] ">New Opportunity</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
+                New Opportunity
+              </h3>
+            </div>
             {/* Contracts list */}
             <div className="flex flex-wrap ">
               {applicantContracts.length > 0 ? (
@@ -584,8 +604,8 @@ export default function DashboardPage() {
 
 
         </div>
-
-
+      </div>
+      </div>
       </div>
 
     </DashboardLayout>

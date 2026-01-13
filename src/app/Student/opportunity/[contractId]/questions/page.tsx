@@ -58,28 +58,31 @@ export default function ContractQuestionsPage() {
    <div
   key={q.id}
   className="
-    w-[984px]
-    skew-x-[-12deg]
-    bg-white
-    shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12)]
-    drop-shadow-[0px_0px_2px_rgba(145,158,171,0.2)]
-    rounded-xl
-    overflow-hidden
-    mb-6
-    mx-auto
-  "
+  w-full
+  max-w-[984px]
+  px-4 sm:px-0
+  skew-x-0 sm:skew-x-[-12deg]
+  bg-white
+  shadow-[0px_12px_24px_-4px_rgba(145,158,171,0.12)]
+  drop-shadow-[0px_0px_2px_rgba(145,158,171,0.2)]
+  rounded-xl
+  overflow-hidden
+  mb-6
+  mx-auto
+"
+
 >
         {/* Unskewed content */}
-  <div className="skew-x-[12deg] px-8 py-6 flex flex-col gap-4">
+  <div className="skew-x-0 sm:skew-x-[12deg] px-8 py-6 flex flex-col gap-4">
       <label className="font-semibold">{q.question}</label>
 
       {/* TEXT INPUT */}
                 {original.type === "text" && (
-                  <div className="relative w-full h-[154px]">
+                  <div className="relative w-full h-[120px] sm:h-[154px] skew-x-0 sm:skew-x-[-12deg]
+">
                     <div
                       className="absolute inset-0"
                       style={{
-                        transform: "skewX(-12deg)",
                         borderRadius: "20px",
                         background: "#FBFBFB",
                         border: "1px solid #A2A2A2",
@@ -154,26 +157,43 @@ export default function ContractQuestionsPage() {
 
 
       {original.type === "rating" && (
-        <select
-          value={answers[q.id] || ""}
-          onChange={(e) => handleChange(q.id, e.target.value)}
-          className="border rounded p-2 w-32"
-        >
-          <option value="">Select rating</option>
-          {original.options.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
-      )}
+      <div className="flex gap-1">
+        {original.options.map((opt) => {
+          const value = Number(opt);
+          const selected = Number(answers[q.id]) >= value;
+          return (
+            <svg
+              key={value}
+              onClick={() => handleChange(q.id, value.toString())}
+              className={`w-6 h-6 cursor-pointer transition-colors ${
+                selected ? "text-yellow-400" : "text-gray-300"
+              }`}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 15l-5.878 3.09 1.123-6.545L.49 6.91l6.564-.955L10 0l2.946 5.955 6.564.955-4.755 4.635 1.123 6.545z" />
+            </svg>
+          );
+        })}
+      </div>
+    )}
+
     </div>
     </div>
   );
 })}
 
       {/* Pagination buttons */}
-      <div className="absolute bottom-6 left-6 right-6 flex justify-between items-center">
+      <div className="
+        mt-8
+        flex
+        flex-row
+        gap-4
+        sm:gap-0
+        sm:justify-between
+        sm:items-center
+      ">
+
         <button
           onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
           disabled={page === 0}

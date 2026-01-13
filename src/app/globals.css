@@ -363,6 +363,27 @@
 .sidebar.collapsed .menu-subitem.active .menu-icon img {
   transform: scale(1.45); /* Bigger active icon */
 }
+
+/* ===============================
+   UNREAD BADGE ADJUSTMENTS (COLLAPSED)   
+=============================== */
+
+.sidebar .menu-subitem .unread-badge {
+  top: 1px;      /* inside the circle */
+  right: 1px;    /* inside the circle */
+  width: 12px;
+  height: 12px;
+  font-size: 8px;
+}
+
+.sidebar.collapsed .menu-subitem .unread-badge {
+  top: 1px;      /* inside the circle */
+  right: 1px;    /* inside the circle */
+  width: 12px;
+  height: 12px;
+  font-size: 8px;
+}
+
 /* ===============================
    LOGO STYLES
 =============================== */
