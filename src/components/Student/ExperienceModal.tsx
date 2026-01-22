@@ -292,14 +292,17 @@ const ExperienceModal: React.FC<ExperienceModalProps> = ({ experience, isOpen, o
 
   const handleInputChange = (field: keyof ExperienceData, value: string) => setFormData((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      onSave(formData);
-      setLoading(false);
+    try {
+      await onSave(formData);
       onClose();
-    }, 500);
+    } catch (error) {
+      console.error("Error saving experience:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -353,8 +356,6 @@ const ExperienceModal: React.FC<ExperienceModalProps> = ({ experience, isOpen, o
           <ParallelogramDatePicker label="Start Date" placeholder="Select start date" value={formData.startDate} onChange={(value) => handleInputChange("startDate", value)} />
           <ParallelogramDatePicker label="End Date" placeholder="Select end date" value={formData.endDate} onChange={(value) => handleInputChange("endDate", value)} />
          
-        </form>
-
         {/* Footer */}
         <div
             className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
@@ -364,6 +365,7 @@ const ExperienceModal: React.FC<ExperienceModalProps> = ({ experience, isOpen, o
         >
             <div className="flex w-[400px] justify-between">
             <button
+                type="button"
                 onClick={onClose}
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             >
@@ -381,6 +383,7 @@ const ExperienceModal: React.FC<ExperienceModalProps> = ({ experience, isOpen, o
             </button>
             </div>
         </div>
+        </form>
         </div>
     </div>
     );

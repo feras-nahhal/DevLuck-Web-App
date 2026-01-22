@@ -11,7 +11,7 @@ interface ProfileData {
   name: string;
   description: string;
   availability: string;
-  image?: string; // URL to the image
+  image?: string;
 }
 
 
@@ -358,7 +358,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
    useEffect(() => {
     if (profile) {
-      setFormData(profile);
+      setFormData({
+        name: profile.name || "",
+        description: profile.description || "",
+        availability: profile.availability || ""
+      });
     } else {
       setFormData({ name: "", description: "", availability: "" });
     }
@@ -372,13 +376,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    // Mock save
-    setTimeout(() => {
-      onSave(formData);
-      setLoading(false);
+    try {
+      await onSave(formData);
       onClose();
-    }, 500);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -459,12 +464,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             placeholder="Ex: Shortly Write yourself"
             value={formData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
+            type="textarea"
           />
 
           
-
-  
-        </form>
 
         {/* Footer */}
         <div
@@ -475,6 +478,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         >
             <div className="flex w-[400px] justify-between">
             <button
+                type="button"
                 onClick={onClose}
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             >
@@ -492,6 +496,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             </button>
             </div>
         </div>
+        </form>
         </div>
     </div>
     );

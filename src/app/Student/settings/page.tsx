@@ -1,10 +1,13 @@
 // src/app/Student/settings/page.tsx
 "use client";
 
-import { useState} from "react";
+import { useEffect, useState} from "react";
+import { useRouter } from "next/navigation";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
-import AddressModal from "@/src/components/common/AddressModal"; 
-
+import AddressModal from "@/src/components/common/AddressModal";
+import { useAuth } from "@/src/hooks/useAuth"; 
+import { useStudentSettingsHandler } from "@/src/hooks/studentapihandler/useStudentSettingsHandler";
+import { Eye, EyeOff } from "lucide-react";
 // src/mocks/mockUniversityAddresses.ts
 export const mockUniversityAddresses = [
   {
@@ -38,149 +41,179 @@ const colors = [
 ];
  
 export default function SettingsPage() {
-
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<any>(null);
-
-  const ParallelogramInput = ({
-    label,
-    placeholder,
-    type = "text",
-  }: {
-    label: string;
-    placeholder: string;
-    type?: string;
-  }) => (
-    <div className="relative w-full h-[48px]">
-      <label
-        className="absolute -top-2 left-5 h-[18px] px-3 bg-[#FFEB9C] text-[#1E1E1E] text-xs font-normal select-none flex items-center skew-x-[-12deg] z-20"
-        style={{ borderRadius: "6px" }}
-      >
-        <span className="skew-x-[12deg]">{label}</span>
-      </label>
-      <div className="overflow rounded-[12px] h-full w-full">
-        <div
-          className="h-full w-full border border-[#1C252E]"
-          style={{ transform: "skewX(-15deg)", borderRadius: "12px", background: "transparent" }}
-        >
-          <div
-            style={{
-              transform: "skewX(15deg)",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              padding: "0 20px",
-            }}
-          >
-            {type === "textarea" ? (
-              <textarea
-                placeholder={placeholder}
-                className="bg-transparent outline-none w-full resize-none text-[14px] text-[#171717cc] h-full"
-              />
-            ) : (
-              <input
-                type={type}
-                placeholder={placeholder}
-                className="bg-transparent outline-none w-full text-[14px] text-[#171717cc]"
-              />
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const [activeTab, setActiveTab] = useState<
-      "general" | "notification"| "security"
-    >("general");
-
-  const [activity, setActivity] = useState({
-  jobAlerts: true,
-  emailNotifications: true,
-  profileVisibility: true,
-  NewsAndAnnouncements: true,
-  WeeklyProductUpdates: true,
-  WeeklyBlogDigest: true,
-  });
-
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const ThemeOption = ({
-      label,
-      active,
-      onClick,
-    }: {
-      label: string;
-      active: boolean;
-      onClick: () => void;
-    }) => {
-      return (
-        <button
-          onClick={onClick}
-          className={`flex items-center h-[139px] rounded-[24px] transition-all
-            ${active ? "bg-[#FFFCF0] border border-[#FFEB9C]" : ""}
-          `}
-        >
-          {/* Center */}
-          <div className="w-[240px] h-full skew-x-12 flex flex-col justify-center gap-[16px] px-4 ">
-            <div className="flex items-center justify-between">
-              {/* Icon */}
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path opacity="0.32" d="M16.9462 11.0863C16.9759 11.0875 17.0055 11.0886 17.035 11.0898C20.1966 11.2176 22.5 13.3358 22.5 16.5C22.5 19.6642 20.1966 21.7824 17.035 21.9102C15.7057 21.9639 14.0498 22 12 22C9.9502 22 8.2943 21.9639 6.965 21.9102C3.80337 21.7824 1.5 19.6642 1.5 16.5C1.5 14.0317 2.90165 12.1999 5.019 11.4529C5.2406 8.2951 7.3872 6.02435 10.6413 6.00125C10.7585 6.00045 10.878 6 11 6C11.122 6 11.2415 6.00045 11.3587 6.00125C14.4855 6.02345 16.5897 8.1208 16.9462 11.0863Z" fill="#1E1E1E"/>
-              <path d="M19.2407 2.28853C19.5263 2.12002 19.5419 1.62921 19.2169 1.57222C18.1306 1.38179 16.9755 1.56344 15.9464 2.17059C14.4123 3.07575 13.5394 4.70186 13.501 6.38837C15.4283 7.12677 16.6785 8.86242 16.9459 11.0863L17.0347 11.0898C17.7391 11.1183 18.401 11.2456 19.0042 11.4612C19.6324 11.3806 20.2555 11.1732 20.8383 10.8294C21.8673 10.2222 22.5988 9.2907 22.9806 8.23415C23.0948 7.918 22.6711 7.6864 22.3855 7.8549C20.8813 8.74235 18.958 8.2157 18.0896 6.6786C17.2212 5.1415 17.7366 3.17599 19.2407 2.28853Z" fill="#1E1E1E"/>
-              </svg>
-              {/* Switch */}
-              <div
-                className={`w-[25px] h-[16px] rounded-full border flex items-center p-[3px]
-                  ${active
-                    ? "bg-[#FFEB9C] border-[#CCBC7D] justify-end"
-                    : "bg-[#919EAB]/40 border-[#DFE3E8] justify-start"}
-                `}
-              >
-                <div className="w-[10px] h-[10px] bg-white rounded-full" />
-              </div>
-            </div>
-
-            <span className="text-[13px] font-semibold text-[#1E1E1E]">
-              {label}
-            </span>
-          </div>
-        </button>
-      );
-    };
-
-    function Switch({
-      enabled,
-      onToggle,
-    }: {
-      enabled: boolean;
-      onToggle: () => void;
-    }) {
-      return (
-        <button
-          onClick={onToggle}
-          className={`w-[33px] h-[20px] rounded-full p-[3px] flex items-center transition-all ${
-            enabled ? "bg-[#FFEB9C]" : "bg-[rgba(145,158,171,0.48)]"
-          }`}
-        >
-          <div
-            className={`w-[14px] h-[14px] bg-white rounded-full transition-all ${
-              enabled ? "translate-x-[13px]" : "translate-x-0"
-            }`}
-          />
-        </button>
-      );
-    }
-
-
+ const [isModalOpen, setIsModalOpen] = useState(false);
+   const [editingAddress, setEditingAddress] = useState<any>(null);
+   const [showPassword, setShowPassword] = useState(false);
+   const [showNewPassword, setShowNewPassword] = useState(false);
+   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+   const { logout } = useAuth();
+   const router = useRouter();
+ 
+   // Settings hook
+   const {
+     settings,
+     getSettings,
+     updateSettings,
+     changePasswordLoading,
+     changePasswordError,
+     changePassword
+   } = useStudentSettingsHandler();
+ 
+   // Theme state from API
+   const [apiTheme, setApiTheme] = useState(settings?.theme || 'light');
+   const [apiThemeColor, setApiThemeColor] = useState(settings?.themeColor || '#FFEB9C');
+ 
+   // Password state
+   const [currentPassword, setCurrentPassword] = useState('');
+   const [newPassword, setNewPassword] = useState('');
+   const [confirmPassword, setConfirmPassword] = useState('');
+   const [showPasswordSection, setShowPasswordSection] = useState(false);
+ 
+   const handleLogout = async () => {
+     try {
+       await logout();
+       router.push("/auth");
+     } catch (error) {
+       console.error("Logout failed:", error);
+     }
+   };
+ 
+   // Load settings on component mount
+   useEffect(() => {
+     getSettings().catch(console.error);
+   }, []);
+ 
+   // Handle theme update
+   const handleThemeUpdate = async () => {
+     try {
+       await updateSettings({
+         theme: apiTheme,
+         themeColor: apiThemeColor
+       });
+       alert('Theme updated successfully!');
+     } catch (error) {
+       console.error("Failed to update theme:", error);
+       alert('Failed to update theme');
+     }
+   };
+ 
+   // Handle password change
+   const handlePasswordChange = async (e: React.FormEvent) => {
+     e.preventDefault();
+ 
+     if (newPassword !== confirmPassword) {
+       alert('New password and confirm password do not match');
+       return;
+     }
+ 
+     if (newPassword.length < 6) {
+       alert('Password must be at least 6 characters long');
+       return;
+     }
+ 
+     try {
+       await changePassword(currentPassword, newPassword, confirmPassword);
+       alert('Password changed successfully!');
+       setCurrentPassword('');
+       setNewPassword('');
+       setConfirmPassword('');
+       setShowPasswordSection(false);
+     } catch (error) {
+       console.error("Failed to change password:", error);
+       alert('Failed to change password. Please check your current password.');
+     }
+   };
+ 
+ 
+   const [activeTab, setActiveTab] = useState<
+       "general" | "notification"| "security"
+     >("general");
+ 
+   const [activity, setActivity] = useState({
+   jobAlerts: true,
+   emailNotifications: true,
+   profileVisibility: true,
+   NewsAndAnnouncements: true,
+   WeeklyProductUpdates: true,
+   WeeklyBlogDigest: true,
+   });
+ 
+   const [selectedColor, setSelectedColor] = useState(colors[0]);
+   const [theme, setTheme] = useState<"light" | "dark">("light");
+   const ThemeOption = ({
+       label,
+       active,
+       onClick,
+     }: {
+       label: string;
+       active: boolean;
+       onClick: () => void;
+     }) => {
+       return (
+         <button
+           onClick={onClick}
+           className={`flex items-center h-[139px] rounded-[24px] transition-all
+             ${active ? "bg-[#FFFCF0] border border-[#FFEB9C]" : ""}
+           `}
+         >
+           {/* Center */}
+           <div className="w-[240px] h-full skew-x-12 flex flex-col justify-center gap-[16px] px-4 ">
+             <div className="flex items-center justify-between">
+               {/* Icon */}
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path opacity="0.32" d="M16.9462 11.0863C16.9759 11.0875 17.0055 11.0886 17.035 11.0898C20.1966 11.2176 22.5 13.3358 22.5 16.5C22.5 19.6642 20.1966 21.7824 17.035 21.9102C15.7057 21.9639 14.0498 22 12 22C9.9502 22 8.2943 21.9639 6.965 21.9102C3.80337 21.7824 1.5 19.6642 1.5 16.5C1.5 14.0317 2.90165 12.1999 5.019 11.4529C5.2406 8.2951 7.3872 6.02435 10.6413 6.00125C10.7585 6.00045 10.878 6 11 6C11.122 6 11.2415 6.00045 11.3587 6.00125C14.4855 6.02345 16.5897 8.1208 16.9462 11.0863Z" fill="#1E1E1E"/>
+               <path d="M19.2407 2.28853C19.5263 2.12002 19.5419 1.62921 19.2169 1.57222C18.1306 1.38179 16.9755 1.56344 15.9464 2.17059C14.4123 3.07575 13.5394 4.70186 13.501 6.38837C15.4283 7.12677 16.6785 8.86242 16.9459 11.0863L17.0347 11.0898C17.7391 11.1183 18.401 11.2456 19.0042 11.4612C19.6324 11.3806 20.2555 11.1732 20.8383 10.8294C21.8673 10.2222 22.5988 9.2907 22.9806 8.23415C23.0948 7.918 22.6711 7.6864 22.3855 7.8549C20.8813 8.74235 18.958 8.2157 18.0896 6.6786C17.2212 5.1415 17.7366 3.17599 19.2407 2.28853Z" fill="#1E1E1E"/>
+               </svg>
+               {/* Switch */}
+               <div
+                 className={`w-[25px] h-[16px] rounded-full border flex items-center p-[3px]
+                   ${active
+                     ? "bg-[#FFEB9C] border-[#CCBC7D] justify-end"
+                     : "bg-[#919EAB]/40 border-[#DFE3E8] justify-start"}
+                 `}
+               >
+                 <div className="w-[10px] h-[10px] bg-white rounded-full" />
+               </div>
+             </div>
+ 
+             <span className="text-[13px] font-semibold text-[#1E1E1E]">
+               {label}
+             </span>
+           </div>
+         </button>
+       );
+     };
+ 
+     function Switch({
+       enabled,
+       onToggle,
+     }: {
+       enabled: boolean;
+       onToggle: () => void;
+     }) {
+       return (
+         <button
+           onClick={onToggle}
+           className={`w-[33px] h-[20px] rounded-full p-[3px] flex items-center transition-all ${
+             enabled ? "bg-[#FFEB9C]" : "bg-[rgba(145,158,171,0.48)]"
+           }`}
+         >
+           <div
+             className={`w-[14px] h-[14px] bg-white rounded-full transition-all ${
+               enabled ? "translate-x-[13px]" : "translate-x-0"
+             }`}
+           />
+         </button>
+       );
+     }
+ 
  
   return (
     <DashboardLayout>
       <div
         className="py-6 min-h-[800px]"
         style={{
-            transform: "scale(0.96)",
+          transform: "scale(0.96)",
           transformOrigin: "top center",
         }}
       >
@@ -196,6 +229,7 @@ export default function SettingsPage() {
           <div className="flex items-center gap-4">
             {/* Example Button 1 */}
             <button
+              onClick={handleLogout}
               className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105">
               <span className="skew-x-[12deg] font-bold text-[#1E1E1E] flex items-center justify-center">
                 Log Out
@@ -595,62 +629,140 @@ export default function SettingsPage() {
           </div>
         )}
 
-         {/* TAB CONTENT */}
+         {/* Security Tab */}
         {activeTab === "security" && (
           <div className="flex flex-col gap-6">
-            {/* Row 1 */}
-            <div className="flex flex-row items-start xl:items-stretch justify-start gap-10 flex-wrap xl:flex-nowrap w-full">
-              
-              {/* Password Card */}
-              <div className="w-full sm:max-w-[655px] sm:min-w-[580px] h-auto relative">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
-                    Password
-                  </h3>
-                </div>
-
-                <div
-                  className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[280px]`}
-                >
-                  <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 py-2">
-                  {/* Reuse ParallelogramInput */}
-                  <ParallelogramInput
-                    label="Current Password"
-                    placeholder="Enter current password"
-                    type="password"
-                  />
-
-                  <ParallelogramInput
-                    label="New Password"
-                    placeholder="Enter new password"
-                    type="password"
-                  />
-
-                  <ParallelogramInput
-                    label="Confirm Password"
-                    placeholder="Confirm new password"
-                    type="password"
-                  />
-
-                  
-
-                  {/* Submit Button */}
-                  <button
-                    className="mt-2 w-[98px] h-[40px] -skew-x-12 rounded-[9px] flex items-center justify-center bg-[#FFEB9C]  font-bold text-[14px] text-[#1E1E1E] relative"
-                  >
-                    Save
-    
-               
-                  </button>
-                </div>
-
-                </div>
+            <div className="w-full sm:max-w-[655px] sm:min-w-[580px] relative">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
+                  Password
+                </h3>
               </div>
 
+             {/* Card wrapper */}
+              <div className="relative w-full">
+                {/* Decorative skew background */}
+                <div
+                  className="
+                    absolute inset-0
+                    bg-white
+                    rounded-[24px]
+                    shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)]
+                    -skew-x-12
+                    pointer-events-none
+                  "
+                />
+
+                {/* Real content */}
+                <div
+                  className="
+                    relative
+              
+                    px-10
+                    py-8
+                    w-full
+                    flex
+                    flex-col
+                    gap-6
+                  "
+                >
+                  <form
+                    onSubmit={handlePasswordChange}
+                    className="flex flex-col gap-5 w-full"
+                  >
+
+                    {/* Current Password */}
+                    <div className="relative w-full h-[48px]">
+                      <label className="absolute -top-2 left-5 h-[18px] px-3 bg-[#FFEB9C] text-[#1E1E1E] text-xs flex items-center skew-x-[-12deg] z-20 rounded-md">
+                        <span className="skew-x-[12deg]">Current Password</span>
+                      </label>
+                      <div className="absolute inset-0 border border-[#1C252E] rounded-[12px] -skew-x-12 pointer-events-none" />
+                      <div className="relative h-full flex items-center px-5 bg-transparent">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          placeholder="Enter current password"
+                          className="w-full bg-transparent outline-none text-[12px] text-[#171717cc]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="ml-2 text-[#171717cc]"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* New Password */}
+                    <div className="relative w-full h-[48px]">
+                      <label className="absolute -top-2 left-5 h-[18px] px-3 bg-[#FFEB9C] text-[#1E1E1E] text-xs flex items-center skew-x-[-12deg] z-20 rounded-md">
+                        <span className="skew-x-[12deg]">New Password</span>
+                      </label>
+                      <div className="absolute inset-0 border border-[#1C252E] rounded-[12px] -skew-x-12 pointer-events-none" />
+                      <div className="relative h-full flex items-center px-5 bg-transparent">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="Enter new password"
+                          className="w-full bg-transparent outline-none text-[12px] text-[#171717cc]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="ml-2 text-[#171717cc]"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="relative w-full h-[48px]">
+                      <label className="absolute -top-2 left-5 h-[18px] px-3 bg-[#FFEB9C] text-[#1E1E1E] text-xs flex items-center skew-x-[-12deg] z-20 rounded-md">
+                        <span className="skew-x-[12deg]">Confirm Password</span>
+                      </label>
+                      <div className="absolute inset-0 border border-[#1C252E] rounded-[12px] -skew-x-12 pointer-events-none" />
+                      <div className="relative h-full flex items-center px-5 bg-transparent">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Confirm new password"
+                          className="w-full bg-transparent outline-none text-[12px] text-[#171717cc]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="ml-2 text-[#171717cc]"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {changePasswordError && (
+                      <div className="text-red-500 text-sm">{changePasswordError}</div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={changePasswordLoading}
+                      className="relative w-[200px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center rounded-md hover:bg-[#FFE066] transition disabled:opacity-50"
+                    >
+                      <span className="skew-x-[12deg] font-bold text-[#1E1E1E]">
+                        {changePasswordLoading ? "Changing..." : "Change Password"}
+                      </span>
+                    </button>
+                  </form>
+                </div>
+              </div>
             </div>
-            
           </div>
         )}
+
       </div>
       </div>
       <AddressModal

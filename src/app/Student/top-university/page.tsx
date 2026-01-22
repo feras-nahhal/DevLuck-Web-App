@@ -624,7 +624,7 @@ export default function TopUniversityPage() {
                   university={university}
                   onClick={() =>
                     router.push(
-                      `/Company/top-university/${university.id}`
+                      `/Student/top-university/${university.id}`
                     )
                   }
                 />
@@ -643,7 +643,7 @@ export default function TopUniversityPage() {
                   university={university}
                   onMainClick={() =>
                     router.push(
-                      `/Company/top-university/${university.id}`
+                      `/Student/top-university/${university.id}`
                     )
                   }
                   showCheckbox={true}

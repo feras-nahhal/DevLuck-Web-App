@@ -1,11 +1,30 @@
-// src/app/Company/payment/page.tsx
+// src/app/Company/payment/[contractId]/page.tsx
 "use client";
 import { useState, useMemo, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
-import { mockApplicantPayments } from "@/src/mocks/mockApplicantPayments";
 import { ArrowUpRight } from "lucide-react";
-import { useParams, notFound } from "next/navigation";
+import { useParams } from "next/navigation";
 import PaymentModal from "@/src/components/Company/PaymentModal";
+import { useContractHandler } from "@/src/hooks/companyapihandler/useContractHandler";
+import { usePaymentHandler } from "@/src/hooks/companyapihandler/usePaymentHandler";
+
+interface Payment {
+  id: string;
+  applicantName: string;
+  contractId?: string;
+  nextPayment: string;
+  monthlyAllowance?: string;
+  note?: string;
+  paymentStatus: string;
+  applicantId?: string | null;
+  transferId?: string | null;
+  workLocation?: string | null;
+  method?: string | null;
+  companyId: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 /* ──────────────────────────────────────────────
    Card Component
@@ -165,18 +184,33 @@ const Card = ({
 };
 
 type ContractRowProps = {
-  payment: typeof mockApplicantPayments[0];
+  payment: Payment;
   onSideClick?: () => void;
+  onDelete?: () => void;
   showCheckbox?: boolean;
 };
 
-const ContractRow = ({ payment,onSideClick,showCheckbox = false }: ContractRowProps) => {
+const ContractRow = ({ payment, onSideClick, onDelete, showCheckbox = false }: ContractRowProps) => {
   const [checked, setChecked] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   return (
     <div className="flex w-full gap-4">
       {/* Main 80% section */}
       <div
-        className="flex items-center w-9/10 skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg bg-white cursor-pointer hover:bg-gray-50"
+        className="flex items-center skew-x-[-12deg] rounded-lg h-[72px] shadow-lg bg-white cursor-pointer hover:bg-gray-50"
         onClick={() => {
           onSideClick?.();
         }}
@@ -224,10 +258,10 @@ const ContractRow = ({ payment,onSideClick,showCheckbox = false }: ContractRowPr
         {/* Applicant Info */}
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
 
-          {/* Next Payment */}
+          {/* Payment Date */}
           <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">{payment.nextPayment}</span>
-            <span className="text-xs text-gray-400">Next Payment</span>
+            <span className="text-xs text-gray-400">Payment Date</span>
           </div>
 
           {/* Monthly Allowance */}
@@ -237,26 +271,20 @@ const ContractRow = ({ payment,onSideClick,showCheckbox = false }: ContractRowPr
           </div>
 
           {/* Transfer ID */}
-          <div className="flex flex-col justify-center w-[150px]">
+          <div className="flex flex-col justify-center w-[300px]">
             <span className="text-sm font-semibold text-gray-900">{payment.transferId}</span>
             <span className="text-xs text-gray-400">Transfer ID</span>
           </div>
 
-           {/* Method ID */}
-          <div className="flex flex-col justify-center w-[160px]">
-            <span className="text-sm font-semibold text-gray-900">{payment.method}</span>
-            <span className="text-xs text-gray-400">Method</span>
-          </div>
-
-            {/* Note ID */}
-          <div className="flex flex-col justify-center w-[160px]">
-            <span className="text-sm font-semibold text-gray-900">{payment.note}</span>
-            <span className="text-xs text-gray-400">Method</span>
+            {/* Note */}
+          <div className="flex flex-col justify-center w-[150px]">
+            <span className="text-sm font-semibold text-gray-900">{payment.note || "-"}</span>
+            <span className="text-xs text-gray-400">Note</span>
           </div>
 
 
             {/* Payment Status */}
-            <div className="flex flex-col justify-center items-center">
+            <div className="flex flex-col justify-center items-center w-[150px]">
             <div
                 className={`
                 ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8px] text-xs font-semibold flex items-center justify-center
@@ -276,48 +304,82 @@ const ContractRow = ({ payment,onSideClick,showCheckbox = false }: ContractRowPr
       {/* Second 20% section beside the main card */}
       <div
         className="relative  flex items-center w-1/10 skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg bg-[#FFF9E0] cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation();
+
+          const rect = e.currentTarget.getBoundingClientRect();
+
+         setMenuPos({
+            top: rect.top + window.scrollY,
+            left: rect.right + window.scrollX - 230,
+          });
+
+
+
+          setMenuOpen((prev) => !prev);
+        }}
       >
         <div className="flex items-center justify-center skew-x-[12deg] w-full h-full">
-          {/* Example Frame 295 content */}
           <div className="flex flex-col items-center justify-center gap-1">
-            <svg
-              width="77"
-              height="72"
-              viewBox="0 0 77 72"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect width="76.4667" height="72" fill="#FFF9E0" />
-
-              <path
-                d="M27.7333 20H23.0852C18.1121 20 13.5891 22.8805 11.486 27.3871L7.08281 36.8226C3.78263 43.8944 8.94481 52 16.7488 52H27.7333"
-                stroke="#1E1E1E"
-                strokeWidth="1.06667"
-              />
-
-              <path
-                d="M24.7334 20V20.5H48.7334V20V19.5H24.7334V20ZM48.7334 52V51.5H24.7334V52V52.5H48.7334V52Z"
-                fill="#1E1E1E"
-              />
-
-              <path
-                d="M27.7334 30.3762C27.7334 29.8922 28.0784 29.4992 28.5044 29.4992H31.1694C31.6984 29.4832 32.1654 29.1002 32.3454 28.5342L32.3754 28.4342L32.4904 28.0432C32.5604 27.8032 32.6214 27.5932 32.7074 27.4062C33.0454 26.6672 33.6714 26.1542 34.3944 26.0232C34.5784 25.9902 34.7724 25.9902 34.9944 25.9902H38.4724C38.6954 25.9902 38.8894 25.9902 39.0724 26.0232C39.7954 26.1542 40.4224 26.6672 40.7594 27.4062C40.8454 27.5932 40.9064 27.8022 40.9774 28.0432L41.0914 28.4342L41.1214 28.5342C41.3014 29.1002 41.8614 29.4842 42.3914 29.4992H44.9614C45.3884 29.4992 45.7334 29.8922 45.7334 30.3762C45.7334 30.8602 45.3884 31.2532 44.9624 31.2532H28.5034C28.0784 31.2532 27.7334 30.8602 27.7334 30.3762Z"
-                fill="#1E1E1E"
-              />
-
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M36.3294 45.9902H37.1374C39.9204 45.9902 41.3114 45.9902 42.2174 45.1042C43.1214 44.2182 43.2134 42.7652 43.3984 39.8592L43.6654 35.6712C43.7654 34.0942 43.8154 33.3052 43.3624 32.8062C42.9084 32.3062 42.1424 32.3062 40.6094 32.3062H32.8574C31.3244 32.3062 30.5574 32.3062 30.1044 32.8062C29.6504 33.3062 29.7004 34.0942 29.8014 35.6712L30.0684 39.8592C30.2534 42.7652 30.3454 44.2192 31.2504 45.1042C32.1554 45.9902 33.5464 45.9902 36.3294 45.9902Z"
-                fill="#1E1E1E"
-              />
-
-              <path
-                d="M45.7335 52L50.3816 52C55.3547 52 59.8777 49.1195 61.9808 44.6129L66.384 35.1774C69.6842 28.1056 64.522 20 56.718 20L45.7335 20"
-                stroke="#1E1E1E"
-                strokeWidth="1.06667"
-              />
+            <svg width="77" height="72" viewBox="0 0 77 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="76.4667" height="72" fill="#FFF9E0"/>
+              <path d="M27.7333 20H23.0852C18.1121 20 13.5891 22.8805 11.486 27.3871L7.08281 36.8226C3.78263 43.8944 8.94481 52 16.7488 52H27.7333" stroke="#1E1E1E" strokeWidth="1.06667"/>
+              <path d="M24.7334 20V20.5H48.7334V20V19.5H24.7334V20ZM48.7334 52V51.5H24.7334V52V52.5H48.7334V52Z" fill="#1E1E1E"/>
+              <path d="M36.7334 38C37.838 38 38.7334 37.1046 38.7334 36C38.7334 34.8954 37.838 34 36.7334 34C35.6288 34 34.7334 34.8954 34.7334 36C34.7334 37.1046 35.6288 38 36.7334 38Z" fill="#1E1E1E"/>
+              <path d="M36.7334 31C37.838 31 38.7334 30.1046 38.7334 29C38.7334 27.8954 37.838 27 36.7334 27C35.6288 27 34.7334 27.8954 34.7334 29C34.7334 30.1046 35.6288 31 36.7334 31Z" fill="#1E1E1E"/>
+              <path d="M36.7334 45C37.838 45 38.7334 44.1046 38.7334 43C38.7334 41.8954 37.838 41 36.7334 41C35.6288 41 34.7334 41.8954 34.7334 43C34.7334 44.1046 35.6288 45 36.7334 45Z" fill="#1E1E1E"/>
+              <path d="M45.7335 52L50.3816 52C55.3547 52 59.8777 49.1195 61.9808 44.6129L66.384 35.1774C69.6842 28.1056 64.522 20 56.718 20L45.7335 20" stroke="#1E1E1E" strokeWidth="1.06667"/>
             </svg>
+
+            {menuOpen && menuPos &&
+            createPortal(
+              <div
+                ref={menuRef}
+                className="fixed w-[180px] rounded-xl bg-white shadow-2xl border py-2 z-50"
+                style={{
+                  top: menuPos.top,
+                  left: menuPos.left,
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button 
+                  className="w-full flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onSideClick?.();
+                  }}
+                >
+                 <svg fill="#000000" width="20px" height="20px" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><title/><path d="M84.4373,11.577a18.0012,18.0012,0,0,0-25.46,0L8.0639,62.4848A5.9955,5.9955,0,0,0,6.306,66.7271V83.6964a5.9968,5.9968,0,0,0,6,6H29.2813a5.9959,5.9959,0,0,0,4.2423-1.7579l50.92-50.9078A18.0419,18.0419,0,0,0,84.4373,11.577Zm-8.49,8.4847a6.014,6.014,0,0,1,.0058,8.4846l-4.243,4.243-8.4891-8.4861,4.2416-4.2415A5.998,5.998,0,0,1,75.9468,20.0617Zm-49.15,57.6345h-8.49V69.2116L54.7352,32.7871l8.489,8.4861Z"/></svg>
+
+                  <span>Edit</span>
+                </button>
+
+                <button 
+                  className="w-full flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onDelete?.();
+                  }}
+                >
+                  <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M9.99526 11.1738L14.7071 15.886C14.8642 16.0378 15.0746 16.1217 15.293 16.1198C15.5114 16.1179 15.7203 16.0303 15.8748 15.8759C16.0292 15.7215 16.1168 15.5125 16.1187 15.2941C16.1206 15.0757 16.0366 14.8653 15.8849 14.7082L11.173 9.99597L15.8849 5.28375C16.0366 5.12664 16.1206 4.91623 16.1187 4.69782C16.1168 4.47941 16.0292 4.27049 15.8748 4.11605C15.7203 3.9616 15.5114 3.874 15.293 3.8721C15.0746 3.8702 14.8642 3.95416 14.7071 4.1059L9.99526 8.81813L5.28337 4.1059C5.12557 3.95792 4.91639 3.87713 4.70009 3.88065C4.48379 3.88416 4.27735 3.97169 4.12443 4.12472C3.97152 4.27775 3.88414 4.48427 3.88078 4.70059C3.87742 4.91691 3.95835 5.12604 4.10643 5.28375L8.81749 9.99597L4.1056 14.7082C4.02605 14.785 3.96259 14.877 3.91894 14.9786C3.87529 15.0802 3.85231 15.1895 3.85135 15.3001C3.85039 15.4107 3.87146 15.5204 3.91334 15.6228C3.95522 15.7252 4.01707 15.8182 4.09528 15.8964C4.17348 15.9746 4.26648 16.0364 4.36885 16.0783C4.47121 16.1202 4.58089 16.1413 4.69149 16.1403C4.80208 16.1394 4.91138 16.1164 5.013 16.0727C5.11462 16.0291 5.20653 15.9656 5.28337 15.886L9.99526 11.1738Z"
+                    fill="#1C252E"
+                  />
+                </svg>
+                   <span>Delete</span>
+                </button>
+              </div>,
+              document.body
+            )}
           </div>
         </div>
       </div>
@@ -331,26 +393,62 @@ export default function PaymentPage() {
     // ---------------modal popup--------
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPayment, setEditingPayment] = useState<any>(null);
+    const [selectedContract, setSelectedContract] = useState<any>(null);
     //-----------------------------------
     
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [paymentToDelete, setPaymentToDelete] = useState<string | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    
     const params = useParams<{ applicantId: string }>();
-    const applicantId = params.applicantId;
+    const contractId = params.applicantId;
 
-    // 🔎 Find payment by applicantId
-    const payment = mockApplicantPayments.find(
-        (p) => p.applicantId === applicantId
-    );
+    const { getContractById, loading: contractLoading } = useContractHandler();
+    const { listPayments: fetchPayments, deletePayment: deletePaymentApi } = usePaymentHandler();
+    const [contract, setContract] = useState<any>(null);
+    const [payments, setPayments] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    if (!payment) {
-        return notFound(); // or custom empty state
-    }
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const contractData = await getContractById(contractId);
+                setContract(contractData);
+                setSelectedContract({
+                    id: contractData.id,
+                    name: contractData.name,
+                    inContractNumber: contractData.inContractNumber,
+                    salary: contractData.salary,
+                    currency: contractData.currency,
+                });
+
+                try {
+                    const paymentsResponse = await fetchPayments(1, 100);
+                    const contractPayments = paymentsResponse.items.filter(
+                        (p: any) => p.contractId === contractData.inContractNumber
+                    );
+                    setPayments(contractPayments);
+                } catch (error) {
+                    console.error("Failed to fetch payments:", error);
+                    setPayments([]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch contract:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (contractId) {
+            fetchData();
+        }
+    }, [contractId, getContractById, fetchPayments]);
 
     //--------------------------------Action menu--------------------------
     const [menuOpen, setMenuOpen] = useState(false);
     // ---------------------------------------------------------------------
 
     //---------------------filter----------------------------------
-    // Multi-select arrays instead of single string
     type PaymentStatus = "Pending" | "Due" | "Paid" | "All";
 
     const PAYMENT_STATUSES: PaymentStatus[] = ["Pending", "Due", "Paid", "All"];
@@ -359,50 +457,64 @@ export default function PaymentPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
-    // 🔍 Filter applicants
+    // 🔍 Filter payments
     const filteredPayments = useMemo(() => {
-        return mockApplicantPayments.filter(payment => {
+        return payments.filter(payment => {
             // Search filter
             const searchMatch =
             !searchQuery.trim() ||
-            payment.applicantId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            payment.applicantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            payment.contractId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            payment.transferId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            payment.method.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            payment.workLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            payment.monthlyAllowance.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            payment.note.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            payment.paymentStatus.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            payment.nextPayment.toLowerCase().includes(searchQuery.toLowerCase());
-
+            (payment.applicantName && payment.applicantName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (payment.contractId && payment.contractId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (payment.transferId && payment.transferId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (payment.monthlyAllowance && payment.monthlyAllowance.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (payment.note && payment.note.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (payment.paymentStatus && payment.paymentStatus.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (payment.nextPayment && payment.nextPayment.toLowerCase().includes(searchQuery.toLowerCase()));
 
             // Payment status filter
             const paymentMatch =
             selectedPaymentStatus.length === 0 ||
             selectedPaymentStatus.includes("All") ||
-            selectedPaymentStatus.includes(payment.paymentStatus as "Pending" | "Due" | "Paid");
+            (payment.paymentStatus && selectedPaymentStatus.includes(payment.paymentStatus as "Pending" | "Due" | "Paid"));
 
             return searchMatch && paymentMatch;
         });
-    }, [searchQuery, selectedPaymentStatus]);
-
-
-
-    
-    // 🔎 Only payments for this applicant
-        const applicantPayments = filteredPayments.filter(
-        (p) => p.applicantId === applicantId
-        );
+    }, [payments, searchQuery, selectedPaymentStatus]);
 
         // 📄 Pagination
-        const totalPages = Math.ceil(applicantPayments.length / ITEMS_PER_PAGE);
+        const totalPages = Math.ceil(filteredPayments.length / ITEMS_PER_PAGE);
 
-        const paginatedPayments = applicantPayments.slice(
+        const paginatedPayments = filteredPayments.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
         );
 
+    const formatCurrency = (amount: number) => {
+      return `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${contract?.currency || 'SAR'}`;
+    };
+
+    const stats = useMemo(() => {
+      let totalPaid = 0;
+      let pendingPayment = 0;
+      let duePayment = 0;
+
+      payments.forEach((payment) => {
+        const amount = parseFloat(payment.monthlyAllowance) || 0;
+        const status = (payment.paymentStatus || "").trim();
+
+        if (status === "Paid") {
+          totalPaid += amount;
+        } else if (status === "Pending") {
+          pendingPayment += amount;
+        }
+      });
+
+      return {
+        totalPaid,
+        pendingPayment,
+        duePayment: 0,
+      };
+    }, [payments, contract?.currency]);
 
     
     const goToPage = (page: number) => {
@@ -424,32 +536,41 @@ return (
       <div className="flex items-center justify-between mb-8">
         {/* Left: Title */}
         <h1 className="text-[28px] font-bold text-[#1E1E1E]">
-          payment
+          Payment - {contract?.name || "Loading..."}
         </h1>
 
         {/* Right: Button group */}
         <div className="flex items-center gap-4">
           {/* Example Button 1 */}
-          <button
-            className="relative w-[180px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
-            onClick={() => {
-              setEditingPayment(null); // clear previous data
-              setIsModalOpen(true);
-            }}
-          >
-            <span className="skew-x-[12deg] font-bold text-[#1E1E1E] flex items-center justify-center">
-              Create payment
-            </span>
-          </button>
+                <button
+                  className="relative w-[180px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!contract}
+                  onClick={() => {
+                    if (!contract) return;
+                    setEditingPayment(null);
+                    setSelectedContract({
+                      id: contract.id,
+                      name: contract.name,
+                      inContractNumber: contract.inContractNumber,
+                      salary: contract.salary,
+                      currency: contract.currency,
+                    });
+                    setIsModalOpen(true);
+                  }}
+                >
+                  <span className="skew-x-[12deg] font-bold text-[#1E1E1E] flex items-center justify-center">
+                    Create payment
+                  </span>
+                </button>
 
         </div>
       </div>
       
-      {/* Top row: 4 cards */}
+      {/* Top row: 3 cards */}
       <div className="grid grid-cols-1 sm:grid-cols-1 xl:grid-cols-3 gap-4 mb-8 ">
-        <Card title="Total Paid" value="500 SAR" subtitle="2+ this week" />
-        <Card title="Pending Payment" value="345 SAR" subtitle="10% growth" />
-        <Card title="Due" value="200" subtitle="5% growth" />
+        <Card title="Total Paid" value={formatCurrency(stats.totalPaid)} subtitle={`${payments.filter(p => p.paymentStatus === "Paid").length} payments`} />
+        <Card title="Pending Payment" value={formatCurrency(stats.pendingPayment)} subtitle={`${payments.filter(p => p.paymentStatus === "Pending").length} pending`} />
+        <Card title="Due" value={formatCurrency(stats.duePayment)} subtitle={`${payments.filter(p => p.paymentStatus === "Due").length} due`} />
       </div>
 
       {/* Main Column */}
@@ -572,19 +693,33 @@ return (
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 mt-4">
-        {paginatedPayments.map((payment, index) => (
-          <ContractRow
-            key={index}
-            payment={payment}
-            showCheckbox={true}
-            onSideClick={() => {
-              setEditingPayment(payment);   
-              setIsModalOpen(true);        
-            }}
-          />
-        ))}
-        </div>
+        {paginatedPayments.length === 0 ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <p className="text-gray-500 text-lg mb-2">No payments found</p>
+              <p className="text-gray-400 text-sm">Create a payment to get started.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2 mt-4">
+            {paginatedPayments.map((payment, index) => (
+              <ContractRow
+                key={index}
+                payment={payment}
+                showCheckbox={true}
+                onSideClick={() => {
+                  setEditingPayment(payment);
+                  setSelectedContract(null);
+                  setIsModalOpen(true);
+                }}
+                onDelete={() => {
+                  setPaymentToDelete(payment.id);
+                  setDeleteConfirmOpen(true);
+                }}
+              />
+            ))}
+          </div>
+        )}
 
 
       </div>
@@ -642,12 +777,87 @@ return (
     <PaymentModal
       isOpen={isModalOpen}
       payment={editingPayment}
-      onClose={() => setIsModalOpen(false)}
-      onSave={(data) => {
-        console.log("payment saved:", data);
+      contract={selectedContract}
+      onClose={() => {
         setIsModalOpen(false);
+        setEditingPayment(null);
+        if (contract) {
+          setSelectedContract({
+            id: contract.id,
+            name: contract.name,
+            inContractNumber: contract.inContractNumber,
+            salary: contract.salary,
+            currency: contract.currency,
+          });
+        }
+      }}
+      onSave={async (data) => {
+        setIsModalOpen(false);
+        setEditingPayment(null);
+        if (contract) {
+          try {
+            const paymentsResponse = await fetchPayments(1, 100);
+            const contractPayments = paymentsResponse.items.filter(
+              (p: any) => p.contractId === contract.inContractNumber
+            );
+            setPayments(contractPayments);
+            setCurrentPage(1);
+          } catch (error) {
+            console.error("Failed to refresh payments:", error);
+          }
+        }
       }}
     />
+
+    {deleteConfirmOpen && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setDeleteConfirmOpen(false)}>
+        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 skew-x-[-12deg]" onClick={(e) => e.stopPropagation()}>
+          <div className="skew-x-[12deg]">
+            <h3 className="text-xl font-bold mb-4">Delete Payment</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to delete this payment? This action cannot be undone.</p>
+            <div className="flex gap-4 justify-end">
+              <button
+                onClick={() => {
+                  setDeleteConfirmOpen(false);
+                  setPaymentToDelete(null);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!paymentToDelete) return;
+                  setDeleting(true);
+                  try {
+                    await deletePaymentApi(paymentToDelete);
+                    const paymentsResponse = await fetchPayments(1, 100);
+                    if (contract) {
+                      const contractPayments = paymentsResponse.items.filter(
+                        (p: any) => p.contractId === contract.inContractNumber
+                      );
+                      setPayments(contractPayments);
+                    }
+                    setDeleteConfirmOpen(false);
+                    setPaymentToDelete(null);
+                  } catch (error) {
+                    console.error("Failed to delete payment:", error);
+                    alert("Failed to delete payment. Please try again.");
+                  } finally {
+                    setDeleting(false);
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
   </DashboardLayout>
 );
 }

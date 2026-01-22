@@ -1,20 +1,47 @@
-// src/app/Company/contract-list/page.tsx
+// src/app/Student/opportunity/page.tsx
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
-import { mockContracts } from "@/src/mocks/mockContract";
-import { mockApplicants } from "@/src/mocks/mockApplicants";
+import { useStudentOpportunityHandler } from "@/src/hooks/studentapihandler/useStudentOpportunityHandler";
+import { useStudentApplicationHandler } from "@/src/hooks/studentapihandler/useStudentApplicationHandler";
+import { Toast } from "@/src/components/common/Toast";
 
+interface MappedOpportunity {
+  id: number;
+  originalId: string;
+  applicantId: number;
+  contractTitle: string;
+  company: string;
+  salary: string;
+  jobType: "Full-time" | "Part-time" | "Contract";
+  location: string;
+  jobDescription: string;
+  workProgress: number;
+  deadline: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  applicantIds: any[];
+  companyId: string;
+  opportunityStatus: "Applied" | "Upcoming Interview" | "Rejected";
+  opportunityFrom: "Company" | "Investor";
+  skills: string[];
+  benefits: string[];
+  keyResponsibilities: string[];
+  whyYoullLoveWorkingHere: string[];
+}
 
 const ApplicantCard = ({
   applicant,
   onClick,
-
+  onApply,
+  isApplying,
 }: {
-  applicant: typeof mockContracts[0];
+  applicant: MappedOpportunity;
   onClick?: () => void;
-
+  onApply?: () => void;
+  isApplying?: boolean;
 }) => {
   return (
     <div className="relative w-[400px] h-[389px] cursor-pointer">
@@ -166,22 +193,66 @@ const ApplicantCard = ({
 
 const ITEMS_PER_PAGE = 4;
 export default function ContractListPage() {
+      const [applyingOpportunityId, setApplyingOpportunityId] = useState<string | null>(null);
+      const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+      // API Hooks
+      const { opportunities, loading: opportunitiesLoading, error: opportunitiesError, listOpportunities } = useStudentOpportunityHandler();
+      const { createApplication, loading: applying } = useStudentApplicationHandler();
 
       const [menuOpen, setMenuOpen] = useState(false);
       const menuRef = useRef<HTMLDivElement>(null);
       const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
 
-      const applicantMap = useMemo(() => {
-        return Object.fromEntries(
-          mockApplicants.map(a => [a.applicantId, a.name])
-        );
+      // Fetch all opportunities on mount
+      useEffect(() => {
+        listOpportunities(1, 1000).catch(console.error);
       }, []);
 
-      const allCount = mockContracts.length;
-      const appliedCount = mockContracts.filter(c => c.opportunityStatus === "Applied").length;
-      const upcomingCount = mockContracts.filter(c => c.opportunityStatus === "Upcoming Interview").length;
-      const rejectedCount = mockContracts.filter(c => c.opportunityStatus === "Rejected").length;
+      // Map opportunities to mockContracts format
+      const mappedOpportunities = useMemo(() => {
+        if (!opportunities || !Array.isArray(opportunities)) {
+          return [];
+        }
+        const mapped: MappedOpportunity[] = opportunities.map((opp, index) => {
+          const mappedItem: MappedOpportunity = {
+            id: index + 1, // Use index for display, but keep opp.id for API calls
+            originalId: opp.id, // Store original ID for API calls
+            applicantId: 0, // Not used for opportunities
+            contractTitle: opp.title,
+            company: opp.company?.name || "Unknown Company",
+            salary: opp.allowance ? `${opp.currency} ${opp.allowance}` : "Not specified",
+            jobType: (opp.type === "Full-time" || opp.type === "Part-time" || opp.type === "Contract") 
+              ? opp.type 
+              : "Full-time" as "Full-time" | "Part-time" | "Contract",
+            location: opp.location || "Not specified",
+            jobDescription: opp.details || "",
+            workProgress: Math.floor(Math.random() * 100), // Random for now, can be calculated later
+            deadline: opp.startDate ? new Date(opp.startDate).toLocaleDateString() : "Not specified",
+            startDate: opp.startDate ? new Date(opp.startDate).toLocaleDateString() : "Not specified",
+            endDate: "Not specified",
+            status: "Running",
+            applicantIds: [],
+            companyId: opp.companyId || "",
+            opportunityStatus: "Applied", // Default status
+            opportunityFrom: "Company",
+            skills: opp.skills || [],
+            benefits: opp.benefits || [],
+            keyResponsibilities: opp.keyResponsibilities || [],
+            whyYoullLoveWorkingHere: opp.whyYouWillLoveWorkingHere || [],
+          }
+          return mappedItem
+        })
+        return mapped
+      }, [opportunities]);
+
+      // Use only real API data (no mock fallback)
+      const displayContracts = mappedOpportunities;
+
+      const allCount = displayContracts.length;
+      const appliedCount = displayContracts.filter(c => c.opportunityStatus === "Applied").length;
+      const upcomingCount = displayContracts.filter(c => c.opportunityStatus === "Upcoming Interview").length;
+      const rejectedCount = displayContracts.filter(c => c.opportunityStatus === "Rejected").length;
 
   //---------------------filter----------------------------------
 
@@ -218,20 +289,35 @@ export default function ContractListPage() {
       const MIN_SALARY = 0;
       const MAX_SALARY = 10000;
 
-      const [salaryRange, setSalaryRange] = useState<[number, number]>([2000, 7000]);
+      const [salaryRange, setSalaryRange] = useState<[number, number]>([0, 10000]);
 
 
       const locations = useMemo(() => {
         const unique = Array.from(
-          new Set(mockContracts.map(c => c.location))
+          new Set(displayContracts.map(c => c.location))
         );
         return ["All", ...unique];
-      }, []);
+      }, [displayContracts]);
 
   
+      // Handle Apply button click
+      const handleApply = async (contract: MappedOpportunity) => {
+        try {
+          // Use originalId if available (from API), otherwise use id
+          const opportunityId = (contract as any).originalId || String(contract.id);
+          setApplyingOpportunityId(opportunityId);
+          await createApplication(opportunityId);
+          setToast({ message: "Application submitted successfully!", type: 'success' });
+        } catch (err: any) {
+          setToast({ message: err.message || "Failed to submit application", type: 'error' });
+        } finally {
+          setApplyingOpportunityId(null);
+        }
+      };
+
       // 🔍 Filter applicants
       const filteredApplicants = useMemo(() => {
-        return mockContracts.filter(contract => {
+        return displayContracts.filter(contract => {
           // Search filter
           const searchMatch =
             !searchQuery.trim() ||
@@ -239,8 +325,8 @@ export default function ContractListPage() {
             contract.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
             contract.jobType.toLowerCase().includes(searchQuery.toLowerCase()) ||
             contract.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            contract.startDate.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            contract.endDate.toLowerCase().includes(searchQuery.toLowerCase());
+            (contract.startDate && contract.startDate.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (contract.endDate && contract.endDate.toLowerCase().includes(searchQuery.toLowerCase()));
   
           // Opportunity Status filter
           const opportunityMatch =
@@ -253,22 +339,23 @@ export default function ContractListPage() {
           contract.location === selectedLocation;
 
           // Salary filter
-          const salary = Number(
-            String(contract.salary).replace(/[^0-9]/g, "")
-          );
-
-          const salaryMatch =
-          salary >= salaryRange[0] &&
-          salary <= salaryRange[1];
+          const salaryStr = String(contract.salary).replace(/[^0-9]/g, "");
+          const salary = salaryStr ? Number(salaryStr) : 0;
+          
+          // If salary is 0 or "Not specified", include it (don't filter out)
+          const salaryMatch = 
+            salary === 0 || 
+            contract.salary === "Not specified" ||
+            (salary >= salaryRange[0] && salary <= salaryRange[1]);
 
           // Opportunity From filter
           const opportunityFromMatch =
           selectedOpportunityFrom === "All" ||
           contract.opportunityFrom === selectedOpportunityFrom;
 
-          return searchMatch && opportunityMatch && locationMatch && salaryMatch&& opportunityFromMatch;
+          return searchMatch && opportunityMatch && locationMatch && salaryMatch && opportunityFromMatch;
         });
-      }, [searchQuery, selectedOpportunityStatus, selectedLocation,salaryRange,selectedOpportunityFrom]);
+      }, [displayContracts, searchQuery, selectedOpportunityStatus, selectedLocation, salaryRange, selectedOpportunityFrom]);
   
   
       
@@ -291,10 +378,14 @@ export default function ContractListPage() {
       const goToNext = () => {
         if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
       };
-  
-    
 return (
   <DashboardLayout>
+    <Toast
+      message={toast?.message || ''}
+      type={toast?.type || 'success'}
+      isVisible={!!toast}
+      onClose={() => setToast(null)}
+    />
     <div className="px-4 sm:px-6 lg:px-8 py-6">
 
       {/* Main Row: Search (1/2) + Grid (1/2) */}
@@ -569,18 +660,30 @@ return (
 
         {/* ================= RIGHT COLUMN — GRID (3/4) ================= */}
         <div className="w-full lg:w-2/3 " >
-          {showApplicants && (
+          {opportunitiesLoading ? (
+           <div className="flex h-screen items-center justify-center">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
+          </div>
+          ) : opportunitiesError ? (
+            <div className="flex justify-center items-center h-64">
+              <p className="text-red-500">Error: {opportunitiesError}</p>
+            </div>
+          ) : showApplicants && (
              <div className="grid grid-cols-1 sm:grid-cols-2 grid-rows-2 gap-4">
-            {paginatedApplicants.map((contract, index) => (
-              <ApplicantCard
-                key={index}
-                applicant={contract}
-                onClick={() =>
-                  router.push(`/Student/opportunity/${contract.id}`)
-                }
-
-              />
-            ))}
+            {paginatedApplicants.map((contract, index) => {
+              const opportunityId = (contract as any).originalId || String(contract.id);
+              return (
+                <ApplicantCard
+                  key={contract.id || index}
+                  applicant={contract}
+                  onClick={() =>
+                    router.push(`/Student/opportunity/${opportunityId}`)
+                  }
+                  onApply={() => handleApply(contract)}
+                  isApplying={applyingOpportunityId === opportunityId}
+                />
+              );
+            })}
           </div>
           )}
 

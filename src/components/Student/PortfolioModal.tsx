@@ -284,14 +284,17 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ portfolio, isOpen, onCl
 
   const handleInputChange = (field: keyof PortfolioData , value: string) => setFormData((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      onSave(formData);
-      setLoading(false);
+    try {
+      await onSave(formData);
       onClose();
-    }, 500);
+    } catch (error) {
+      console.error("Error saving portfolio:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -351,9 +354,6 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ portfolio, isOpen, onCl
             onChange={(e) => handleInputChange("link", e.target.value)}
           />
 
-         
-  
-        </form>
 
         {/* Footer */}
         <div
@@ -364,6 +364,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ portfolio, isOpen, onCl
         >
             <div className="flex w-[400px] justify-between">
             <button
+                type="button"
                 onClick={onClose}
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             >
@@ -381,6 +382,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ portfolio, isOpen, onCl
             </button>
             </div>
         </div>
+        </form>
         </div>
     </div>
     );

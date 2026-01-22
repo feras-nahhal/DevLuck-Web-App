@@ -5,25 +5,29 @@ import { Loader2 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
+import { usePaymentHandler } from "@/src/hooks/companyapihandler/usePaymentHandler";
 
 interface PaymentData {
+  id?: string;
   applicantName: string;
-
   contractId: string;
-
   nextPayment: string;
+  monthlyAllowance: string;
+  note?: string;
+  paymentStatus: string;
+}
 
-  monthlyAllowance: string; // e.g. "2024-01-15"
-
-  workLocation: string; // e.g. "2024-12-15"
-
-  note?: string; // optional notes or remarks
-
-  paymentStatus:string;
+interface ContractData {
+  id: string;
+  name: string;
+  inContractNumber: string;
+  salary: number | null;
+  currency: string;
 }
 
 interface PaymentModalProps {
   payment?: PaymentData | null;
+  contract?: ContractData | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: PaymentData) => void;
@@ -280,6 +284,7 @@ const ParallelogramInput = ({
 // Main payment Modal Component
 const PaymentModal: React.FC<PaymentModalProps> = ({
   payment,
+  contract,
   isOpen,
   onClose,
   onSave,
@@ -289,12 +294,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     contractId: "",
     nextPayment: "",
     monthlyAllowance: "",
-    workLocation: "",
     note: "",
     paymentStatus: "",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { createPayment, updatePayment, loading } = usePaymentHandler();
 
   useEffect(() => {
     if (payment) {
@@ -303,22 +308,32 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         contractId: payment.contractId || "",
         nextPayment: payment.nextPayment || "",
         monthlyAllowance: payment.monthlyAllowance || "",
-        workLocation: payment.workLocation || "",
         note: payment.note || "",
-        paymentStatus:payment.paymentStatus || "",
+        paymentStatus: payment.paymentStatus || "",
       });
-    } else {
+    } else if (contract && isOpen) {
+      const allowance = contract.salary !== null && contract.salary !== undefined
+        ? `${contract.salary} ${contract.currency || ""}` 
+        : "";
+      setFormData({
+        applicantName: contract.name || "",
+        contractId: contract.inContractNumber || "",
+        nextPayment: "",
+        monthlyAllowance: allowance,
+        note: "",
+        paymentStatus: "",
+      });
+    } else if (!payment && !contract) {
       setFormData({
         applicantName: "",
         contractId: "",
         nextPayment: "",
         monthlyAllowance: "",
-        workLocation: "",
         note: "",
         paymentStatus: "",
       });
     }
-  }, [payment, isOpen]);
+  }, [payment, contract, isOpen]);
 
 
   const handleInputChange = (field: keyof PaymentData, value: string) => {
@@ -327,14 +342,33 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitError(null);
 
-    // MOCK SAVE
-    setTimeout(() => {
+    if (!formData.applicantName.trim() || !formData.nextPayment || !formData.monthlyAllowance.trim() || !formData.paymentStatus) {
+      setSubmitError("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const paymentData = {
+        applicantName: formData.applicantName.trim(),
+        contractId: formData.contractId.trim() || undefined,
+        nextPayment: formData.nextPayment,
+        monthlyAllowance: formData.monthlyAllowance.trim(),
+        note: formData.note?.trim() || undefined,
+        paymentStatus: formData.paymentStatus,
+      };
+
+      if (payment?.id) {
+        await updatePayment(payment.id, paymentData);
+      } else {
+        await createPayment(paymentData);
+      }
       onSave(formData);
-      setLoading(false);
       onClose();
-    }, 600);
+    } catch (error: any) {
+      setSubmitError(error.message || (payment?.id ? "Failed to update payment" : "Failed to create payment"));
+    }
   };
 
   if (!isOpen) return null;
@@ -377,15 +411,15 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
         {/* Form - scrollable */}
         <form
+            id="payment-form"
             className="flex-1 flex flex-col gap-4 p-4  bg-white "
             onSubmit={handleSubmit}
         >
-            <ParallelogramSelect
+            <ParallelogramInput
             label="Applicant Name"
-            placeholder="Select applicant"
+            placeholder="Enter applicant name"
             value={formData.applicantName}
-            options={["Ben", "Alice", "John", "Sarah"]}
-            onChange={(val) => handleInputChange("applicantName", val)}
+            onChange={(e) => handleInputChange("applicantName", e.target.value)}
             />
 
             <ParallelogramInput
@@ -402,19 +436,13 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             />
             <ParallelogramInput
             label="Monthly Allowance"
-            placeholder=" Enter monthly allowance"
+            placeholder="Enter monthly allowance"
             value={formData.monthlyAllowance ?? ""}
             onChange={(e) => handleInputChange("monthlyAllowance", e.target.value)}
             />
-            <ParallelogramInput
-            label="Work Location"
-            placeholder="Enter work location"
-            value={formData.workLocation ?? ""}
-            onChange={(e) => handleInputChange("workLocation", e.target.value)}
-            />
             <ParallelogramSelect
             label="Payment Status"
-            placeholder="Select paymentStatus"
+            placeholder="Select payment status"
             value={formData.paymentStatus}
             options={["Paid", "Due", "Pending"]}
             onChange={(val) => handleInputChange("paymentStatus", val)}
@@ -425,6 +453,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             value={formData.note ?? ""}
             onChange={(e) => handleInputChange("note", e.target.value)}
             />
+            
+            {submitError && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                <p className="text-sm text-red-600">{submitError}</p>
+              </div>
+            )}
             
         </form>
 
@@ -445,11 +479,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
             <button
                 type="submit"
+                form="payment-form"
                 disabled={loading}
-                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
+                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                <span className="skew-x-[12deg] font-bold text-black">
-                {loading ? <Loader2 className="animate-spin" /> : payment ? "Update" : "Confirm"}
+                <span className="skew-x-[12deg] font-bold text-black flex items-center justify-center">
+                {loading ? <Loader2 className="animate-spin" size={16} /> : payment ? "Update" : "Confirm"}
                 </span>
             </button>
             </div>

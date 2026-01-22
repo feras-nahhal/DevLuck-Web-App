@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState,useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
@@ -150,16 +150,15 @@ const ParallelogramSelect = ({
             style={{ transform: "skewX(15deg)" }}
           >
             <span
-              className={`text-[14px] ${
-                value ? "text-[#171717cc]" : "text-[#17171780]"
-              }`}
+              className={`text-[14px] ${value ? "text-[#171717cc]" : "text-[#17171780]"
+                }`}
             >
               {value || placeholder}
             </span>
 
             {/* Arrow */}
             <svg width="10" height="5" viewBox="0 0 10 5" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4.66752 4.66752C4.51175 4.66782 4.36079 4.61357 4.24085 4.51418L0.24085 1.18085C-0.0426562 0.945208 -0.0814581 0.524356 0.154183 0.24085C0.389825 -0.0426562 0.810677 -0.0814581 1.09418 0.154183L4.66752 3.14085L8.24085 0.26085C8.37858 0.149003 8.55521 0.0966707 8.73164 0.11544C8.90807 0.134209 9.06973 0.22253 9.18085 0.36085C9.30427 0.499423 9.36435 0.683168 9.34664 0.867889C9.32893 1.05261 9.23502 1.22159 9.08752 1.33418L5.08752 4.55418C4.96413 4.63786 4.81625 4.67776 4.66752 4.66752Z" fill="#1E1E1E"/>
+              <path d="M4.66752 4.66752C4.51175 4.66782 4.36079 4.61357 4.24085 4.51418L0.24085 1.18085C-0.0426562 0.945208 -0.0814581 0.524356 0.154183 0.24085C0.389825 -0.0426562 0.810677 -0.0814581 1.09418 0.154183L4.66752 3.14085L8.24085 0.26085C8.37858 0.149003 8.55521 0.0966707 8.73164 0.11544C8.90807 0.134209 9.06973 0.22253 9.18085 0.36085C9.30427 0.499423 9.36435 0.683168 9.34664 0.867889C9.32893 1.05261 9.23502 1.22159 9.08752 1.33418L5.08752 4.55418C4.96413 4.63786 4.81625 4.67776 4.66752 4.66752Z" fill="#1E1E1E" />
             </svg>
 
           </div>
@@ -170,28 +169,27 @@ const ParallelogramSelect = ({
       {open && (
         <div
           className="absolute left-0 right-0 mt-2 bg-white  rounded-[12px] z-40 shadow-md overflow-hidden"
-         
+
         >
-            {options.map((option) => (
-              <div
-                key={option}
-                onClick={() => {
-                  onChange(option);
-                  setOpen(false);
-                }}
-                className={`
+          {options.map((option) => (
+            <div
+              key={option}
+              onClick={() => {
+                onChange(option);
+                setOpen(false);
+              }}
+              className={`
                   px-5 py-2 text-sm cursor-pointer
-                  ${
-                    value === option
-                      ? "bg-[#FFEB9C] font-semibold"
-                      : "hover:bg-[#FFEB9C]/60"
-                  }
+                  ${value === option
+                  ? "bg-[#FFEB9C] font-semibold"
+                  : "hover:bg-[#FFEB9C]/60"
+                }
                 `}
-              >
-                {option}
-              </div>
-            ))}
-        
+            >
+              {option}
+            </div>
+          ))}
+
         </div>
       )}
     </div>
@@ -244,9 +242,8 @@ const ParallelogramDatePicker = ({
             style={{ transform: "skewX(15deg)" }}
           >
             <span
-              className={`text-[14px] ${
-                value ? "text-[#171717cc]" : "text-[#17171780]"
-              }`}
+              className={`text-[14px] ${value ? "text-[#171717cc]" : "text-[#17171780]"
+                }`}
             >
               {value || placeholder}
             </span>
@@ -254,32 +251,32 @@ const ParallelogramDatePicker = ({
         </div>
       </button>
 
-     {/* Calendar */}
-{open && (
-  <div
-    className="absolute z-50"
-    style={{
-      top: "-230px", // move slightly higher
-      left: "50%",   // center horizontally relative to the input
-      transform: "translateX(-50%)", // center and keep parallelogram skew
-      minWidth: "250px", // normal width
-      maxWidth: "350px",
-    }}
-  >
-    <div className="bg-white border rounded-[12px] p-3 shadow-lg">
-        <DayPicker
-          mode="single"
-          selected={value ? new Date(value) : undefined}
-          onSelect={(date) => {
-            if (date) {
-              onChange(format(date, "yyyy-MM-dd"));
-              setOpen(false);
-            }
+      {/* Calendar */}
+      {open && (
+        <div
+          className="absolute z-50"
+          style={{
+            top: "-230px", // move slightly higher
+            left: "50%",   // center horizontally relative to the input
+            transform: "translateX(-50%)", // center and keep parallelogram skew
+            minWidth: "250px", // normal width
+            maxWidth: "350px",
           }}
-        />
-    </div>
-  </div>
-)}
+        >
+          <div className="bg-white border rounded-[12px] p-3 shadow-lg">
+            <DayPicker
+              mode="single"
+              selected={value ? new Date(value) : undefined}
+              onSelect={(date) => {
+                if (date) {
+                  onChange(format(date, "yyyy-MM-dd"));
+                  setOpen(false);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -390,169 +387,172 @@ const OpportunityModal: React.FC<OpportunityModalProps> = ({
     e.preventDefault();
     setLoading(true);
 
-    // MOCK SAVE
-    setTimeout(() => {
-      onSave(formData);
-      setLoading(false);
+    try {
+      await onSave(formData);
       onClose();
-    }, 600);
+    } catch (error) {
+      console.error("Failed to save opportunity:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
 
-    return (
+  return (
     <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <div className="fixed inset-0 bg-black/35 backdrop-blur-l" onClick={onClose} />
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/35 backdrop-blur-l" onClick={onClose} />
 
-        {/* Modal */}
-        <div
+      {/* Modal */}
+      <div
         className="relative w-full max-w-[640px] max-h-[95vh] flex flex-col isolate rounded-4xl bg-[rgba(255,255,255,0.04)] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
-        >
+      >
         {/* Header */}
         <div
-            className="flex items-center justify-between w-full h-[85px] px-4 flex-shrink-0"
-            style={{
+          className="flex items-center justify-between w-full h-[85px] px-4 flex-shrink-0"
+          style={{
             backgroundImage: "url('/cards/cardHeader.svg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            }}
+          }}
         >
-            <h2
+          <h2
             className="absolute flex items-center text-[#1E1E1E]"
             style={{
-                width: "350px",
-                height: "36px",
-                left: "117.37px",
-                top: "21.79px",
-                fontFamily: "'Public Sans', sans-serif",
-                fontWeight: 700,
-                fontSize: "24px",
-                lineHeight: "36px",
+              width: "350px",
+              height: "36px",
+              left: "117.37px",
+              top: "21.79px",
+              fontFamily: "'Public Sans', sans-serif",
+              fontWeight: 700,
+              fontSize: "24px",
+              lineHeight: "36px",
             }}
-            >
+          >
             {opportunity ? "Edit Opportunity" : "Create Opportunity"}
-            </h2>
+          </h2>
         </div>
 
         {/* Form - scrollable */}
         <form
-            className="flex-1 flex flex-col gap-4 p-4 bg-white overflow-y-auto"
- 
-            onSubmit={handleSubmit}
+          className="flex-1 flex flex-col gap-4 p-4 bg-white overflow-y-auto"
+
+          onSubmit={handleSubmit}
         >
           <div className="flex flex-col gap-4">
             <ParallelogramInput
-            label="Opportunity Title"
-            placeholder="Enter title"
-            value={formData.title}
-            onChange={(e) => handleInputChange("title", e.target.value)}
+              label="Opportunity Title"
+              placeholder="Enter title"
+              value={formData.title}
+              onChange={(e) => handleInputChange("title", e.target.value)}
             />
             <ParallelogramInput
-            label="Opportunity Details"
-            placeholder="Enter Details"
-            value={formData.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
+              label="Opportunity Details"
+              placeholder="Enter Details"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
             />
             <ParallelogramSelect
-            label="Opportunity Type"
-            placeholder="Select type"
-            value={formData.type}
-            options={["Full-time", "Part-time", "Internship"]}
-            onChange={(val) => handleInputChange("type", val)}
+              label="Opportunity Type"
+              placeholder="Select type"
+              value={formData.type}
+              options={["Full-time", "Part-time", "Internship"]}
+              onChange={(val) => handleInputChange("type", val)}
             />
             <ParallelogramDatePicker
-            label="Start Date"
-            placeholder="YYYY-MM-DD"
-            value={formData.startDate}
-            onChange={(val) => handleInputChange("startDate", val)}
+              label="Start Date"
+              placeholder="YYYY-MM-DD"
+              value={formData.startDate}
+              onChange={(val) => handleInputChange("startDate", val)}
             />
             <ParallelogramInput
-            label="Opportunity Time Length"
-            placeholder="Enter Time"
-            value={formData.timeLength}
-            onChange={(e) => handleInputChange("timeLength", e.target.value)}
+              label="Opportunity Time Length"
+              placeholder="Enter Time"
+              value={formData.timeLength}
+              onChange={(e) => handleInputChange("timeLength", e.target.value)}
             />
             <ParallelogramSelect
-            label="Work Location"
-            placeholder="Enter Location"
-            value={formData.location}
-            options={["Hybrid", "Remote", "Onsite"]}
-            onChange={(val) => handleInputChange("location", val)}
+              label="Work Location"
+              placeholder="Enter Location"
+              value={formData.location}
+              options={["Hybrid", "Remote", "Onsite"]}
+              onChange={(val) => handleInputChange("location", val)}
             />
             <ParallelogramInput
-            label="Allowance"
-            placeholder="Enter Amount"
-            value={formData.allowance}
-            onChange={(e) => handleInputChange("allowance", e.target.value)}
+              label="Allowance"
+              placeholder="Enter Amount"
+              value={formData.allowance}
+              onChange={(e) => handleInputChange("allowance", e.target.value)}
             />
             <ParallelogramSelect
-            label="Currency"
-            placeholder="USD, EUR"
-            value={formData.currency}
-            options={["USD", "EUR", "SAR"]}
-            onChange={(val) => handleInputChange("currency", val)}
+              label="Currency"
+              placeholder="USD, EUR"
+              value={formData.currency}
+              options={["USD", "EUR", "SAR"]}
+              onChange={(val) => handleInputChange("currency", val)}
             />
-            
-        
-            
+
+
+
           </div>
 
-            <MultiInputList
-                label="Why You'll Love Working Here"
-                items={formData.whyYouWillLoveWorkingHere || []}
-                setItems={(items) => setFormData((prev) => ({ ...prev, whyYouWillLoveWorkingHere: items }))}
-              />
+          <MultiInputList
+            label="Why You'll Love Working Here"
+            items={formData.whyYouWillLoveWorkingHere || []}
+            setItems={(items) => setFormData((prev) => ({ ...prev, whyYouWillLoveWorkingHere: items }))}
+          />
 
-              <MultiInputList
-                label="Benefits"
-                items={formData.benefits || []}
-                setItems={(items) => setFormData((prev) => ({ ...prev, benefits: items }))}
-              />
+          <MultiInputList
+            label="Benefits"
+            items={formData.benefits || []}
+            setItems={(items) => setFormData((prev) => ({ ...prev, benefits: items }))}
+          />
 
-              <MultiInputList
-                label="Skills"
-                items={formData.skills || []}
-                setItems={(items) => setFormData((prev) => ({ ...prev, skills: items }))}
-              />
+          <MultiInputList
+            label="Skills"
+            items={formData.skills || []}
+            setItems={(items) => setFormData((prev) => ({ ...prev, skills: items }))}
+          />
 
-              <MultiInputList
-                label=" Key Responsibilities"
-                items={formData.keyResponsibilities || []}
-                setItems={(items) => setFormData((prev) => ({ ...prev, keyResponsibilities: items }))}
-              />
+          <MultiInputList
+            label=" Key Responsibilities"
+            items={formData.keyResponsibilities || []}
+            setItems={(items) => setFormData((prev) => ({ ...prev, keyResponsibilities: items }))}
+          />
         </form>
 
         {/* Footer */}
         <div
-            className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
-            style={{
+          className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
+          style={{
             backgroundImage: "url('/cards/cardFooter.svg')",
-            }}
+          }}
         >
-            <div className="flex w-[400px] justify-between">
+          <div className="flex w-[400px] justify-between">
             <button
-                onClick={onClose}
-                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+              onClick={onClose}
+              className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             >
-                <span className="skew-x-[12deg] font-bold text-black">Cancel</span>
+              <span className="skew-x-[12deg] font-bold text-black">Cancel</span>
             </button>
 
             <button
-                type="submit"
-                disabled={loading}
-                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
+              type="submit"
+              disabled={loading}
+              onClick={handleSubmit}
+              className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
             >
-                <span className="skew-x-[12deg] font-bold text-black">
+              <span className="skew-x-[12deg] font-bold text-black">
                 {loading ? <Loader2 className="animate-spin" /> : opportunity ? "Update" : "Confirm"}
-                </span>
+              </span>
             </button>
-            </div>
+          </div>
         </div>
-        </div>
+      </div>
     </div>
-    );
+  );
 };
 
 export default OpportunityModal;

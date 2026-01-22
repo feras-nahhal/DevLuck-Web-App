@@ -3,12 +3,10 @@
 import {useRouter } from "next/navigation";
 import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
-import { mockApplicants } from "@/src/mocks/mockApplicants";
-import { mockApplicantPayments } from "@/src/mocks/mockApplicantPayments";
 import { ArrowUpRight } from "lucide-react";
 import { createPortal } from "react-dom";
-
-
+import { useContractHandler } from "@/src/hooks/companyapihandler/useContractHandler";
+import { usePaymentHandler } from "@/src/hooks/companyapihandler/usePaymentHandler";
 /* ──────────────────────────────────────────────
    Card Component
 ────────────────────────────────────────────── */
@@ -167,13 +165,32 @@ const ClipImage = ({ src, size = 160 }: ClipImageProps) => {
 
 
 
+type ContractCardData = {
+  id: string;
+  name: string;
+  contractTitle: string;
+  salary: number | null;
+  createdAt: string;
+  currency: string;
+  status: string;
+};
+
 const ApplicantCard = ({
-  applicant,
+  contract,
   onClick,
 }: {
-  applicant: typeof mockApplicants[0];
+  contract: ContractCardData;
   onClick?: () => void;
 }) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.');
+  };
+
+  const formatCurrency = (amount: number | null, currency: string) => {
+    if (amount === null || amount === undefined) return "N/A";
+    return `${amount} ${currency}`;
+  };
   return (
     <div className="relative w-[400px] h-[299px]">
       {/* SVG Card Body */}
@@ -254,7 +271,16 @@ const ApplicantCard = ({
         </defs>
       </svg>
 
-          <div
+
+      {/* Button */}
+      <button className="absolute left-[5%] top-[73%] flex items-center  justify-center px-3 min-w-[120px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
+        onClick={onClick}>
+        <span className="text-[14px]  font-bold leading-[24px] text-[#1E1E1E]">
+          View Details
+        </span>
+      </button>
+
+      <div
           className={` absolute left-[80%] top-[8%] 
             skew-x-[-12deg]
             flex items-center justify-center
@@ -266,32 +292,17 @@ const ApplicantCard = ({
             font-bold
             leading-[24px]
             ${
-              applicant.paymentStatus === "Paid" &&
+              contract.status === "Running" &&
               "bg-[#D3FCD2] text-[#22C55E] text-[12px]"
             }
             ${
-            applicant.paymentStatus === "Pending" &&
-            "bg-[#FFF4CC] text-[#F59E0B] text-[8px] "
-            }
-            ${
-              applicant.paymentStatus === "Due" &&
-              "bg-[#FFDCDC] text-[#FF4D4F]  text-[12px]"
+            contract.status=== "Completed" &&
+            "bg-[#E0E0E0] text-[#666666] text-[12px]"
             }
           `}
         >
-          {/* Unskew text */}
-          <span className="skew-x-[12deg] px-2">
-            {applicant.paymentStatus}
-          </span>
+          {contract.status}
         </div>
-
-      {/* Button */}
-      <button className="absolute left-[5%] top-[73%] flex items-center  justify-center px-3 min-w-[120px] h-[36px] bg-[#FFEB9C] rounded-[8px] transition-all duration-200 hover:bg-[#FFE066] hover:scale-105"
-        onClick={onClick}>
-        <span className="text-[14px]  font-bold leading-[24px] text-[#1E1E1E]">
-          View Details
-        </span>
-      </button>
 
 
 
@@ -304,7 +315,7 @@ const ApplicantCard = ({
           {/* Name & Subtitle */}
           <div className="flex flex-coll">
             <span className="font-semibold text-[16px] leading-[24px] text-[#1E1E1E]">
-              {applicant.name}
+              {contract.name}
             </span>
           </div>
         
@@ -317,7 +328,7 @@ const ApplicantCard = ({
             <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none ">
               {/* body2 text */}
               <span className="w-[77px] h-[22px] text-[14px] font-normal text-[#1E1E1E] flex items-center">
-                {applicant.startDate}
+                {formatDate(contract.createdAt)}
               </span>
               {/* caption text */}
               <span className="w-[77px] h-[18px] text-[12px] font-normal  text-[#00000090] flex items-center">
@@ -335,36 +346,18 @@ const ApplicantCard = ({
             <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none">
               {/* body2 text */}
               <span className="w-[77px] h-[22px] text-[14px] font-normal text-[#1E1E1E] flex items-center">
-                {applicant.salaryPaid}
+                {formatCurrency(contract.salary, contract.currency)}
               </span>
               {/* caption text */}
               <span className="w-[100px] h-[18px] text-[12px] font-normal text-[#00000090] flex items-center">
-                Monthly Allownce
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-            <img 
-              src="/cards/tag.svg" 
-              alt="Tag Icon"
-            />
-            {/* Frame 97 - Label container */}
-            <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none">
-              {/* body2 text */}
-              <span className="w-[77px] h-[22px] text-[14px] font-normal text-[#1E1E1E] flex items-center">
-                {applicant.endDate}
-              </span>
-              {/* caption text */}
-              <span className="w-[100px] h-[18px] text-[12px] font-normal text-[#00000090] flex items-center">
-                Next Payment
+                Salary
               </span>
             </div>
           </div>
         </div>
       </div>
       <div className="flex gap-4">
-        <ClipImage src={applicant.image} />
+        <ClipImage src="/images/A1.jpeg" />
       </div>
     </div>
 
@@ -384,14 +377,29 @@ const ApplicantCard = ({
   );
 };
 
+type ContractRowData = {
+  id: string;
+  name: string;
+  contractTitle: string;
+  salary: number | null;
+  inContractNumber: string;
+  note: string | null;
+  status: string;
+  currency: string;
+};
+
 type ContractRowProps = {
-  applicant: typeof mockApplicants[0];
+  contract: ContractRowData;
   onMainClick?: () => void;
   onSideClick?: () => void;
   showCheckbox?: boolean;
 };
 
-const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }: ContractRowProps) => {
+const ContractRow = ({ contract, onMainClick, onSideClick, showCheckbox = false }: ContractRowProps) => {
+  const formatCurrency = (amount: number | null, currency: string) => {
+    if (amount === null || amount === undefined) return "N/A";
+    return `${amount} ${currency}`;
+  };
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [checked, setChecked] = useState(false);
@@ -460,31 +468,31 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
 
           {/* Name */}
           <div className="flex flex-col justify-center w-[140px]">
-            <span className="text-sm font-semibold text-gray-900">{applicant.name}</span>
+            <span className="text-sm font-semibold text-gray-900">{contract.name}</span>
             <span className="text-xs text-gray-400">Applicant Name</span>
           </div>
 
-          {/* Next Payment */}
+          {/* Contract Title */}
           <div className="flex flex-col justify-center w-[140px]">
-            <span className="text-sm font-semibold text-gray-900">{applicant.startDate}</span>
-            <span className="text-xs text-gray-400">Next Payment</span>
+            <span className="text-sm font-semibold text-gray-900">{contract.contractTitle}</span>
+            <span className="text-xs text-gray-400">Contract Title</span>
           </div>
 
-          {/* Monthly Allowance */}
+          {/* Salary */}
           <div className="flex flex-col justify-center w-[140px]">
-            <span className="text-sm font-semibold text-gray-900">{applicant.salaryPaid}</span>
-            <span className="text-xs text-gray-400">Monthly Allowance</span>
+            <span className="text-sm font-semibold text-gray-900">{formatCurrency(contract.salary, contract.currency)}</span>
+            <span className="text-xs text-gray-400">Salary</span>
           </div>
 
           {/* Transfer ID */}
           <div className="flex flex-col justify-center w-[160px]">
-            <span className="text-sm font-semibold text-gray-900">{applicant.transferId}</span>
+            <span className="text-sm font-semibold text-gray-900">{contract.inContractNumber}</span>
             <span className="text-xs text-gray-400">Transfer ID</span>
           </div>
 
-           {/* Note ID */}
+           {/* Note */}
           <div className="flex flex-col justify-center w-[160px]">
-            <span className="text-sm font-semibold text-gray-900">{applicant.education.split(" ").slice(0, 2).join(" ")}</span>
+            <span className="text-sm font-semibold text-gray-900">{contract.note || "N/A"}</span>
             <span className="text-xs text-gray-400">Note</span>
           </div>
 
@@ -494,14 +502,13 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
             <div
               className={`
                 ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8] text-xs font-semibold flex items-center justify-center
-                ${applicant.paymentStatus === "Paid" ? "bg-[#D3FCD2] text-[#22C55E] text-[12px]" : ""}
-                ${applicant.paymentStatus === "Pending" ? "bg-[#FFF4CC] text-[#F59E0B] " : ""}
-               ${applicant.paymentStatus === "Due" ? "bg-[#FFDCDC] text-[#FF4D4F]  text-[12px]" : ""}
+                ${contract.status === "Running" ? "bg-[#D3FCD2] text-[#22C55E] text-[12px]" : ""}
+                ${contract.status === "Completed" ? "bg-[#E0E0E0] text-[#666666] text-[12px]" : ""}
               `}
             >
-              {applicant.paymentStatus}
+              {contract.status}
             </div>
-            <span className="text-xs text-gray-400">payment Status</span>
+            <span className="text-xs text-gray-400">Contract Status</span>
           </div>
         </div>
       </div>
@@ -543,7 +550,7 @@ const ContractRow = ({ applicant,onMainClick,onSideClick,showCheckbox = false }:
             createPortal(
               <div
                 ref={menuRef}
-                className="absolute top-12 right-0 w-40 bg-white border rounded-md shadow-lg p-2 z-50"
+                className="fixed w-[180px] rounded-xl bg-white shadow-2xl border py-2 z-50"
                 style={{
                   top: menuPos.top,
                   left: menuPos.left,
@@ -627,74 +634,62 @@ export default function PaymentPage() {
     // ---------------------------------------------------------------------
 
     //---------------------filter----------------------------------
-    // Multi-select arrays instead of single string
     type ContractStatus = "Running" | "Completed" | "All";
-    type PaymentStatus = "Pending" | "Due" | "Paid" | "All";
 
     const CONTRACT_STATUSES: ContractStatus[] = ["Running", "Completed", "All"];
-    const PAYMENT_STATUSES: PaymentStatus[] = ["Pending", "Due", "Paid", "All"];
 
     const [selectedContractStatus, setSelectedContractStatus] = useState<ContractStatus[]>([]);
-    const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<PaymentStatus[]>([]);
     const [showApplicants, setShowApplicants] = useState(true);
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
-    // 🔍 Filter applicants
-    const filteredApplicants = useMemo(() => {
-      return mockApplicants.filter(applicant => {
+    const { contracts, loading, listContracts } = useContractHandler();
+    const [totalContracts, setTotalContracts] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+
+    useEffect(() => {
+      const fetchContracts = async () => {
+        try {
+          const statusFilter = selectedContractStatus.length > 0 && !selectedContractStatus.includes("All") 
+            ? selectedContractStatus[0] 
+            : undefined;
+          
+          const response = await listContracts(currentPage, ITEMS_PER_PAGE, searchQuery || undefined, statusFilter);
+          setTotalContracts(response.total);
+          setTotalPages(response.totalPages);
+        } catch (err) {
+          console.error("Failed to fetch contracts:", err);
+        }
+      };
+
+      fetchContracts();
+    }, [currentPage, searchQuery, selectedContractStatus, listContracts]);
+
+    // 🔍 Filter contracts
+    const filteredContracts = useMemo(() => {
+      return contracts.filter(contract => {
         // Search filter
         const searchMatch =
           !searchQuery.trim() ||
-          applicant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          applicant.applicantId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          applicant.contractTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          applicant.startDate.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          applicant.endDate.toLowerCase().includes(searchQuery.toLowerCase());
+          contract.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          contract.contractTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          contract.inContractNumber.toLowerCase().includes(searchQuery.toLowerCase());
 
         // Contract status filter
         const contractMatch =
           selectedContractStatus.length === 0 || // empty = no filter
           selectedContractStatus.includes("All") || // All = include all
-          selectedContractStatus.includes(applicant.contractStatus as "Running" | "Completed");
+          selectedContractStatus.includes(contract.status as "Running" | "Completed");
 
-        // Payment status filter
-        const paymentMatch =
-          selectedPaymentStatus.length === 0 || // empty = no filter
-          selectedPaymentStatus.includes("All") || // All = include all
-          selectedPaymentStatus.includes(applicant.paymentStatus as "Pending" | "Due" | "Paid");
-
-        return searchMatch && contractMatch && paymentMatch;
+        return searchMatch && contractMatch;
       });
-    }, [searchQuery, selectedContractStatus, selectedPaymentStatus]);
+    }, [contracts, searchQuery, selectedContractStatus]);
 
 
     
     // 📄 Pagination
-    const [itemsPerPage, setItemsPerPage] = useState(6); // default 6 for desktop
-
-    useEffect(() => {
-      const updateItemsPerPage = () => {
-        if (window.innerWidth < 640) { // mobile
-          setItemsPerPage(5);
-        } else {
-          setItemsPerPage(6); // desktop
-        }
-      };
-
-      updateItemsPerPage(); // run once on mount
-      window.addEventListener("resize", updateItemsPerPage); // run on resize
-
-      return () => window.removeEventListener("resize", updateItemsPerPage);
-    }, []);
-
-    const totalPages = Math.ceil(filteredApplicants.length / itemsPerPage);
-    
-    const paginatedApplicants = filteredApplicants.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
-    );
+    const paginatedContracts = filteredContracts;
     
     const goToPage = (page: number) => {
       if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -707,26 +702,42 @@ export default function PaymentPage() {
     const goToNext = () => {
       if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
     };
-// ----------------card view----------------------------------------------
-    const parseAmount = (amount: string) =>
-    Number(amount.replace("$", "").trim());
-
-    const totalPaid = mockApplicantPayments
-  .filter(p => p.paymentStatus === "Paid")
-  .reduce((sum, p) => sum + parseAmount(p.monthlyAllowance), 0);
-
-  const totalPending = mockApplicantPayments
-    .filter(p => p.paymentStatus === "Pending")
-    .reduce((sum, p) => sum + parseAmount(p.monthlyAllowance), 0);
-
-  const totalDue = mockApplicantPayments
-    .filter(p => p.paymentStatus === "Due")
-    .reduce((sum, p) => sum + parseAmount(p.monthlyAllowance), 0);
-
-  // Optional: Hold = Pending + Due (common dashboard logic)
-  const totalHold = totalPending + totalDue;
 
 
+    const { payments,  error, listPayments } = usePaymentHandler();
+
+
+  // Fetch all payments and contracts on mount
+  useEffect(() => {
+    listPayments(1, 1000); // get all payments
+    listContracts(1, 1000); // get all contracts
+  }, [listPayments, listContracts]);
+
+  // Compute totals dynamically
+  const stats = useMemo(() => {
+    const totalPaid = payments
+      .filter(p => p.paymentStatus === "Paid")
+      .reduce((sum, p) => sum + parseFloat(p.monthlyAllowance || "0"), 0);
+
+    const pendingPayment = payments
+      .filter(p => p.paymentStatus === "Pending")
+      .reduce((sum, p) => sum + parseFloat(p.monthlyAllowance || "0"), 0);
+
+    const due = payments
+      .filter(p => p.paymentStatus === "Due")
+      .reduce((sum, p) => sum + parseFloat(p.monthlyAllowance || "0"), 0);
+
+    const hold = payments
+      .filter(p => p.paymentStatus === "Hold")
+      .length; // count of payments on hold
+
+    return [
+      { title: "Total Paid", value: `${totalPaid} SAR`, subtitle: `${payments.filter(p => p.paymentStatus === "Paid").length}+ this week` },
+      { title: "Pending Payment", value: `${pendingPayment} SAR`, subtitle: `${payments.filter(p => p.paymentStatus === "Pending").length}% growth` },
+      { title: "Due", value: `${due} SAR`, subtitle: `${payments.filter(p => p.paymentStatus === "Due").length}% growth` },
+      { title: "Hold", value: `${hold}`, subtitle: `${hold} this week` },
+    ];
+  }, [payments]);
 
 
 return (
@@ -741,31 +752,10 @@ return (
       
       {/* Top row: 4 cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 place-items-center">
-        <Card
-          title="Total Paid"
-          value={`${totalPaid.toLocaleString()} SAR`}
-          subtitle="Completed payments"
-        />
-
-        <Card
-          title="Pending Payment"
-          value={`${totalPending.toLocaleString()} SAR`}
-          subtitle="Awaiting processing"
-        />
-
-        <Card
-          title="Due"
-          value={`${totalDue.toLocaleString()} SAR`}
-          subtitle="Invoices sent"
-        />
-
-        <Card
-          title="Hold"
-          value={`${totalHold.toLocaleString()} SAR`}
-          subtitle="Pending + Due"
-        />
+        {stats.map((stat) => (
+          <Card key={stat.title} title={stat.title} value={stat.value} subtitle={stat.subtitle} />
+        ))}
       </div>
-
 
       {/* Main Column */}
       <div className="flex flex-col gap-6">
@@ -845,13 +835,13 @@ return (
             {/* Action Menu – appears beside the button */}
               {menuOpen && (
                 <div
-                  className="absolute sm:top-[47%]  sm:left-[68%] top-[110%] left-[5%] mt-2 sm:w-[420px]  w-[360px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
+                  className="absolute sm:top-[47%]  sm:left-[68%] top-[106%] left-[5%] mt-2 sm:w-[420px]  w-[360px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
                   onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
                 >
                   <div className="p-2">
                     {/* Contract Status */}
                     <h6 className="px-2 skew-x-[12deg] py-1 font-semibold">Contract Status</h6>
-                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row">
+                    <div className="flex gap-2">
                       {CONTRACT_STATUSES.map((status) => {
                         const isSelected = selectedContractStatus.includes(status);
 
@@ -897,87 +887,69 @@ return (
                         );
                       })}
                     </div>
-                    {/* Payment Status */}
-                    <h6 className="px-2 skew-x-[12deg] py-1 font-semibold mt-2">Payment Status</h6>
-                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row">
-                      {PAYMENT_STATUSES.map((status) => {
-                        const isSelected = selectedPaymentStatus.includes(status);
-
-                        return (
-                          <div
-                            key={status}
-                            className="flex items-center skew-x-[12deg] px-2 py-1 cursor-pointer hover:bg-gray-100 rounded-md"
-                            onClick={() => {
-                              if (status === "All") {
-                                setSelectedPaymentStatus(["Pending", "Due", "Paid", "All"]);
-                              } else {
-                                setSelectedPaymentStatus(prev =>
-                                  prev.includes(status)
-                                    ? prev.filter(s => s !== status && s !== "All")
-                                    : [...prev.filter(s => s !== "All"), status]
-                                );
-                              }
-                            }}
-                          >
-                            <div className="flex items-center justify-center w-9 h-9 mr-2">
-                              {isSelected ? /* ✅ SELECTED SVG */
-                                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                                    <path
-                                      d="M15.0537 9.16113C16.6809 7.53396 19.3191 7.53395 20.9463 9.16113L26.8389 15.0537C28.4659 16.6809 28.466 19.3192 26.8389 20.9463L20.9463 26.8389C19.3192 28.466 16.6809 28.4659 15.0537 26.8389L9.16113 20.9463C7.53395 19.3191 7.53396 16.6809 9.16113 15.0537L15.0537 9.16113Z"
-                                      fill="#FFEB9C"
-                                    />
-                                    <path
-                                      d="M31.5873 8.96738C25.7014 13.6017 22.2888 16.641 18.7083 22.3035C18.6366 22.4169 18.4767 22.4333 18.3856 22.3348L12.7212 16.2001C12.6426 16.115 12.6504 15.9817 12.7383 15.9064L15.8265 13.2606C15.9194 13.181 16.0609 13.2004 16.129 13.3019L18.3444 16.6048C24.2049 11.4469 29.2798 9.33343 31.3963 8.61265C31.6142 8.53845 31.7681 8.82499 31.5873 8.96738Z"
-                                      fill="#1E1E1E"
-                                    />
-                                  </svg> :  /* ⬜ UNSELECTED SVG */
-                                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                                    <path
-                                      fillRule="evenodd"
-                                      clipRule="evenodd"
-                                      d="M20.9463 9.16112C19.3191 7.53394 16.6809 7.53394 15.0537 9.16112L9.16117 15.0537C7.53398 16.6809 7.53398 19.319 9.16117 20.9462L15.0537 26.8388C16.6809 28.466 19.3191 28.466 20.9463 26.8388L26.8388 20.9462C28.466 19.319 28.466 16.6809 26.8388 15.0537L20.9463 9.16112ZM20.357 10.3396C19.0553 9.03789 16.9447 9.03789 15.643 10.3396L10.3397 15.6429C9.03793 16.9447 9.03793 19.0552 10.3397 20.357L15.643 25.6603C16.9447 26.962 19.0553 26.962 20.357 25.6603L25.6603 20.357C26.9621 19.0552 26.9621 16.9447 25.6603 15.6429L20.357 10.3396Z"
-                                      fill="#637381"
-                                    />
-                                  </svg>}
-                            </div>
-                            <span className="text-sm">{status}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
                   </div>
                 </div>
               )}
           </div>
         </div>
 
-      {/* Applicants Grid */}
-      {showApplicants && (
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-12 mt-50">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && paginatedContracts.length === 0 && (
+        <div className="flex items-center justify-center py-10 mt-50">
+          <p className="text-gray-500">No contracts found</p>
+        </div>
+      )}
+
+      {/* Contracts Grid */}
+      {!loading && paginatedContracts.length > 0 && showApplicants && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center ">
-          {paginatedApplicants.map((applicant, index) => (
+          {paginatedContracts.map((contract) => (
             <ApplicantCard
-              key={index}
-              applicant={applicant}
+              key={contract.id}
+              contract={{
+                id: contract.id,
+                name: contract.name,
+                contractTitle: contract.contractTitle,
+                salary: contract.salary || null,
+                createdAt: contract.createdAt,
+                currency: contract.currency,
+                status: contract.status,
+              }}
               onClick={() =>
-                router.push(`/Company/payment/${applicant.applicantId}`)
+                router.push(`/Company/payment/${contract.id}`)
               }
             />
           ))}
         </div>
       )}
 
-         {/* Contracts Grid */}
-      {!showApplicants && (
+         {/* Contracts Table */}
+      {!loading && paginatedContracts.length > 0 && !showApplicants && (
         <div className="flex flex-col gap-2 mt-4">
-          {paginatedApplicants.map((applicant, index) => (
+          {paginatedContracts.map((contract) => (
             <ContractRow
-              key={index}
-              applicant={applicant}
+              key={contract.id}
+              contract={{
+                id: contract.id,
+                name: contract.name,
+                contractTitle: contract.contractTitle,
+                salary: contract.salary || null,
+                inContractNumber: contract.inContractNumber,
+                note: contract.note || null,
+                status: contract.status,
+                currency: contract.currency,
+              }}
               onMainClick={() =>
-                router.push(`/Company/payment/${applicant.applicantId}`)
+                router.push(`/Company/payment/${contract.id}`)
               }
-
-              showCheckbox={true} // optional
+              showCheckbox={true}
             />
           ))}
         </div>

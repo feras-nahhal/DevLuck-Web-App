@@ -1,13 +1,9 @@
-// src/app/Company/profile/page.tsx
+// src/app/Student/profile/page.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
-import { mockApplicants } from "@/src/mocks/mockApplicants";
-import { educationData } from "@/src/mocks/mockEducation";
-import { experienceData } from "@/src/mocks/mockExperience";
-import { languageData  } from "@/src/mocks/mockLanguages";
-import { portfolioData  } from "@/src/mocks/mockPortfolio";
+import { useStudentProfileHandler } from "@/src/hooks/studentapihandler/useStudentProfileHandler";
 
 import ProfileModal from "@/src/components/Student/ProfileModal";
 import ExperienceModal from "@/src/components/Student/ExperienceModal";
@@ -17,6 +13,44 @@ import PortfolioModal from "@/src/components/Student/PortfolioModal";
 import SkillsModal from "@/src/components/Student/SkillsModal";
 
 export default function ApplicantPage() {
+
+  const {
+    profile,
+    profileLoading,
+    profileError,
+    getProfile,
+    createProfile,
+    updateProfile,
+    skills,
+    skillsLoading,
+    getSkills,
+    addSkills,
+    removeSkill,
+    experiences,
+    experienceLoading,
+    getExperiences,
+    createExperience,
+    updateExperience,
+    deleteExperience,
+    educations,
+    educationLoading,
+    getEducations,
+    createEducation,
+    updateEducation,
+    deleteEducation,
+    languages,
+    languageLoading,
+    getLanguages,
+    createLanguage,
+    updateLanguage,
+    deleteLanguage,
+    portfolios,
+    portfolioLoading,
+    getPortfolios,
+    createPortfolio,
+    updatePortfolio,
+    deletePortfolio,
+  } = useStudentProfileHandler();
 
   const [isModalOpen1, setIsModalOpen1] = useState(false);
   const [editingProfile, setEditingProfile] = useState<any>(null);
@@ -36,32 +70,57 @@ export default function ApplicantPage() {
   const [isModalOpen6, setIsModalOpen6] = useState(false);
   const [editingSkills, setEditingSkills] = useState<any>(null);
 
-  const params = useParams(); // { applicantId: "456" }
-  const {applicantId } = params;
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Try to get profile, if 404, create a basic one
+        try {
+          await getProfile();
+        } catch (error: any) {
+          if (error.message.includes('not found') || error.message.includes('404')) {
+            // Profile doesn't exist, create a basic one
+            await createProfile({
+              name: "New Student",
+              description: "",
+              availability: undefined,
+              profileComplete: 0
+            });
+          }
+        }
+        
+        // Fetch all related data
+        await Promise.all([
+          getSkills(),
+          getExperiences(),
+          getEducations(),
+          getLanguages(),
+          getPortfolios()
+        ]);
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    };
 
+    fetchData();
+  }, []);
 
-  // TEMP applicant with ID 201 
-  const applicant = mockApplicants.find(a => a.applicantId === "201");
+  
 
-  if (!applicant) {
+  // Loading state
+  if (profileLoading && !profile) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="bg-white shadow-md rounded-lg p-8 sm:p-12 text-center max-w-md w-full">
-            <h2 className="text-2xl sm:text-3xl font-bold text-red-600 mb-4 flex items-center justify-center gap-2">
-              ❌ Applicant Not Found
-            </h2>
-            <p className="text-[#555] text-base sm:text-lg">
-              No applicant with ID: <span className="font-semibold text-[#1E1E1E]">{applicantId}</span> was found.
-            </p>
-            <p className="text-[#777] mt-2 text-sm">
-              Please check the ID or go back to the <a href="/Student/dashboard" className="text-blue-500 hover:underline">dashboard</a>.
-            </p>
-          </div>
+        <div className="flex h-screen items-center justify-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
         </div>
       </DashboardLayout>
     );
   }
+
+  const formatDate = (date?: string) =>
+  date ? new Date(date).toLocaleDateString() : "—";
+
 
   return (
     <DashboardLayout>
@@ -98,13 +157,13 @@ export default function ApplicantPage() {
             {/* Name + Button Row */}
             <div className="flex items-center justify-between w-full">
               <h1 className="font-barlow font-extrabold text-[40px] leading-[64px] text-[#1E1E1E]">
-                {applicant ? applicant.name : applicantId}
+                {profile?.name || "Complete your name"}
               </h1>
 
              <div
                 className="relative w-[60px] h-[35px] skew-x-[-12deg] border-1 border-black flex items-center justify-center overflow-hidden rounded-md  transition-transform duration-200 transform hover:scale-105 "
                  onClick={() => {
-                          setEditingProfile(applicant); 
+                          setEditingProfile(profile); 
                           setIsModalOpen1(true);
                         }}
               >
@@ -119,11 +178,11 @@ export default function ApplicantPage() {
 
             {/* Description */}
               <p className="font-publicSans text-[16px] leading-[24px] text-[#1E1E1E] break-words">
-                {applicant
-                  ? applicant.description.length > 250
-                    ? applicant.description.slice(0, 250) + "..."
-                    : applicant.description
-                  : "Applicant description not found."}
+                {profile?.description
+                ? profile.description.length > 250
+                  ? profile.description.slice(0, 250) + "..."
+                  : profile.description
+                : "Complete your description to tell employers about yourself."}
               </p>
 
           </div>
@@ -137,8 +196,12 @@ export default function ApplicantPage() {
 
               <div className="relative w-[260px] sm:w-[260px] h-[175px]">
                 {/* Background number or placeholder */}
-                <div className="font-barlow font-extrabold text-[200px] leading-[175px] text-[#C2C2C2] flex  w-[200px] sm:w-[260px] h-[175px]">
-                  {applicant ? applicant.profileRanking : "Applicant Ranking not found."}
+                <div
+                  className={`font-barlow font-extrabold leading-[175px] text-[#C2C2C2] flex w-[200px] sm:w-[260px] h-[175px]
+                    ${profile?.profileRanking ? "text-[200px]" : "text-[100px] leading-[175px] text-center justify-center items-center"}
+                  `}
+                >
+                  {profile?.profileRanking ?? "N/A"}
                 </div>
 
                 {/* Profile Ranking label */}
@@ -154,7 +217,7 @@ export default function ApplicantPage() {
                   </span>
                   
                   <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
-                    {applicant.profileComplete}%
+                    {profile?.profileComplete || 0}%
                   </span>
                 </div>
 
@@ -163,69 +226,35 @@ export default function ApplicantPage() {
                   {/* Progress Fill */}
                   <div
                     className="absolute left-0.5 top-1/2 h-[14px] -translate-y-1/2 rounded bg-[#FFEB9C]"
-                    style={{ width: `${applicant.profileComplete}%` }}
+                    style={{ width: `${profile?.profileComplete || 0}%` }}
                   />
 
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-4 w-[62px] h-[152px] mx-auto">
-              {/* First pair */}
-              <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-                <img 
-                  src="/cards/tag.svg" 
-                  alt="Tag Icon"
-                />
-                  {/* Frame 97 - Label container */}
-                <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
-                  {/* body2 text */}
-                  <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
-                    {applicant?.salaryPaid}
-                  </span>
-                  {/* caption text */}
-                  <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
-                    Salary
-                  </span>
+           <div className="flex flex-col gap-4 w-[62px] h-[152px] mx-auto">
+              {[
+                { value: profile?.status ?? "—", label: "Status", key: "status" },
+                { value: profile?.availability ?? "—", label: "Availability", key: "availability" },
+                { value: formatDate(profile?.createdAt) ?? "—", label: "Joined", key: "joined" },
+              ].map((item) => (
+                <div key={item.key} className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                  <img src="/cards/tag.svg" alt="Tag Icon" />
+                  <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                    <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                      {item.value}
+                    </span>
+                    <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                      {item.label}
+                    </span>
+                  </div>
                 </div>
-              </div>
-
-              {/* Second pair */}
-              <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-                <img 
-                  src="/cards/tag.svg" 
-                  alt="Tag Icon"
-                />
-                  {/* Frame 97 - Label container */}
-                <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
-                  {/* body2 text */}
-                  <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
-                    {applicant?.availability}
-                  </span>
-                  {/* caption text */}
-                  <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
-                    Availability
-                  </span>
-                </div>
-              </div>
-              {/* Third pair */}
-              <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-                <img 
-                  src="/cards/tag.svg" 
-                  alt="Tag Icon"
-                />
-                  {/* Frame 97 - Label container */}
-                <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
-                  {/* body2 text */}
-                  <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
-                    {applicant?.city}
-                  </span>
-                  {/* caption text */}
-                  <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
-                    City
-                  </span>
-                </div>
-              </div>
+              ))}
             </div>
+
+
+
+
           </div>
         </div>
         {/* Skills Parallelogram Card */}
@@ -239,6 +268,7 @@ export default function ApplicantPage() {
               <button
                 className="relative w-[80px] h-[32px] skew-x-[-12deg]  border border-black flex items-center justify-center rounded-md cursor-pointer duration-200 hover:scale-105  transition"
                  onClick={() => {
+                        setEditingSkills(null);
                         setIsModalOpen6(true);        
                       }}
               >
@@ -255,19 +285,21 @@ export default function ApplicantPage() {
           >
             {/* Inner content (counter-skew) */}
               <div className="transform skew-x-12 px-8 w-full h-full overflow-y-auto">
-              {applicant?.skills?.length ? (
+              {skillsLoading ? (
+                <p className="text-[#555] font-publicSans">Loading skills...</p>
+              ) : skills?.length ? (
                 <div className="flex flex-wrap gap-3">
-                  {applicant.skills.map((skill) => (
+                  {skills.map((skill) => (
                     <span
-                      key={skill}
+                      key={skill.id}
                       className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
                     >
-                      {skill}
+                      {skill.name}
                     </span>
                   ))}
                 </div>
               ) : (
-                <p className="text-[#555] font-publicSans">No skills info available.</p>
+                <p className="text-[#555] font-publicSans">Complete this field - Add your skills to showcase your expertise.</p>
               )}
             </div>
           </div>
@@ -289,6 +321,7 @@ export default function ApplicantPage() {
               <button
                 className="relative w-[80px] h-[32px] skew-x-[-12deg]  border border-black flex items-center justify-center rounded-md cursor-pointer duration-200 hover:scale-105  transition"
                  onClick={() => {
+                        setEditingSkills(null);
                         setIsModalOpen6(true);        
                       }}
               >
@@ -299,19 +332,21 @@ export default function ApplicantPage() {
             </div>
             <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
               <div className="transform skew-x-12 px-8 w-full h-full overflow-y-auto">
-                {applicant?.skills?.length ? (
-                  <div className="flex flex-wrap gap-3">
-                    {applicant.skills.map((skill) => (
+                 {skillsLoading ? (
+                <p className="text-[#555] font-publicSans">Loading skills...</p>
+              ) : skills?.length ? (
+                <div className="flex flex-wrap gap-3">
+                  {skills.map((skill) => (
                       <span
-                        key={skill}
+                          
                         className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap transform-none"
                       >
-                        {skill}
+                        {skill.name}
                       </span>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[#555] font-publicSans">No skills info available.</p>
+                  <p className="text-[#555] font-publicSans">Complete this field - Add your skills to showcase your expertise.</p>
                 )}
               </div>
             </div>
@@ -330,6 +365,7 @@ export default function ApplicantPage() {
               <button
                 className="relative w-[80px] h-[32px] skew-x-[-12deg]  border border-black flex items-center justify-center rounded-md cursor-pointer duration-200 hover:scale-105  transition"
                  onClick={() => {
+                        setEditingExperience(null);
                         setIsModalOpen2(true);        
                       }}
               >
@@ -340,10 +376,10 @@ export default function ApplicantPage() {
             </div>
             <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                {experienceData.filter(exp => exp.applicantId === applicant?.applicantId).length ? (
-                experienceData
-                  .filter((exp) => exp.applicantId === applicant?.applicantId)
-                  .map((exp) => (
+                {experienceLoading ? (
+                  <p className="text-[#555] font-publicSans py-4">Loading experience...</p>
+                ) : experiences?.length ? (
+                experiences.map((exp) => (
                     <div key={exp.id} className="px-4 py-2 w-full">
                       <div className="flex items-center justify-between">
                         {/* Left side: SVG + Role */}
@@ -401,13 +437,17 @@ export default function ApplicantPage() {
                       </div>
 
                       <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1 break-words">
+                        {exp.description ? (
+                          <>
                         {exp.description.split(" ").slice(0, 10).join(" ")}
                         {exp.description.split(" ").length > 10 ? "..." : ""}
+                          </>
+                        ) : ""}
                       </p>
                     </div>
                    ))
               ) : (
-                <p className="text-[#555] font-publicSans py-4">No experience info available.</p>
+                <p className="text-[#555] font-publicSans py-4">Complete this field - Add your work experience to showcase your professional background.</p>
               )}
             </div>
             </div>
@@ -424,6 +464,7 @@ export default function ApplicantPage() {
               <button
                 className="relative w-[80px] h-[32px] skew-x-[-12deg]  border border-black flex items-center justify-center rounded-md cursor-pointer duration-200 hover:scale-105  transition"
                  onClick={() => {
+                        setEditingEducation(null);
                         setIsModalOpen3(true);        
                       }}
               >
@@ -435,10 +476,10 @@ export default function ApplicantPage() {
             </div>
             <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                {educationData.filter(edu => edu.applicantId === applicant?.applicantId).length ? (
-                educationData
-                  .filter((edu) => edu.applicantId === applicant?.applicantId)
-                  .map((edu) => (
+                {educationLoading ? (
+                  <p className="text-[#555] font-publicSans py-4">Loading education...</p>
+                ) : educations?.length ? (
+                educations.map((edu) => (
                     <div
                       key={edu.id}
                       className="px-4 py-2  w-full"
@@ -507,13 +548,17 @@ export default function ApplicantPage() {
 
                       </div>
                       <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1">
+                        {edu.description ? (
+                          <>
                         {edu.description.split(" ").slice(0, 10).join(" ")}
                         {edu.description.split(" ").length > 10 ? "..." : ""}
+                          </>
+                        ) : ""}
                       </p>
                     </div>
                 ))
               ) : (
-                <p className="text-[#555] font-publicSans py-4">No education info available.</p>
+                <p className="text-[#555] font-publicSans py-4">Complete this field - Add your education history to showcase your academic background.</p>
               )}
             </div>
             </div>
@@ -533,6 +578,7 @@ export default function ApplicantPage() {
               <button
                 className="relative w-[80px] h-[32px] skew-x-[-12deg]  border border-black flex items-center justify-center rounded-md cursor-pointer duration-200 hover:scale-105  transition"
                  onClick={() => {
+                        setEditingLanguage(null);
                         setIsModalOpen4(true);        
                       }}
               >
@@ -543,10 +589,10 @@ export default function ApplicantPage() {
             </div>
             <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                {languageData.filter(lang => lang.applicantId === applicant?.applicantId).length ? (
-                languageData
-                  .filter((lang) => lang.applicantId === applicant?.applicantId)
-                  .map((lang) => (
+                 {languageLoading ? (
+                  <p className="text-[#555] font-publicSans py-4">Loading languages...</p>
+                ) : languages?.length ? (
+                languages.map((lang) => (
                     <div key={lang.id} className="px-4 py-2 w-full">
                       <div className="flex items-center justify-between">
                         {/* Left side: SVG + Language name */}
@@ -586,7 +632,7 @@ export default function ApplicantPage() {
                     </div>
                   ))
               ) : (
-                <p className="text-[#555] font-publicSans py-4">No language info available.</p>
+                <p className="text-[#555] font-publicSans py-4">Complete this field - Add languages you speak to showcase your communication skills.</p>
               )}
             </div>
             </div>
@@ -604,6 +650,7 @@ export default function ApplicantPage() {
               <button
                 className="relative w-[80px] h-[32px] skew-x-[-12deg]  border border-black flex items-center justify-center rounded-md cursor-pointer duration-200 hover:scale-105  transition"
                  onClick={() => {
+                        setEditingPortfolio(null);
                         setIsModalOpen5(true);        
                       }}
               >
@@ -614,10 +661,10 @@ export default function ApplicantPage() {
             </div>
             <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
               <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                {portfolioData.filter(port => port.applicantId === applicant?.applicantId).length ? (
-                  portfolioData
-                  .filter((port) => port.applicantId === applicant?.applicantId)
-                  .map((port) => (
+                {portfolioLoading ? (
+                  <p className="text-[#555] font-publicSans py-4">Loading portfolio...</p>
+                ) : portfolios?.length ? (
+                  portfolios.map((port) => (
                     <div key={port.id} className="px-4 py-2 w-full">
                       <div className="flex items-center justify-between">
                         {/* Left side: SVG + Portfolio Name */}
@@ -683,7 +730,7 @@ export default function ApplicantPage() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-[#555] font-publicSans py-4">No portfolio info available.</p>
+                  <p className="text-[#555] font-publicSans py-4">Complete this field - Add your portfolio links to showcase your work.</p>
                 )}
               </div>
             </div>
@@ -697,54 +744,137 @@ export default function ApplicantPage() {
       isOpen={isModalOpen1}
       profile={editingProfile}
       onClose={() => setIsModalOpen1(false)}
-      onSave={(data) => {
-        console.log("Profile saved:", data);
-        setIsModalOpen1(false);
+      onSave={async (data) => {
+        await updateProfile({
+          name: data.name,
+          description: data.description,
+          availability: data.availability || undefined
+        });
+        await getProfile();
       }}
     />
     <ExperienceModal
       isOpen={isModalOpen2}
       experience={editingExperience}
-      onClose={() => setIsModalOpen2(false)}
-      onSave={(data) => {
-        console.log("Experience saved:", data);
+      onClose={() => {
+        setEditingExperience(null);
         setIsModalOpen2(false);
+      }}
+      onSave={async (data) => {
+        if (editingExperience?.id) {
+          await updateExperience(editingExperience.id, {
+            role: data.role,
+            companyName: data.companyName,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            description: data.description
+          });
+        } else {
+          await createExperience({
+            role: data.role,
+            companyName: data.companyName,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            description: data.description
+          });
+        }
+        await getExperiences();
+        await getProfile();
+        setEditingExperience(null);
       }}
     />
     <EducationModal
-      isOpen={isModalOpen3 }
+      isOpen={isModalOpen3}
       education={editingEducation}
-      onClose={() => setIsModalOpen3(false)}
-      onSave={(data) => {
-        console.log("Education saved:", data);
+      onClose={() => {
+        setEditingEducation(null);
         setIsModalOpen3(false);
+      }}
+      onSave={async (data) => {
+        if (editingEducation?.id) {
+          await updateEducation(editingEducation.id, {
+            name: data.name,
+            major: data.major,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            description: data.description
+          });
+        } else {
+          await createEducation({
+            name: data.name,
+            major: data.major,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            description: data.description
+          });
+        }
+        await getEducations();
+        await getProfile();
+        setEditingEducation(null);
       }}
     />
     <LanguageModal
       isOpen={isModalOpen4}
       language={editingLanguage}
-      onClose={() => setIsModalOpen4(false)}
-      onSave={(data) => {
-        console.log("Language saved:", data);
+      onClose={() => {
+        setEditingLanguage(null);
         setIsModalOpen4(false);
+      }}
+      onSave={async (data) => {
+        if (editingLanguage?.id) {
+          await updateLanguage(editingLanguage.id, {
+            name: data.name,
+            level: data.level
+          });
+        } else {
+          await createLanguage({
+            name: data.name,
+            level: data.level
+          });
+        }
+        await getLanguages();
+        await getProfile();
+        setEditingLanguage(null);
       }}
     />
     <PortfolioModal
       isOpen={isModalOpen5}
       portfolio={editingPortfolio}
-      onClose={() => setIsModalOpen5(false)}
-      onSave={(data) => {
-        console.log("Portfolio saved:", data);
+      onClose={() => {
+        setEditingPortfolio(null);
         setIsModalOpen5(false);
+      }}
+      onSave={async (data) => {
+        if (editingPortfolio?.id) {
+          await updatePortfolio(editingPortfolio.id, {
+            name: data.name,
+            link: data.link
+          });
+        } else {
+          await createPortfolio({
+            name: data.name,
+            link: data.link
+          });
+        }
+        await getPortfolios();
+        await getProfile();
+        setEditingPortfolio(null);
       }}
     />
     <SkillsModal
       isOpen={isModalOpen6}
       skills={editingSkills}
-      onClose={() => setIsModalOpen6(false)}
-      onSave={(data) => {
-        console.log("Skills saved:", data);
+      onClose={() => {
+        setEditingSkills(null);
         setIsModalOpen6(false);
+      }}
+      onSave={async (data) => {
+        if (Array.isArray(data.skills)) {
+          await addSkills(data.skills);
+        }
+        await getSkills();
+        await getProfile();
+        setEditingSkills(null);
       }}
     />
     </DashboardLayout>

@@ -2,142 +2,168 @@
 
 import React, { useState, useEffect } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useAuth } from "@/src/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
-/* ──────────────────────────────────────────────
-   Types
-────────────────────────────────────────────── */
 type AuthMode = "login" | "register";
 
 interface AuthSystemProps {
   initialMode?: AuthMode;
 }
 
-/* ──────────────────────────────────────────────
-   Toggle mock mode (TURN OFF when backend ready)
-────────────────────────────────────────────── */
-const MOCK_MODE = true;
+interface InputModifiedProps {
+  label: string;
+  placeholder: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+  showPassword?: boolean;
+  onToggleShow?: () => void;
+}
 
-/* ──────────────────────────────────────────────
-   Component
-────────────────────────────────────────────── */
+const ParallelogramInput: React.FC<InputModifiedProps> = ({
+  label,
+  placeholder,
+  value,
+  onChange,
+  type = "text",
+  showPassword,
+  onToggleShow,
+}) => {
+  return (
+    <div className="relative w-[383px] h-[48px]">
+      <label
+        className="
+          absolute -top-2 left-5
+          h-[18px]
+          px-3
+          bg-[#FFEB9C]
+          text-[#1E1E1E]
+          text-xs
+          font-normal
+          select-none
+          flex items-center
+          skew-x-[-12deg]
+          z-20
+        "
+        style={{borderRadius: "6px"}}
+      >
+        <span className="skew-x-[12deg] leading-[18px]">
+          {label}
+        </span>
+      </label>
+
+      <div className="overflow rounded-[12px] h-full w-full">
+        <div
+          className="h-full w-full border border-[#1C252E]"
+          style={{
+            transform: "skewX(-15deg)",
+            borderRadius: "12px",
+            boxSizing: "border-box",
+            position: "relative",
+            background: "transparent",
+          }}
+        >
+          <div
+            style={{
+              transform: "skewX(15deg)",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 20px",
+            }}
+          >
+            <input
+              type={type === "password" && showPassword ? "text" : type}
+              value={value}
+              onChange={onChange}
+              placeholder={placeholder}
+              className="bg-transparent outline-none flex-1 text-[12px] text-[#171717cc]"
+              style={{ lineHeight: "18px" }}
+            />
+            {type === "password" && onToggleShow && (
+              <button
+                type="button"
+                onClick={onToggleShow}
+                className="ml-2 text-[#171717cc]"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AuthSystem: React.FC<AuthSystemProps> = ({
   initialMode = "login",
 }) => {
   const [mode, setMode] = useState<AuthMode>(initialMode);
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<"STUDENT" | "COMPANY">("STUDENT");
+  const [formError, setFormError] = useState("");
+
+  const { signup, login, loading, error, clearError, user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    setLoading(false);
-  }, [mode]);
+    clearError();
+    setFormError("");
+  }, [mode, clearError]);
 
-  /* ──────────────────────────────────────────────
-     Submit (Mock now, real later)
-  ────────────────────────────────────────────── */
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setLoading(true);
+    setFormError("");
+    clearError();
 
-    // 🧪 MOCK MODE (SAFE)
-    if (MOCK_MODE) {
-      setTimeout(() => {
-        window.location.href = "http://localhost:3000/Student/dashboard";
-      }, 600);
+    if (!email || !password) {
+      setFormError("Email and password are required");
       return;
     }
 
-    // 🔐 REAL AUTH WILL LIVE HERE LATER
-  };
+    if (mode === "register") {
+      if (password !== confirmPassword) {
+        setFormError("Passwords do not match");
+        return;
+      }
+      if (password.length < 6) {
+        setFormError("Password must be at least 6 characters");
+        return;
+      }
+    }
 
-  interface InputModifiedProps {
-    label: string;
-    placeholder: string;
-    value?: string;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    type?: string;
-    showPassword?: boolean;
-    onToggleShow?: () => void;
-  }
-
-  const ParallelogramInput: React.FC<InputModifiedProps> = ({
-    label,
-    placeholder,
-    value,
-    onChange,
-    type = "text",
-    showPassword,
-    onToggleShow,
-  }) => {
-    return (
-      <div className="relative w-[383px] h-[48px]">
-        {/* Floating Label */}
-        <label
-          className="
-            absolute -top-2 left-5
-            h-[18px]
-            px-3
-            bg-[#FFEB9C]
-            text-[#1E1E1E]
-            text-xs
-            font-normal
-            select-none
-            flex items-center
-            skew-x-[-12deg]
-            z-20
-          "
-          style={{borderRadius: "6px"}}
-        >
-          <span className="skew-x-[12deg] leading-[18px]">
-            {label}
-          </span>
-        </label>
-
-        {/* Parallelogram container */}
-        <div className="overflow rounded-[12px] h-full w-full">
-          {/* Skewed box for parallelogram shape */}
-          <div
-            className="h-full w-full border border-[#1C252E]"
-            style={{
-              transform: "skewX(-15deg)",
-              borderRadius: "12px",
-              boxSizing: "border-box",
-              position: "relative",
-              background: "transparent",
-            }}
-          >
-            {/* Content skewed back to normal inside */}
-            <div
-              style={{
-                transform: "skewX(15deg)",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                padding: "0 20px",
-              }}
-            >
-              <input
-                type={type === "password" && showPassword ? "text" : type}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                className="bg-transparent outline-none flex-1 text-[12px] text-[#171717cc]"
-                style={{ lineHeight: "18px" }}
-              />
-              {type === "password" && onToggleShow && (
-                <button
-                  type="button"
-                  onClick={onToggleShow}
-                  className="ml-2 text-[#171717cc]"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    try {
+      if (mode === "login") {
+        await login(email, password);
+      } else {
+        await signup(email, password, role);
+      }
+      
+      const token = localStorage.getItem('devluck_token');
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const userRole = payload.role || role;
+          if (userRole === 'COMPANY') {
+            router.push("/Company/dashboard");
+          } else {
+            router.push("/Student/dashboard");
+          }
+        } catch {
+          router.push("/Student/dashboard");
+        }
+      } else {
+        router.push("/Student/dashboard");
+      }
+    } catch (err: any) {
+      setFormError(err.message || "Authentication failed");
+    }
   };
 
   return (
@@ -197,17 +223,75 @@ const AuthSystem: React.FC<AuthSystemProps> = ({
 
           {/* ───────── Form ───────── */}
           <div className="px-6 pb-6 space-y-4">
-            {mode === "register" && (
-              <ParallelogramInput placeholder="Full name" label={"Full name"} />
+            {(error || formError) && (
+              <div className="w-[383px] p-3 bg-red-50 border border-red-200 rounded text-red-600 text-xs">
+                {error || formError}
+              </div>
             )}
 
-            <ParallelogramInput placeholder="Email address" label={"Email"} />
+            {mode === "register" && (
+              <>
+                <ParallelogramInput placeholder="Full name" label={"Full name"} />
+              </>
+            )}
 
-            {/* Password */}
+            <ParallelogramInput
+              placeholder="Email address"
+              label={"Email"}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            {mode === "register" && (
+
+               <div className="relative w-[383px] pt-6">
+              {/* Floating Label */}
+              <label
+                className="absolute top-0 left-5 h-[18px] px-3 bg-[#FFEB9C] text-[#1E1E1E] text-xs font-normal select-none flex items-center skew-x-[-12deg] z-20"
+                style={{ borderRadius: "6px" }}
+              >
+                <span className="skew-x-[12deg] leading-[18px]">Role</span>
+              </label>
+
+              {/* Radio group */}
+              <div className="flex gap-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="STUDENT"
+                    checked={role === "STUDENT"}
+                    onChange={(e) =>
+                      setRole(e.target.value as "STUDENT" | "COMPANY")
+                    }
+                    className="w-4 h-4 accent-black"
+                  />
+                  <span className="text-xs text-[#1E1E1E]">Student</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="COMPANY"
+                    checked={role === "COMPANY"}
+                    onChange={(e) =>
+                      setRole(e.target.value as "STUDENT" | "COMPANY")
+                    }
+                    className="w-4 h-4 accent-black"
+                  />
+                  <span className="text-xs text-[#1E1E1E]">Company</span>
+                </label>
+              </div>
+            </div>
+
+            )}
+
             <ParallelogramInput
               type="password"
               placeholder="Password"
               label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               showPassword={showPassword}
               onToggleShow={() => setShowPassword(!showPassword)}
             />
@@ -217,6 +301,8 @@ const AuthSystem: React.FC<AuthSystemProps> = ({
                 type="password"
                 placeholder="Confirm password"
                 label="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 showPassword={showConfirmPassword}
                 onToggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
               />

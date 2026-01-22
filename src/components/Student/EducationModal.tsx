@@ -292,14 +292,17 @@ const EducationModal: React.FC<EducationModalProps> = ({ education, isOpen, onCl
 
   const handleInputChange = (field: keyof EducationData, value: string) => setFormData((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      onSave(formData);
-      setLoading(false);
+    try {
+      await onSave(formData);
       onClose();
-    }, 500);
+    } catch (error) {
+      console.error("Error saving education:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -352,8 +355,6 @@ const EducationModal: React.FC<EducationModalProps> = ({ education, isOpen, onCl
           <ParallelogramInput label="Description" placeholder="Enter description" value={formData.description} onChange={(e) => handleInputChange("description", e.target.value)} />
           <ParallelogramDatePicker label="Start Date" placeholder="Select start date" value={formData.startDate} onChange={(value) => handleInputChange("startDate", value)} />
           <ParallelogramDatePicker label="End Date" placeholder="Select end date" value={formData.endDate} onChange={(value) => handleInputChange("endDate", value)} />
-         
-        </form>
 
         {/* Footer */}
         <div
@@ -364,6 +365,7 @@ const EducationModal: React.FC<EducationModalProps> = ({ education, isOpen, onCl
         >
             <div className="flex w-[400px] justify-between">
             <button
+                type="button"
                 onClick={onClose}
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             >
@@ -381,6 +383,7 @@ const EducationModal: React.FC<EducationModalProps> = ({ education, isOpen, onCl
             </button>
             </div>
         </div>
+        </form>
         </div>
     </div>
     );
