@@ -93,15 +93,17 @@ const SkillsModal: React.FC<SkillsModalProps> = ({
     });
   }, [skills, isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    setTimeout(() => {
-      onSave(formData);
-      setLoading(false);
+    try {
+      await onSave(formData);
       onClose();
-    }, 500);
+    } catch (error) {
+      console.error("Error saving skills:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -185,8 +187,6 @@ const SkillsModal: React.FC<SkillsModalProps> = ({
             Add multiple skills separate by comma
           </span>
              
-        </form>
-
         {/* Footer */}
         <div
             className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
@@ -196,6 +196,7 @@ const SkillsModal: React.FC<SkillsModalProps> = ({
         >
             <div className="flex w-[400px] justify-between">
             <button
+                type="button"
                 onClick={onClose}
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             >
@@ -213,6 +214,7 @@ const SkillsModal: React.FC<SkillsModalProps> = ({
             </button>
             </div>
         </div>
+        </form>
         </div>
     </div>
     );

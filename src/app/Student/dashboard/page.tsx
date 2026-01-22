@@ -1,19 +1,27 @@
-// src/app/Company/dashboard/page.tsx
+// src/app/Student/dashboard/page.tsx
 "use client";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
-import { mockApplicants } from "@/src/mocks/mockApplicants";
 import { ArrowUpRight } from 'lucide-react';
-import { educationData } from "@/src/mocks/mockEducation";
-import { experienceData } from "@/src/mocks/mockExperience";
 import { mockContracts} from "@/src/mocks/mockContract";
 import { useRouter } from "next/navigation";
+import { useStudentProfileHandler } from "@/src/hooks/studentapihandler/useStudentProfileHandler";
+import { useStudentOpportunityHandler } from "@/src/hooks/studentapihandler/useStudentOpportunityHandler";
+import { useEffect, useMemo } from "react";
 
-
+interface Card1Contract {
+  id: string | number;
+  contractTitle: string;
+  company?: string;
+  salary?: string;
+  workProgress?: number;
+  opportunityStatus?: string;
+  [key: string]: any;
+}
 const Card1 = ({
   contract,
   onClick,
 }: {
-  contract: typeof mockContracts[0];
+  contract: Card1Contract;
   onClick?: () => void;
 }) => {
       const isUpcoming = contract.opportunityStatus === "Upcoming Interview";
@@ -195,16 +203,81 @@ const Card = ({
 
 
 export default function DashboardPage() {
-  // TEMP applicant with ID 201 
-  // Logged-in applicant (TEMP)
-  const applicant = mockApplicants.find(a => a.applicantId === "201");
-  const applicantIdNum = Number(applicant?.applicantId);
+  const {
+    profile,
+    profileLoading,
+    getProfile,
+    experiences,
+    experienceLoading,
+    getExperiences,
+    educations,
+    educationLoading,
+    getEducations,
+    skills,
+    skillsLoading,
+    getSkills,
+  } = useStudentProfileHandler();
 
+  const {
+    opportunities,
+    loading: opportunitiesLoading,
+    listOpportunities,
+  } = useStudentOpportunityHandler();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          getProfile(),
+          getExperiences(),
+          getEducations(),
+          getSkills(),
+          listOpportunities(1, 4)
+        ]);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+    fetchData();
+  }, [getProfile, getExperiences, getEducations, getSkills, listOpportunities]);
+
+  const mappedOpportunities = useMemo(() => {
+    if (!opportunities || !Array.isArray(opportunities)) {
+      return [];
+    }
+    return opportunities.map((opp) => ({
+      id: opp.id,
+      applicantId: 0,
+      contractTitle: opp.title,
+      company: opp.company?.name || "Unknown Company",
+      salary: opp.allowance ? `${opp.currency} ${opp.allowance}` : "Not specified",
+      workProgress: Math.floor(Math.random() * 100),
+      opportunityStatus: "Applied" as const,
+      opportunityFrom: "Company" as const,
+      deadline: opp.startDate ? new Date(opp.startDate).toLocaleDateString() : "Not specified",
+      startDate: opp.startDate ? new Date(opp.startDate).toLocaleDateString() : "Not specified",
+      endDate: "Not specified",
+      status: "Running" as const,
+      applicantIds: [],
+      companyId: opp.companyId || "",
+      skills: opp.skills || [],
+      benefits: opp.benefits || [],
+      keyResponsibilities: opp.keyResponsibilities || [],
+      whyYoullLoveWorkingHere: opp.whyYouWillLoveWorkingHere || [],
+      jobDescription: opp.details || "",
+      jobType: (opp.type === "Full-time" || opp.type === "Part-time" || opp.type === "Contract") 
+        ? opp.type 
+        : "Full-time" as "Full-time" | "Part-time" | "Contract",
+      location: opp.location || "Not specified",
+    }));
+  }, [opportunities]);
+
+  const applicantIdNum = 201;
   const applicantContracts = mockContracts.filter(
     contract => contract.applicantId === applicantIdNum
   );
-
-  const router = useRouter();
 
   // Total opportunities assigned to this applicant
   const totalOpportunities = applicantContracts.length;
@@ -224,7 +297,23 @@ export default function DashboardPage() {
     (contract) => contract.opportunityStatus === "Rejected"
   ).length;
 
-  
+  const isLoading =
+  profileLoading ||
+  experienceLoading ||
+  educationLoading ||
+  skillsLoading ||
+  opportunitiesLoading;
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-screen items-center justify-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
 
   return (
     <DashboardLayout>
@@ -270,21 +359,21 @@ export default function DashboardPage() {
 
                 {/* Secondary Button */}
                 <div className="w-[160px] h-10 bg-[#FFEB9C] rounded-lg flex items-center justify-center font-bold text-[14px] text-[#1E1E1E] -skew-x-12">
-                  <div className="skew-x-12">#{applicant?.profileRanking} Profile Ranking </div>
+                  <div className="skew-x-12">#{profile?.profileRanking || "-"} Profile Ranking </div>
                 </div>
 
               </div>
 
               <h1 className="text-4xl font-extrabold">
-                {applicant?.name }
+                {profile?.name || "Complete your name"}
               </h1>
 
-              <p className="text-sm text-black/90">
-              {applicant
-                ? applicant.description.length > 250
-                  ? applicant.description.slice(0, 250) + "..."
-                  : applicant.description
-                : "Applicant description not found."}
+             <p className="text-sm text-black/90">
+              {profile?.description
+                ? profile.description.length > 250
+                  ? profile.description.slice(0, 250) + "..."
+                  : profile.description
+                : "Complete this field - Add a short description about yourself."}
               </p>
 
             </div>
@@ -297,7 +386,7 @@ export default function DashboardPage() {
                     Profile Complete %
                   </span>
                   <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
-                    {applicant?.workProgress ?? 0}%
+                    {profile?.profileComplete ?? 0}%
                   </span>
                 </div>
                 <div className="relative w-[250px] h-[16px] bg-[#1E1E1E] transform -skew-x-[20deg] rounded-[4px]">
@@ -318,7 +407,7 @@ export default function DashboardPage() {
                   {/* Progress Fill */}
                   <div
                     className="absolute left-0 top-1/2 h-[14px] -translate-y-1/2 rounded bg-[#FFEB9C]"
-                    style={{ width: `${applicant?.workProgress ?? 0}%` }}
+                    style={{ width: `${profile?.profileComplete ?? 0}%` }}
                   />
                 </div>
               </div>
@@ -328,7 +417,7 @@ export default function DashboardPage() {
               
                 <div className="flex flex-col justify-center items-start w-[77px] h-[40px]">
                   <span className="text-[14px] font-normal leading-[22px] text-[#1E1E1E]">
-                    {applicant?.availability ?? "-"}
+                    {profile?.availability ?? "-"}
                   </span>
                   <span className="text-[12px] font-normal leading-[18px] text-[#00000090]">
                     Availability
@@ -336,7 +425,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex flex-col justify-center items-start w-[100px] h-[40px]">
                   <span className="text-[14px] font-normal leading-[22px] text-[#1E1E1E]">
-                    {applicant?.salaryPaid ?? "-"}
+                    -
                   </span>
                   <span className="text-[12px] font-normal leading-[18px] text-[#00000090]">
                     Salary Expectation
@@ -377,10 +466,10 @@ export default function DashboardPage() {
                         </div>
                         <div className={`w-full sm:max-w-[360px] sm:min-w-[340px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
                           <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                          {experienceData.filter(exp => exp.applicantId === applicant?.applicantId).length ? (
-                            experienceData
-                              .filter(exp => exp.applicantId === applicant?.applicantId)
-                              .map((exp) => (
+                           {experienceLoading ? (
+                              <p className="text-[#555] font-publicSans py-4">Loading experience...</p>
+                            ) : experiences?.length ? (
+                            experiences.map((exp) => (
                                 <div key={exp.id} className="px-4 py-2 w-full">
                                   <div className="flex items-center justify-between">
                                     {/* Left side: SVG + Role */}
@@ -406,11 +495,14 @@ export default function DashboardPage() {
                                     >
                                       <rect x="3.53564" width="5" height="5" fill="black" />
                                     </svg>
-                                    <span className="font-publicSans transform-none">{exp.date}</span>
+                                    <span className="font-publicSans">
+                                    {exp.startDate && exp.endDate
+                                      ? `${exp.startDate} - ${exp.endDate}`
+                                      : exp.startDate || exp.endDate || "No dates"}
+                                  </span>
                                   </div>
-                                  <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1 break-words transform-none">
-                                    {exp.description.split(" ").slice(0, 10).join(" ")}
-                                    {exp.description.split(" ").length > 10 ? "..." : ""}
+                                   <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1 break-words">
+                                    {exp.description ? (exp.description.split(" ").slice(0, 10).join(" ") + (exp.description.split(" ").length > 10 ? "..." : "")) : ""}
                                   </p>
                                 </div>
                               ))
@@ -431,11 +523,14 @@ export default function DashboardPage() {
                         </div>
                         <div className={`w-full sm:max-w-[360px] sm:min-w-[340px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
                           <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                          {educationData.filter(edu => edu.applicantId === applicant?.applicantId).length ? (
-                            educationData
-                              .filter(edu => edu.applicantId === applicant?.applicantId)
-                              .map((edu) => (
-                                <div key={edu.id} className="px-4 py-2 w-full">
+                          {educationLoading ? (
+                              <p className="text-[#555] font-publicSans py-4">Loading education...</p>
+                            ) : educations?.length ? (
+                            educations.map((edu) => (
+                                <div
+                                  key={edu.id}
+                                  className="px-4 py-2  w-full"
+                                >
                                   <div className="flex items-center justify-between">
                                     {/* Left side: SVG + Major */}
                                     <div className="flex items-center gap-2">
@@ -462,11 +557,14 @@ export default function DashboardPage() {
                                       <rect x="3.53564" width="5" height="5" fill="black" />
                                     </svg>
 
-                                    <span className="font-publicSans">{edu.date}</span>
+                                    <span className="font-publicSans">
+                                    {edu.startDate && edu.endDate
+                                      ? `${edu.startDate} - ${edu.endDate}`
+                                      : edu.startDate || edu.endDate || "No dates"}
+                                  </span>
                                   </div>
                                   <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1">
-                                    {edu.description.split(" ").slice(0, 10).join(" ")}
-                                    {edu.description.split(" ").length > 10 ? "..." : ""}
+                                    {edu.description ? (edu.description.split(" ").slice(0, 10).join(" ") + (edu.description.split(" ").length > 10 ? "..." : "")) : ""}
                                   </p>
                                 </div>
                               ))
@@ -492,16 +590,18 @@ export default function DashboardPage() {
                         </div>
                           <div className={`w-full sm:max-w-[360px] sm:min-w-[340px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
                             <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                              {applicant?.skills?.length ? (
-                              <div className="flex flex-wrap gap-3">
-                                {applicant.skills.map((skill) => (
-                                  <span
-                                    key={skill}
-                                    className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
-                                  >
-                                    {skill}
-                                  </span>
-                                ))}
+                              {skillsLoading ? (
+                              <p className="text-[#555] font-publicSans py-4">Loading skills...</p>
+                            ) : skills?.length ? (
+                            <div className="flex flex-wrap gap-3">
+                              {skills.map((skill) => (
+                                <span
+                                  key={skill.id}
+                                  className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
+                                >
+                                  {skill.name}
+                                </span>
+                              ))}
                               </div>
                             ) : (
                               <p className="text-[#555] font-publicSans">No skills info available.</p>
@@ -584,17 +684,19 @@ export default function DashboardPage() {
                 New Opportunity
               </h3>
             </div>
-            {/* Contracts list */}
+            {/* Opportunities list */}
             <div className="flex flex-wrap ">
-              {applicantContracts.length > 0 ? (
-                applicantContracts.map((contract) => (
-                  <Card1 key={contract.id} contract={contract}  onClick={() =>
-                  router.push(`/Student/dashboard/${contract.id}`)
-                } />
+              {opportunitiesLoading ? (
+                <p className="text-[#555] font-publicSans">Loading opportunities...</p>
+              ) : mappedOpportunities.length > 0 ? (
+                mappedOpportunities.map((opp) => (
+                  <Card1 key={opp.id} contract={opp} onClick={() =>
+                    router.push(`/Student/dashboard/${opp.id}`)
+                  } />
                 ))
               ) : (
                 <p className="text-[#555] font-publicSans">
-                  No contracts available for this applicant.
+                  No opportunities available.
                 </p>
               )}
             </div>

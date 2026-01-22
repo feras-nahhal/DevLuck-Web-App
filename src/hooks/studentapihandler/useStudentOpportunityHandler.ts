@@ -1,0 +1,119 @@
+"use client"
+
+import { useState, useCallback } from 'react'
+import { api } from '@/src/lib/api'
+
+interface Opportunity {
+  id: string
+  title: string
+  type: string
+  timeLength: string
+  currency: string
+  allowance?: string
+  location?: string
+  details: string
+  skills: string[]
+  whyYouWillLoveWorkingHere: string[]
+  benefits: string[]
+  keyResponsibilities: string[]
+  startDate?: string
+  companyId: string
+  company?: {
+    id: string
+    name: string
+    logo?: string
+    industry?: string
+    location?: string
+    website?: string
+    description?: string
+  }
+  createdAt: string
+  updatedAt: string
+}
+
+interface ListOpportunitiesResponse {
+  items: Opportunity[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+interface UseStudentOpportunityHandlerReturn {
+  opportunities: Opportunity[]
+  opportunity: Opportunity | null
+  loading: boolean
+  error: string | null
+  listOpportunities: (page?: number, pageSize?: number) => Promise<ListOpportunitiesResponse>
+  getOpportunityById: (id: string) => Promise<Opportunity>
+  clearError: () => void
+}
+
+export const useStudentOpportunityHandler = (): UseStudentOpportunityHandlerReturn => {
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([])
+  const [opportunity, setOpportunity] = useState<Opportunity | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const clearError = useCallback(() => {
+    setError(null)
+  }, [])
+
+  const listOpportunities = useCallback(
+    async (page: number = 1, pageSize: number = 10): Promise<ListOpportunitiesResponse> => {
+      setLoading(true)
+      setError(null)
+      try {
+        const response = await api.get<{ status: string; data: ListOpportunitiesResponse }>(
+          '/api/student/opportunities',
+          {
+            params: { page, pageSize }
+          }
+        )
+        console.log('[useStudentOpportunityHandler] API Response:', JSON.stringify(response.data, null, 2))
+        const items = response.data.data?.items || []
+        console.log('[useStudentOpportunityHandler] Extracted items:', items)
+        console.log('[useStudentOpportunityHandler] Items count:', items.length)
+        setOpportunities(items)
+        return response.data.data
+      } catch (err: any) {
+        const errorMessage = err.response?.data?.message || err.message || 'Failed to list opportunities'
+        setError(errorMessage)
+        setOpportunities([])
+        throw new Error(errorMessage)
+      } finally {
+        setLoading(false)
+      }
+    },
+    []
+  )
+
+  const getOpportunityById = useCallback(async (id: string): Promise<Opportunity> => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await api.get<{ status: string; data: Opportunity }>(
+        `/api/student/opportunities/${id}`
+      )
+      setOpportunity(response.data.data)
+      return response.data.data
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to get opportunity'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  return {
+    opportunities,
+    opportunity,
+    loading,
+    error,
+    listOpportunities,
+    getOpportunityById,
+    clearError
+  }
+}
+

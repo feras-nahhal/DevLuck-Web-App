@@ -3,10 +3,10 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
-import { mockApplicants } from "@/src/mocks/mockApplicants";
 import { ArrowUpRight, Check } from "lucide-react";
 import ContractModal from "@/src/components/Company/ContractModal";
 import { createPortal } from "react-dom";
+import { useContractHandler } from "@/src/hooks/companyapihandler/useContractHandler";
 
 /* ──────────────────────────────────────────────
    Card Component
@@ -147,6 +147,9 @@ const ClipImage = ({
   width = 112,
   height = 380,
 }: ClipImageProps) => {
+  // Use default image if src is empty or invalid
+  const imageSrc = src && src.trim() ? src : "/images/A1.jpeg";
+  
   return (
     <svg
       width={width}
@@ -174,7 +177,7 @@ const ClipImage = ({
       {/* Masked image */}
       <g mask="url(#customMask)">
         <image
-          href={src}
+          href={imageSrc}
           width={width}
           height={height}
           preserveAspectRatio="xMidYMid slice"
@@ -189,7 +192,7 @@ const ApplicantCard = ({
   applicant,
   onClick,
 }: {
-  applicant: typeof mockApplicants[0];
+  applicant: MappedContract;
   onClick?: () => void;
 }) => {
   return (
@@ -334,7 +337,7 @@ const ApplicantCard = ({
           }}
         >
           <ClipImage
-            src={applicant.image}
+            src={applicant.image || '/images/A1.jpeg'}
             width={111.06}
             height={379.36}
           />
@@ -407,7 +410,7 @@ const ApplicantCard = ({
             </span>
             
             <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
-              {applicant.workProgress}%
+              {applicant.workProgress || 0}%
             </span>
           </div>
 
@@ -423,7 +426,7 @@ const ApplicantCard = ({
             {/* Progress Fill */}
             <div
               className="absolute left-0 top-1/2 h-[14px] -translate-y-1/2 rounded bg-[#FFEB9C]"
-              style={{ width: `${applicant.workProgress}%` }}
+              style={{ width: `${applicant.workProgress || 0}%` }}
             />
 
 
@@ -446,8 +449,21 @@ const ApplicantCard = ({
 };
 
 
+interface MappedContract {
+  applicantId: string;
+  name: string;
+  contractTitle: string;
+  startDate: string;
+  endDate: string;
+  contractStatus: string;
+  id: string;
+  image?: string;
+  salaryPaid?: string;
+  workProgress?: number;
+}
+
 type ContractRowProps = {
-  applicant: typeof mockApplicants[0];
+  applicant: MappedContract;
   onMainClick?: () => void;
   onEdit?: () => void;
   showCheckbox?: boolean;
@@ -589,7 +605,7 @@ const ContractRow = ({ applicant,onMainClick,onEdit,showCheckbox = false }: Cont
               <path d="M45.7335 52L50.3816 52C55.3547 52 59.8777 49.1195 61.9808 44.6129L66.384 35.1774C69.6842 28.1056 64.522 20 56.718 20L45.7335 20" stroke="#1E1E1E" strokeWidth="1.06667"/>
             </svg>
 
-           {/* Menu */}
+             {/* Menu */}
             {menuOpen && menuPos &&
             createPortal(
               <div
@@ -672,6 +688,22 @@ const ContractRow = ({ applicant,onMainClick,onEdit,showCheckbox = false }: Cont
 
 
 export default function ContractListPage() {
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      if (window.innerWidth < 640) {
+        setItemsPerPage(5); // mobile
+      } else {
+        setItemsPerPage(10); // desktop
+      }
+    };
+
+    updateItemsPerPage(); // initial run
+    window.addEventListener("resize", updateItemsPerPage);
+
+    return () => window.removeEventListener("resize", updateItemsPerPage);
+  }, []);
+
 //--------------------------------Action menu--------------------------
       const [menuOpen, setMenuOpen] = useState(false);
       const menuRef = useRef<HTMLDivElement>(null);
@@ -689,91 +721,144 @@ export default function ContractListPage() {
       const [searchQuery, setSearchQuery] = useState("");
       const [currentPage, setCurrentPage] = useState(1);
       const [isModalOpen, setIsModalOpen] = useState(false);
-  
-      // 🔍 Filter applicants
-      const filteredApplicants = useMemo(() => {
-        return mockApplicants.filter(applicant => {
-          // Search filter
-          const searchMatch =
-            !searchQuery.trim() ||
-            applicant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            applicant.applicantId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            applicant.contractTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            applicant.startDate.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            applicant.endDate.toLowerCase().includes(searchQuery.toLowerCase());
-  
-          // Contract status filter
-          const contractMatch =
-            selectedContractStatus.length === 0 || // empty = no filter
-            selectedContractStatus.includes("All") || // All = include all
-            selectedContractStatus.includes(applicant.contractStatus as "Running" | "Completed");
-  
+
+      const { contracts, loading, error, listContracts } = useContractHandler();
+      const [totalContracts, setTotalContracts] = useState(0);
+      const [totalPages, setTotalPages] = useState(1);
+      const [allContractsForStats, setAllContractsForStats] = useState<MappedContract[]>([]);
+
+      useEffect(() => {
+        const fetchContracts = async () => {
+          try {
+            const statusFilter =
+              selectedContractStatus.length > 0 &&
+              !selectedContractStatus.includes("All")
+                ? selectedContractStatus[0]
+                : undefined;
+
+            const response = await listContracts(
+              currentPage,
+              itemsPerPage,
+              searchQuery || undefined,
+              statusFilter
+            );
+
+            setTotalContracts(response.total);
+            setTotalPages(response.totalPages);
+          } catch (err) {
+            console.error("Failed to fetch contracts:", err);
+          }
+        };
+
+        fetchContracts();
+      }, [
+        currentPage,
+        searchQuery,
+        selectedContractStatus,
+        listContracts,
+        itemsPerPage, // 👈 IMPORTANT
+      ]);
+
+      useEffect(() => {
+        setCurrentPage(1);
+      }, [itemsPerPage]);
+
+      useEffect(() => {
+        const fetchAllForStats = async () => {
+          try {
+            const response = await listContracts(1, 1000);
+            const allMapped = response.items.map(contract => {
+              const createdDate = new Date(contract.createdDate || contract.createdAt);
+              const durationMonths = contract.duration ? parseInt(contract.duration.split(' ')[0]) : 0;
+              const endDate = new Date(createdDate);
+              endDate.setMonth(endDate.getMonth() + durationMonths);
+
+              const fullId = contract.inContractNumber || contract.id;
+              const truncatedId = fullId.length > 3 ? fullId.substring(fullId.length - 3) : fullId;
+
+              return {
+                applicantId: truncatedId,
+                name: contract.name,
+                contractTitle: contract.contractTitle,
+                startDate: createdDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }),
+                endDate: endDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }),
+                contractStatus: contract.status,
+                id: contract.id,
+                image: '',
+                salaryPaid: contract.monthlyAllowance ? `${contract.currency || 'USD'} ${contract.monthlyAllowance}` : 'N/A',
+                workProgress: 0
+              };
+            });
+            setAllContractsForStats(allMapped);
+          } catch (err) {
+            console.error("Failed to fetch contracts for stats:", err);
+          }
+        };
+
+        if (!searchQuery && selectedContractStatus.length === 0) {
+          fetchAllForStats();
+        }
+      }, [listContracts, searchQuery, selectedContractStatus]);
+
+      const mappedContracts: MappedContract[] = useMemo(() => {
+        return contracts.map(contract => {
+          const createdDate = new Date(contract.createdDate || contract.createdAt);
+          const durationMonths = contract.duration ? parseInt(contract.duration.split(' ')[0]) : 0;
+          const endDate = new Date(createdDate);
+          endDate.setMonth(endDate.getMonth() + durationMonths);
+
+          const fullId = contract.inContractNumber || contract.id;
+          const truncatedId = fullId.length > 3 ? fullId.substring(fullId.length - 3) : fullId;
+
+          return {
+            applicantId: truncatedId,
+            name: contract.name,
+            contractTitle: contract.contractTitle,
+            startDate: createdDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }),
+            endDate: endDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }),
+            contractStatus: contract.status,
+            id: contract.id,
+            image: '',
+            salaryPaid: contract.monthlyAllowance
+          ? `${contract.currency || 'USD'} ${contract.monthlyAllowance}`
+          : contract.salary
+          ? `${contract.currency || 'USD'} ${contract.salary}`
+          : 'N/A'
+                  ,
+                    workProgress: 0
+                  };
+                });
+              }, [contracts]);
+
+      const filteredContracts = mappedContracts;
+
+      const paginatedApplicants = filteredContracts;
       
-  
-          return searchMatch && contractMatch;
-        });
-      }, [searchQuery, selectedContractStatus]);
-  
-
-        // 📄 Pagination
-        const [itemsPerPage, setItemsPerPage] = useState(10); // default 10 for desktop
-
-        useEffect(() => {
-          const updateItemsPerPage = () => {
-            if (window.innerWidth < 640) { // mobile
-              setItemsPerPage(5);
-            } else {
-              setItemsPerPage(10); // desktop
-            }
-          };
-
-          updateItemsPerPage(); // run once on mount
-          window.addEventListener("resize", updateItemsPerPage); // run on resize
-
-          return () => window.removeEventListener("resize", updateItemsPerPage);
-        }, []);
-
-     
+      const goToPage = (page: number) => {
+        if (page >= 1 && page <= totalPages) setCurrentPage(page);
+      };
       
-        const totalPages = Math.ceil(filteredApplicants.length / itemsPerPage);
+      const goToPrevious = () => {
+        if (currentPage > 1) setCurrentPage(prev => prev - 1);
+      };
+      
+      const goToNext = () => {
+        if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+      };
 
-        const paginatedApplicants = filteredApplicants.slice(
-          (currentPage - 1) * itemsPerPage,
-          currentPage * itemsPerPage
-        );
+      const contractStats = useMemo(() => {
+      const total = allContractsForStats.length;
+      const running = allContractsForStats.filter(c => c.contractStatus === "Running").length;
+      const completed = allContractsForStats.filter(c => c.contractStatus === "Completed").length;
+      const other = total - running - completed;
 
-        const goToPage = (page: number) => {
-          if (page >= 1 && page <= totalPages) setCurrentPage(page);
-        };
-
-        const goToPrevious = () => {
-          if (currentPage > 1) setCurrentPage(prev => prev - 1);
-        };
-
-        const goToNext = () => {
-          if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
-        };
-
-
-      //---------------------card-------------------------------------------
-      const totalContracts = mockApplicants.length;
-
-      const runningContracts = mockApplicants.filter(
-        (a) => a.contractStatus === "Running"
-      ).length;
-
-      // Assuming "Hold" = contracts that are not running yet (business logic)
-      // You can adjust this if your backend defines Hold differently
-      const holdContracts = mockApplicants.filter(
-        (a) => a.contractStatus !== "Running" && a.contractStatus !== "Completed"
-      ).length;
-
-      const expiredContracts = mockApplicants.filter(
-        (a) => a.contractStatus === "Completed"
-      ).length;
-
-
-
+      return [
+        { title: "Total Contracts", value: total.toString(), subtitle: "All contracts in the system" },
+        { title: "Running", value: running.toString(), subtitle: "Currently active contracts" },
+        { title: "Completed", value: completed.toString(), subtitle: "Finished contracts" },
+        { title: "Other", value: other.toString(), subtitle: "Contracts with other status" },
+      ];
+    }, [allContractsForStats]);
   
     
 return (
@@ -805,31 +890,15 @@ return (
       </div>
       {/* Top row: 4 cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 place-items-center">
-        <Card
-          title="Total Contracts"
-          value={totalContracts.toString()}
-          subtitle="All contracts"
-        />
-
-        <Card
-          title="Running"
-          value={runningContracts.toString()}
-          subtitle="Active contracts"
-        />
-
-        <Card
-          title="Hold"
-          value={holdContracts.toString()}
-          subtitle="Not started / paused"
-        />
-
-        <Card
-          title="Expired"
-          value={expiredContracts.toString()}
-          subtitle="Completed contracts"
-        />
+        {contractStats.map((stat) => (
+          <Card
+            key={stat.title}
+            title={stat.title}
+            value={stat.value}
+            subtitle={stat.subtitle} // ✅ now we show subtitles
+          />
+        ))}
       </div>
-
 
       {/* Main Column */}
       <div className="flex flex-col gap-6">
@@ -908,7 +977,7 @@ return (
               {/* Action Menu – appears beside the button */}
               {menuOpen && (
                 <div
-                  className="absolute sm:top-[47%]  sm:left-[70%] top-[109%] left-[5%] mt-2 sm:w-[400px]  w-[360px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
+                  className="absolute sm:top-[47%]  sm:left-[70%] top-[106%] left-[5%] mt-2 sm:w-[400px]  w-[360px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
                   onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
                 >
                   <div className="p-2">
@@ -970,37 +1039,55 @@ return (
       {/* Applicants Grid */}
       {showApplicants && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 max-w-[1200px] mx-auto">
-          {paginatedApplicants.map((applicant, index) => (
-            <ApplicantCard
-              key={index}
-              applicant={applicant}
-              onClick={() =>
-                router.push(`/Company/contract-list/${applicant.applicantId}`)
-              }
-            />
-          ))}
+          {loading ? (
+            <div className="flex items-center justify-center py-12 mt-50">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
+            </div>
+          ) : error ? (
+            <div className="col-span-5 text-center py-8 text-red-500  mt-50">Error: {error}</div>
+          ) : paginatedApplicants.length === 0 ? (
+            <div className="flex flex-col items-center justify-center mt-50 ">No contracts found</div>
+          ) : (
+            paginatedApplicants.map((applicant, index) => (
+              <ApplicantCard
+                key={applicant.id}
+                applicant={applicant}
+                onClick={() =>
+                  router.push(`/Company/contract-list/${applicant.id}`)
+                }
+              />
+            ))
+          )}
         </div>
       )}
 
          {/* Contracts Grid */}
       {!showApplicants && (
         <div className="flex flex-col gap-2 mt-4">
-          {paginatedApplicants.map((applicant, index) => (
-            <ContractRow
-              key={index}
-              applicant={applicant}
-              onMainClick={() =>
-                router.push(`/Company/contract-list/${applicant.applicantId}`)
-
-              }
-               onEdit={() => {
-          setEditingContract(applicant); // set the job to edit
-          setIsModalOpen(true); // open the modal
-        }}
-
-              showCheckbox={true} // optional
-            />
-          ))}
+          {loading ? (
+            <div className="flex items-center justify-center py-12 mt-50">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
+            </div>
+          ) : error ? (
+            <div className="col-span-5 text-center py-8 text-red-500  mt-50">Error: {error}</div>
+          ) : paginatedApplicants.length === 0 ? (
+            <div className="flex flex-col items-center justify-center mt-50 ">No contracts found</div>
+          ) : (
+            paginatedApplicants.map((applicant) => (
+              <ContractRow
+                key={applicant.id}
+                applicant={applicant}
+                onMainClick={() =>
+                  router.push(`/Company/contract-list/${applicant.id}`)
+                }
+                onEdit={() => {
+                  setEditingContract(applicant);
+                  setIsModalOpen(true);
+                }}
+                showCheckbox={true}
+              />
+            ))
+          )}
         </div>
       )}
 
@@ -1057,12 +1144,17 @@ return (
     )}
      <ContractModal
     isOpen={isModalOpen}
-    contract={editingContract} // null for new opportunity
-    onClose={() => setIsModalOpen(false)}
-    onSave={(data) => {
-      console.log("Contract saved:", data);
+    contract={editingContract}
+    onClose={() => {
       setIsModalOpen(false);
-  }}
+      setEditingContract(null);
+    }}
+    onSave={async (data) => {
+      setIsModalOpen(false);
+      setEditingContract(null);
+      setCurrentPage(1);
+      await listContracts(1, itemsPerPage, searchQuery || undefined);
+    }}
 />
   </DashboardLayout>
 );

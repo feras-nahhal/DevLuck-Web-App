@@ -732,7 +732,7 @@ export default function TopCompanyPage() {
                    company={company}
                    onClick={() =>
                      router.push(
-                       `/Company/top-company/${company.id}`
+                       `/Student/top-company/${company.id}`
                      )
                    }
                  />
@@ -751,7 +751,7 @@ export default function TopCompanyPage() {
                    company={company}
                    onMainClick={() =>
                      router.push(
-                       `/Company/top-company/${company.id}`
+                       `/Student/top-company/${company.id}`
                      )
                    }
                    showCheckbox={true}

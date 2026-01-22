@@ -285,14 +285,17 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ language, isOpen, onClose
 
   const handleInputChange = (field: keyof LanguageData, value: string) => setFormData((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      onSave(formData);
-      setLoading(false);
+    try {
+      await onSave(formData);
       onClose();
-    }, 500);
+    } catch (error) {
+      console.error("Error saving language:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -353,9 +356,6 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ language, isOpen, onClose
           />
 
          
-  
-        </form>
-
         {/* Footer */}
         <div
             className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
@@ -365,6 +365,7 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ language, isOpen, onClose
         >
             <div className="flex w-[400px] justify-between">
             <button
+                type="button"
                 onClick={onClose}
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             >
@@ -382,6 +383,7 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ language, isOpen, onClose
             </button>
             </div>
         </div>
+        </form>
         </div>
     </div>
     );

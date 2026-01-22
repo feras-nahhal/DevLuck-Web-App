@@ -1,20 +1,33 @@
-// src/app/Company/contract-list/page.tsx
+// src/app/Student/contract/page.tsx
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
-import { mockContracts } from "@/src/mocks/mockContract";
-import { mockApplicants } from "@/src/mocks/mockApplicants";
 import DisputeModal from "@/src/components/Student/DisputeModal";
+import { useStudentContractHandler } from "@/src/hooks/studentapihandler/useStudentContractHandler";
 import { createPortal } from "react-dom";
 
+interface MappedContract {
+  id: string;
+  applicantId: number;
+  contractTitle: string;
+  company: string;
+  jobType: string;
+  location: string;
+  workProgress: number;
+  startDate: string;
+  endDate: string;
+  status: string;
+  salary: string;
+  startedAt: string;
+}
 
 const ApplicantCard = ({
   applicant,
   onClick,
   onDisputeClick,
 }: {
-  applicant: typeof mockContracts[0];
+  applicant: MappedContract;
   onClick?: () => void;
   onDisputeClick?: () => void;
 }) => {
@@ -127,10 +140,10 @@ const ApplicantCard = ({
                   <img src="/cards/tag.svg" alt="Tag Icon" />
                   <div className="flex flex-col justify-center items-start w-[77px] h-[40px]">
                     <span className="text-[14px] font-normal leading-[22px] text-[#1E1E1E]">
-                      {applicant.jobType}
+                      {applicant.salary}
                     </span>
                     <span className="text-[12px] font-normal leading-[18px] text-[#00000090]">
-                      Created Date
+                      Salary
                     </span>
                   </div>
                 </div>
@@ -140,10 +153,10 @@ const ApplicantCard = ({
                   <img src="/cards/tag.svg" alt="Tag Icon" />
                   <div className="flex flex-col justify-center items-start w-[100px] h-[40px]">
                     <span className="text-[14px] font-normal leading-[22px] text-[#1E1E1E]">
-                      {applicant.location}
+                      {applicant.startedAt}
                     </span>
                     <span className="text-[12px] font-normal leading-[18px] text-[#00000090]">
-                      Created Date
+                      Started At
                     </span>
                   </div>
                 </div>
@@ -194,15 +207,14 @@ const ApplicantCard = ({
 
 
 type ContractRowProps = {
-  contract: typeof mockContracts[0];
-  applicantName?: string;
+  contract: MappedContract;
   onMainClick?: () => void;
   onSideClick?: () => void;
   onDisputeClick?: () => void; 
   showCheckbox?: boolean;
 };
 
-const ContractRow = ({ contract,onMainClick,onDisputeClick,applicantName,onSideClick,showCheckbox = false }: ContractRowProps) => {
+const ContractRow = ({ contract,onMainClick,onDisputeClick,onSideClick,showCheckbox = false }: ContractRowProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [checked, setChecked] = useState(false);
@@ -268,32 +280,32 @@ const ContractRow = ({ contract,onMainClick,onDisputeClick,applicantName,onSideC
           </div>
         )}
 
-        {/* Applicant Info */}
+        {/* Contract Info */}
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
-          {/* CO-ID */}
+          {/* Contract ID */}
           <div className="flex flex-col justify-center w-[150px]">
-            <span className="text-sm font-semibold text-gray-900">CO-ID-{contract.applicantId}</span>
-            <span className="text-xs text-gray-400">Job ID</span>
+            <span className="text-sm font-semibold text-gray-900">{contract.id.slice(-8)}</span>
+            <span className="text-xs text-gray-400">Contract ID</span>
           </div>
-          {/* Name */}
+          {/* Company Name */}
           <div className="flex flex-col justify-center w-[150px]">
-            <span className="text-sm font-semibold text-gray-900">{applicantName ?? "Unknown Applicant"}</span>
-            <span className="text-xs text-gray-400">Applicant Name</span>
+            <span className="text-sm font-semibold text-gray-900">{contract.company}</span>
+            <span className="text-xs text-gray-400">Company Name</span>
           </div>
           {/* Contract Title */}
           <div className="flex flex-col justify-center w-[150px]">
             <span className="text-sm font-semibold text-gray-900">{contract.contractTitle}</span>
             <span className="text-xs text-gray-400">Contract Title</span>
           </div>
-          {/* Start Date */}
+          {/* Started At */}
           <div className="flex flex-col justify-center w-[150px]">
-            <span className="text-sm font-semibold text-gray-900">{contract.startDate}</span>
-            <span className="text-xs text-gray-400">Start Date</span>
+            <span className="text-sm font-semibold text-gray-900">{contract.startedAt}</span>
+            <span className="text-xs text-gray-400">Started At</span>
           </div>
-          {/* End Date */}
+          {/* Salary */}
           <div className="flex flex-col justify-center w-[150px]">
-            <span className="text-sm font-semibold text-gray-900">{contract.endDate}</span>
-            <span className="text-xs text-gray-400">End Date</span>
+            <span className="text-sm font-semibold text-gray-900">{contract.salary}</span>
+            <span className="text-xs text-gray-400">Salary</span>
           </div>
           {/* Contract Status */}
           <div className="flex flex-col justify-center items-center ">
@@ -302,7 +314,8 @@ const ContractRow = ({ contract,onMainClick,onDisputeClick,applicantName,onSideC
                 ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8] text-xs font-semibold flex items-center justify-center
                 ${contract.status === "Running" ? "bg-[#D3FCD2] border border-[#22C55E] text-[#22C55E]" : ""}
                 ${contract.status === "Completed" ? "bg-[#FFDCDC] border border-[#FF4D4F] text-[#FF4D4F]" : ""}
-                ${contract.status !== "Running" && contract.status !== "Completed" ? "bg-blue-100 border border-blue-200 text-blue-600" : ""}
+                ${contract.status === "Dispute" ? "bg-yellow-100 border border-yellow-500 text-yellow-600" : ""}
+                ${contract.status !== "Running" && contract.status !== "Completed" && contract.status !== "Dispute" ? "bg-blue-100 border border-blue-200 text-blue-600" : ""}
               `}
             >
               {contract.status}
@@ -416,6 +429,12 @@ const ContractRow = ({ contract,onMainClick,onDisputeClick,applicantName,onSideC
 
 
 export default function ContractListPage() {
+   const { 
+    contracts, 
+    loading: contractsLoading, 
+    error: contractsError, 
+    listContracts 
+  } = useStudentContractHandler();
 
   const STATUS_LABELS: Record<ContractStatus, string> = {
   Running: "Active Contracts",
@@ -427,13 +446,6 @@ export default function ContractListPage() {
       const [menuOpen, setMenuOpen] = useState(false);
       const menuRef = useRef<HTMLDivElement>(null);
       const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
-      // ---------------------------------------------------------------------
-      // 🔹 Build fast lookup map
-  const applicantMap = useMemo(() => {
-    return Object.fromEntries(
-      mockApplicants.map(a => [a.applicantId, a.name])
-    );
-  }, []);
   //---------------------filter----------------------------------
       // Multi-select arrays instead of single string
       type ContractStatus = "Running" | "Completed" | "Dispute";
@@ -446,10 +458,57 @@ export default function ContractListPage() {
       const [searchQuery, setSearchQuery] = useState("");
       const [currentPage, setCurrentPage] = useState(1);
       const [isModalOpen, setIsModalOpen] = useState(false);
+
+      useEffect(() => {
+        const statusFilter = selectedContractStatus.length > 0 ? selectedContractStatus[0].toLowerCase() : undefined;
+        listContracts(1, 1000, statusFilter).catch(console.error);
+      }, [listContracts, selectedContractStatus]);
+
+      // Map contracts to match mock contract structure
+      const mappedContracts = useMemo(() => {
+        if (!contracts || !Array.isArray(contracts)) {
+          return [];
+        }
+        return contracts.map((contract) => {
+          const statusMap: Record<string, string> = {
+            'running': 'Running',
+            'completed': 'Completed',
+            'dispute': 'Dispute',
+            'cancelled': 'Cancelled'
+          };
+          
+          // Format salary
+          let salaryDisplay = 'Not specified';
+          if (contract.monthlyAllowance !== null && contract.monthlyAllowance !== undefined) {
+            const formattedAmount = typeof contract.monthlyAllowance === 'number' 
+              ? contract.monthlyAllowance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+              : contract.monthlyAllowance;
+            salaryDisplay = `${contract.currency || ''} ${formattedAmount}/month`.trim();
+          }
+          
+          // Format started at date
+          const startedAt = contract.createdDate ? new Date(contract.createdDate).toLocaleDateString() : 'Not specified';
+          
+          return {
+            id: contract.id,
+            applicantId: 0,
+            contractTitle: contract.contractTitle,
+            company: contract.company?.name || 'Unknown Company',
+            jobType: contract.duration || 'Not specified',
+            location: contract.workLocation || 'Not specified',
+            workProgress: 0,
+            startDate: contract.createdDate ? new Date(contract.createdDate).toLocaleDateString() : 'Not specified',
+            endDate: contract.duration || 'Not specified',
+            status: statusMap[contract.status.toLowerCase()] || contract.status,
+            salary: salaryDisplay,
+            startedAt: startedAt,
+          };
+        });
+      }, [contracts]);
   
-      // 🔍 Filter applicants
+      // 🔍 Filter contracts
       const filteredApplicants = useMemo(() => {
-        return mockContracts.filter(contract => {
+        return mappedContracts.filter(contract => {
           // Search filter
           const searchMatch =
             !searchQuery.trim() ||
@@ -465,14 +524,10 @@ export default function ContractListPage() {
             selectedContractStatus.length === 0 || // empty = no filter
             selectedContractStatus.includes(contract.status as "Running" | "Completed"|"Dispute");
   
-      
-  
           return searchMatch && contractMatch;
         });
-      }, [searchQuery, selectedContractStatus]);
-  
-  
-      
+      }, [mappedContracts, searchQuery, selectedContractStatus]);
+
       // 📄 Pagination
       const [itemsPerPage, setItemsPerPage] = useState(6); // default 6 for desktop
 
@@ -627,61 +682,53 @@ return (
                 </svg>
               </span>
             </button>
-
-             {/* Second Filter Button */}
-              <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
-                onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpen((prev) => !prev);
-            }}>
-                <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 16.5C14.3852 16.5002 14.7556 16.6486 15.0344 16.9144C15.3132 17.1802 15.479 17.5431 15.4975 17.9279C15.516 18.3127 15.3858 18.6898 15.1338 18.9812C14.8818 19.2726 14.5274 19.4558 14.144 19.493L14 19.5H10C9.61478 19.4998 9.24441 19.3514 8.96561 19.0856C8.68682 18.8198 8.52099 18.4569 8.50248 18.0721C8.48396 17.6873 8.61419 17.3102 8.86618 17.0188C9.11816 16.7274 9.47258 16.5442 9.856 16.507L10 16.5H14ZM17 10.5C17.3978 10.5 17.7794 10.658 18.0607 10.9393C18.342 11.2206 18.5 11.6022 18.5 12C18.5 12.3978 18.342 12.7794 18.0607 13.0607C17.7794 13.342 17.3978 13.5 17 13.5H7C6.60218 13.5 6.22064 13.342 5.93934 13.0607C5.65804 12.7794 5.5 12.3978 5.5 12C5.5 11.6022 5.65804 11.2206 5.93934 10.9393C6.22064 10.658 6.60218 10.5 7 10.5H17ZM20 4.5C20.3978 4.5 20.7794 4.65804 21.0607 4.93934C21.342 5.22064 21.5 5.60218 21.5 6C21.5 6.39782 21.342 6.77936 21.0607 7.06066C20.7794 7.34196 20.3978 7.5 20 7.5H4C3.60218 7.5 3.22064 7.34196 2.93934 7.06066C2.65804 6.77936 2.5 6.39782 2.5 6C2.5 5.60218 2.65804 5.22064 2.93934 4.93934C3.22064 4.65804 3.60218 4.5 4 4.5H20Z" fill="#1E1E1E"/>
-                  </svg>
-                </span>
-              </button>
-              {/* Action Menu – appears beside the button */}
-              {menuOpen && (
-                <div
-                  className="absolute sm:top-[26%]  sm:left-[70%] top-[22%] left-[10%] mt-2 sm:w-[400px]  w-[360px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
-                  onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
-                >
-                 empty
-                </div>
-              )}
           </div>
         </div>
 
-            {showApplicants && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center ">
-            {paginatedApplicants.map((contract, index) => (
-              <ApplicantCard
-                key={index}
-                applicant={contract}
-                onClick={() =>
-                  router.push(`/Student/contract/${contract.id}`)
-                }
-                onDisputeClick={() => setIsModalOpen(true)}
-              />
-            ))}
+           {contractsLoading ? (
+          <div className="flex justify-center items-center h-64">
+             <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
           </div>
+        ) : contractsError ? (
+          <div className="flex justify-center items-center h-64">
+            <p className="text-red-500">Error: {contractsError}</p>
+          </div>
+        ) : filteredApplicants.length === 0 ? (
+          <div className="flex justify-center items-center h-64">
+            <p className="text-gray-500">No contracts found</p>
+          </div>
+        ) : (
+          <>
+            {showApplicants && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center ">
+                {paginatedApplicants.map((contract, index) => (
+                  <ApplicantCard
+                    key={contract.id || index}
+                    applicant={contract}
+                    onClick={() =>
+                      router.push(`/Student/contract/${contract.id}`)
+                    }
+                    onDisputeClick={() => setIsModalOpen(true)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
 
 
          {/* Contracts Grid */}
-      {!showApplicants && (
+      {!showApplicants && !contractsLoading && !contractsError && (
         <div className="flex flex-col gap-2 mt-4">
           {paginatedApplicants.map((contract, index) => (
             <ContractRow
-              key={index}
+              key={contract.id || index}
               contract={contract}
-              applicantName={applicantMap[contract.applicantId]}
               onMainClick={() =>
                 router.push(`/Student/contract/${contract.id}`)
               }
               onDisputeClick={() => setIsModalOpen(true)}
-
-              showCheckbox={true} // optional
+              showCheckbox={true}
             />
           ))}
         </div>
@@ -738,7 +785,7 @@ return (
         </button>
       </div>
     )}
-     <DisputeModal
+      <DisputeModal
     isOpen={isModalOpen}
     onClose={() => setIsModalOpen(false)}
     onSave={(data) => {

@@ -5,8 +5,11 @@ import { Loader2 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
+import { useCompanyApplicationHandler } from "@/src/hooks/companyapihandler/useCompanyApplicationHandler";
+import { useContractHandler } from "@/src/hooks/companyapihandler/useContractHandler";
 
 interface ContractData {
+  email: string;
   name: string;
 
   contractTitle: string;
@@ -18,6 +21,8 @@ interface ContractData {
   startDate: string; // e.g. "2024-01-15"
 
   endDate: string; // e.g. "2024-12-15"
+
+  salary?: string;
 
   note?: string; // optional notes or remarks
 }
@@ -285,56 +290,143 @@ const ContractModal: React.FC<ContractModalProps> = ({
   onSave,
 }) => {
   const [formData, setFormData] = useState<ContractData>({
+    email: "",
     name: "",
     contractTitle: "",
     Contract: "",
     startDate: "",
     endDate: "",
+    salary: "",
     note: "",
     contractStatus: "",
   });
 
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [validatingEmail, setValidatingEmail] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { searchUserByEmail } = useCompanyApplicationHandler();
+  const { createContract } = useContractHandler();
 
   useEffect(() => {
     if (contract) {
       setFormData({
-        name: contract.name || "",
+        email: (contract as any).email || "",
+        name: (contract as any).name || "",
         contractTitle: contract.contractTitle || "",
         Contract: contract.Contract || "",
         startDate: contract.startDate || "",
         endDate: contract.endDate || "",
+        salary: (contract as any).salary || "",
         note: contract.note || "",
         contractStatus: contract.contractStatus || "",
       });
     } else {
       setFormData({
+        email: "",
         name: "",
         contractTitle: "",
         Contract: "",
         startDate: "",
         endDate: "",
+        salary: "",
         note: "",
         contractStatus: "",
       });
     }
+    setSubmitError(null);
+    setEmailError(null);
   }, [contract, isOpen]);
 
 
   const handleInputChange = (field: keyof ContractData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    
+    if (field === "email") {
+      if (validationTimeoutRef.current) {
+        clearTimeout(validationTimeoutRef.current);
+      }
+      
+      setEmailError(null);
+      
+      if (!value.trim()) {
+        return;
+      }
+      
+      // Basic email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value.trim())) {
+        setEmailError("Invalid email format");
+        return;
+      }
+      
+      setValidatingEmail(true);
+      validationTimeoutRef.current = setTimeout(async () => {
+        try {
+          await searchUserByEmail(value.trim());
+          setEmailError(null);
+        } catch (error: any) {
+          setEmailError(error.message || "User does not exist or is not a student");
+        } finally {
+          setValidatingEmail(false);
+        }
+      }, 500);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  useEffect(() => {
+    return () => {
+      if (validationTimeoutRef.current) {
+        clearTimeout(validationTimeoutRef.current);
+      }
+    };
+  }, []);
 
-    // MOCK SAVE
-    setTimeout(() => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
+    if (emailError || validatingEmail) {
+      return;
+    }
+
+    if (!formData.email.trim() || !formData.name.trim() || !formData.contractTitle.trim() || !formData.Contract || !formData.contractStatus) {
+      setSubmitError("Please fill in all required fields");
+      return;
+    }
+
+    setLoading(true);
+    setSubmitError(null);
+
+    try {
+      const contractNumber = `CNT-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+      
+      const contractData = {
+        contractTitle: formData.contractTitle,
+        email: formData.email.trim(),
+        name: formData.name.trim(),
+        inContractNumber: contractNumber,
+        inContractList: [],
+        currency: "USD",
+        duration: formData.Contract,
+        monthlyAllowance: 0,
+        salary: formData.salary ? parseFloat(formData.salary) : undefined,
+        workLocation: "",
+        note: formData.note || undefined,
+        status: formData.contractStatus
+      };
+
+      await createContract(contractData);
       onSave(formData);
-      setLoading(false);
       onClose();
-    }, 600);
+    } catch (error: any) {
+      setSubmitError(error.message || "Failed to create contract");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -371,7 +463,7 @@ const ContractModal: React.FC<ContractModalProps> = ({
                 lineHeight: "36px",
             }}
             >
-            {contract ? "Edit Opportunity" : "Create Opportunity"}
+            {contract ? "Edit Contract" : "Create Contract"}
             </h2>
         </div>
 
@@ -380,12 +472,27 @@ const ContractModal: React.FC<ContractModalProps> = ({
             className="flex-1 flex flex-col gap-4 p-4  bg-white "
             onSubmit={handleSubmit}
         >
-            <ParallelogramSelect
-            label="Applicant Name"
-            placeholder="Select applicant"
-            value={formData.name}
-            options={["Ben", "Alice", "John", "Sarah"]}
-            onChange={(val) => handleInputChange("name", val)}
+            <div className="flex flex-col gap-1">
+              <ParallelogramInput
+                label="Email"
+                placeholder="Enter student email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+              />
+              {validatingEmail && (
+                <p className="text-xs text-gray-500 ml-5">Checking...</p>
+              )}
+              {emailError && (
+                <p className="text-xs text-red-500 ml-5">{emailError}</p>
+              )}
+            </div>
+
+            <ParallelogramInput
+              label="Name"
+              placeholder="Enter applicant name"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
             />
 
             <ParallelogramInput
@@ -431,11 +538,24 @@ const ContractModal: React.FC<ContractModalProps> = ({
             onChange={(val) => handleInputChange("endDate", val)}
             />
             <ParallelogramInput
+            label="Salary"
+            placeholder="Enter salary amount"
+            type="number"
+            value={formData.salary ?? ""}
+            onChange={(e) => handleInputChange("salary", e.target.value)}
+            />
+            <ParallelogramInput
             label="Note"
             placeholder="Note"
             value={formData.note ?? ""}
             onChange={(e) => handleInputChange("note", e.target.value)}
             />
+            
+            {submitError && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                <p className="text-sm text-red-600">{submitError}</p>
+              </div>
+            )}
             
         </form>
 
@@ -455,9 +575,10 @@ const ContractModal: React.FC<ContractModalProps> = ({
             </button>
 
             <button
-                type="submit"
-                disabled={loading}
-                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading || !!emailError || validatingEmail}
+                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <span className="skew-x-[12deg] font-bold text-black">
                 {loading ? <Loader2 className="animate-spin" /> : contract ? "Update" : "Confirm"}
