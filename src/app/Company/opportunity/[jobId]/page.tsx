@@ -793,6 +793,14 @@ const goToNext = () => {
               Applied Candidates
             </span>
           </button>
+
+           <button
+            onClick={() => router.push(`/Company/opportunity/${jobId}/add-questions`)}
+            className="px-4 py-2 bg-[#FFEB9C] rounded-lg font-bold hover:bg-[#FFE066] transition"
+          >
+            Add Questions
+          </button>
+
         </div>
 
 

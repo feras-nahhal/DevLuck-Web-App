@@ -50,6 +50,7 @@ const LeftSidebar = ({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMo
   { name: "Applicant", path: "/Company/applicant", icon: "/icons/applicant.svg" },
   { name: "Contract List", path: "/Company/contract-list", icon: "/icons/contract.svg" },
   { name: "Contract Template", path: "/Company/contract-template", icon: "/icons/template.svg" },
+  { name: "Profile", path: "/Company/profile", icon: "/icons/profile.svg" },
   { name: "Payment", path: "/Company/payment", icon: "/icons/payment.svg" },
   { name: "Top Company", path: "/Company/top-company", icon: "/icons/company.svg" },
   { name: "Top University", path: "/Company/top-university", icon: "/icons/university.svg" },
