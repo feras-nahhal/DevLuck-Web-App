@@ -49,7 +49,7 @@ export default function ApplicantPage() {
             No applicant with ID: <span className="font-semibold text-[#1E1E1E]">{applicantId}</span> was found.
           </p>
           <p className="text-[#777] mt-2 text-sm">
-            Please check the ID or go back to the <a href="/Company/dashboard" className="text-blue-500 hover:underline">dashboard</a>.
+            Please check the ID or go back to the <a href="/Company/opportunity" className="text-blue-500 hover:underline">opportunity</a>.
           </p>
         </div>
       </div>

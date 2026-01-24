@@ -5,6 +5,8 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 
 import { mockUniversities } from "@/src/mocks/mockUniversities";
+import OpportunityModal from "@/src/components/Company/OpportunityModal";
+import UniversityModal from "@/src/components/Company/UniversityModal";
 
 const UniversityCard = ({
   university,
@@ -462,6 +464,29 @@ const UniversityRow = ({ university,onMainClick,onSideClick,showCheckbox = false
 
 export default function TopUniversityPage() {
 
+  //---------------------modal----------------------------------
+
+        const [isModalOpen, setIsModalOpen] = useState(false);
+        const [editingUniversity, setEditingUniversity] = useState<any>(null);
+
+        const handleSave = (data: any) => {
+          if (editingUniversity) {
+            // EDIT existing university
+            console.log("Updating university:", data);
+          } else {
+            // CREATE new university
+            console.log("Creating new university:", data);
+          }
+
+          setIsModalOpen(false);
+          setEditingUniversity(null);
+        };
+
+        const [error, setError] = useState<string | null>(null);
+        const clearError = () => setError(null);
+
+
+
     //---------------------filter----------------------------------
         const [showUniversities, setShowUniversities] = useState(true);
         const router = useRouter();
@@ -528,9 +553,29 @@ export default function TopUniversityPage() {
         {/* =====================
             Page Title
         ====================== */}
-        <h1 className="text-[28px] font-bold text-[#1E1E1E] mb-8">
-           University
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          {/* Left: Title */}
+          <h1 className="text-[28px] font-bold text-[#1E1E1E]">
+            University
+          </h1>
+
+          {/* Right: Button group */}
+          <div className="flex items-center gap-4">
+            {/* Example Button 1 */}
+            <button
+              className="relative w-[180px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
+              onClick={() => {
+                setEditingUniversity(null); // clear previous data
+                setIsModalOpen(true);
+              }}
+            >
+              <span className="skew-x-[12deg] font-bold text-[#1E1E1E] flex items-center justify-center">
+                More University
+              </span>
+            </button>
+
+          </div>
+        </div>
 
         {/* =====================
             Main Column
@@ -703,6 +748,17 @@ export default function TopUniversityPage() {
           </button>
         </div>
       )}
+      <UniversityModal
+        isOpen={isModalOpen}
+        university={editingUniversity}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingUniversity(null);
+          clearError();
+        }}
+        onSave={handleSave}
+      />
+
     </DashboardLayout>
 
   );
