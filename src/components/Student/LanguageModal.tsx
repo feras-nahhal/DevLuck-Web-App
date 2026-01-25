@@ -337,7 +337,7 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ language, isOpen, onClose
         </div>
 
         {/* Form - scrollable */}
-        <form
+        <div
             className="flex-1 flex flex-col gap-4 p-4  bg-white "
             onSubmit={handleSubmit}
         >
@@ -355,7 +355,7 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ language, isOpen, onClose
             onChange={(e) => handleInputChange("name", e.target.value)}
           />
 
-         
+          </div>
         {/* Footer */}
         <div
             className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
@@ -367,6 +367,7 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ language, isOpen, onClose
             <button
                 type="button"
                 onClick={onClose}
+                
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
             >
                 <span className="skew-x-[12deg] font-bold text-black">Cancel</span>
@@ -375,6 +376,7 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ language, isOpen, onClose
             <button
                 type="submit"
                 disabled={loading}
+                onClick={handleSubmit}   // 👈 manually call submit
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
             >
                 <span className="skew-x-[12deg] font-bold text-black">
@@ -383,7 +385,7 @@ const LanguageModal: React.FC<LanguageModalProps> = ({ language, isOpen, onClose
             </button>
             </div>
         </div>
-        </form>
+       
         </div>
     </div>
     );
