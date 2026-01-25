@@ -312,23 +312,18 @@ const ExperienceModal: React.FC<ExperienceModalProps> = ({ experience, isOpen, o
         {/* Backdrop */}
         <div className="fixed inset-0 bg-black/35 backdrop-blur-l" onClick={onClose} />
 
-        {/* Modal */}
-        <div
-        className="relative w-full max-w-[640px] max-h-[95vh] flex flex-col isolate rounded-4xl bg-[rgba(255,255,255,0.04)]"
-        onClick={(e) => e.stopPropagation()}
-        >
+        {/* Modal Container */}
+      <div className="relative w-full max-w-[640px] max-h-[95vh] flex flex-col isolate rounded-4xl bg-[rgba(255,255,255,0.04)] ">
+        
         {/* Header */}
-        <div
-            className="flex items-center justify-between w-full h-[85px] px-4 flex-shrink-0"
+        <div className="flex items-center justify-between w-full h-[85px] px-4 flex-shrink-0"
             style={{
-            backgroundImage: "url('/cards/cardHeader.svg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            }}
-        >
-            <h2
-            className="absolute flex items-center text-[#1E1E1E]"
-            style={{
+              backgroundImage: "url('/cards/cardHeader.svg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}>
+          <h2 className="absolute flex items-center text-[#1E1E1E]"
+              style={{
                 width: "350px",
                 height: "36px",
                 left: "117.37px",
@@ -337,55 +332,40 @@ const ExperienceModal: React.FC<ExperienceModalProps> = ({ experience, isOpen, o
                 fontWeight: 700,
                 fontSize: "24px",
                 lineHeight: "36px",
-            }}
-            >
-            {experience? "Edit Experience" : "Add Experience"}
-            </h2>
+              }}>
+            {experience ? "Edit Experience" : "Add Experience"}
+          </h2>
         </div>
 
-        {/* Form - scrollable */}
+        {/* Scrollable Form */}
         <form
-            className="flex-1 flex flex-col gap-4 p-4  bg-white "
-            onSubmit={handleSubmit}
+          id="experienceForm"
+          className="flex-1 flex flex-col gap-4 p-4  bg-white"
+          onSubmit={handleSubmit}
         >
-          
-
           <ParallelogramInput label="Company Name" placeholder="Enter companyName" value={formData.companyName} onChange={(e) => handleInputChange("companyName", e.target.value)} />
           <ParallelogramInput label="Role" placeholder="Enter Role" value={formData.role} onChange={(e) => handleInputChange("role", e.target.value)} />
           <ParallelogramInput label="Description" placeholder="Enter description" value={formData.description} onChange={(e) => handleInputChange("description", e.target.value)} />
           <ParallelogramDatePicker label="Start Date" placeholder="Select start date" value={formData.startDate} onChange={(value) => handleInputChange("startDate", value)} />
           <ParallelogramDatePicker label="End Date" placeholder="Select end date" value={formData.endDate} onChange={(value) => handleInputChange("endDate", value)} />
-         
+        </form>
+
         {/* Footer */}
-        <div
-            className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
-            style={{
-            backgroundImage: "url('/cards/cardFooter.svg')",
-            }}
-        >
-            <div className="flex w-[400px] justify-between">
-            <button
-                type="button"
-                onClick={onClose}
-                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
-            >
-                <span className="skew-x-[12deg] font-bold text-black">Cancel</span>
+        <div className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
+            style={{ backgroundImage: "url('/cards/cardFooter.svg')" }}>
+          <div className="flex w-[400px] justify-between">
+            <button type="button" onClick={onClose} className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all">
+              <span className="skew-x-[12deg] font-bold text-black">Cancel</span>
             </button>
 
-            <button
-                type="submit"
-                disabled={loading}
-                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
-            >
-                <span className="skew-x-[12deg] font-bold text-black">
-                {loading ? <Loader2 className="animate-spin" /> : experience ? "Update" : "Add"}
-                </span>
+            <button type="submit" form="experienceForm" disabled={loading} className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105">
+              <span className="skew-x-[12deg] font-bold text-black">{loading ? <Loader2 className="animate-spin" /> : experience ? "Update" : "Add"}</span>
             </button>
-            </div>
+          </div>
         </div>
-        </form>
-        </div>
+      </div>
     </div>
+  
     );
 };
 

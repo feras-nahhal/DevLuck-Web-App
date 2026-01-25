@@ -6,7 +6,7 @@ import DashboardLayout from "@/src/components/Student/DashboardLayout";
 import { useStudentOpportunityHandler } from "@/src/hooks/studentapihandler/useStudentOpportunityHandler";
 import { useStudentApplicationHandler } from "@/src/hooks/studentapihandler/useStudentApplicationHandler";
 import { Toast } from "@/src/components/common/Toast";
-
+import { Range } from "react-range";
 interface MappedOpportunity {
   id: number;
   originalId: string;
@@ -378,6 +378,11 @@ export default function ContractListPage() {
       const goToNext = () => {
         if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
       };
+
+      const STEP = 100;
+      const MIN = 0;
+      const MAX = 10000;
+
 return (
   <DashboardLayout>
     <Toast
@@ -582,67 +587,78 @@ return (
               <div className="flex gap-6">
                 <div className="flex items-center gap-2 flex-1">
                   <span className="text-sm font-semibold text-[#919EAB]">Min</span>
-                  <div className="px-2 py-1 bg-[#919EAB14] rounded-md text-sm">
-                    ${salaryRange[0]}
-                  </div>
+                  <input
+                    type="number"
+                    min={MIN}
+                    max={salaryRange[1] - STEP}
+                    step={STEP}
+                    value={salaryRange[0]}
+                    onChange={(e) => {
+                      let val = Number(e.target.value);
+                      if (val < MIN) val = MIN;
+                      if (val > salaryRange[1] - STEP) val = salaryRange[1] - STEP;
+                      setSalaryRange([val, salaryRange[1]]);
+                    }}
+                    className="px-2 py-1 bg-[#919EAB14] rounded-md text-sm text-[#1E1E1E] outline-none border border-transparent focus:border-[#1E1E1E33]"
+                  />
                 </div>
 
                 <div className="flex items-center gap-2 flex-1">
-                  <span className="text-sm font-semibold text-[#919EAB]">Max</span>
-                  <div className="px-2 py-1 bg-[#919EAB14] rounded-md text-sm">
-                    ${salaryRange[1]}
-                  </div>
+                    <span className="text-sm font-semibold text-[#919EAB]">Max</span>
+                    <input
+                      type="number"
+                      min={salaryRange[0] + STEP}
+                      max={MAX}
+                      step={STEP}
+                      value={salaryRange[1]}
+                      onChange={(e) => {
+                        let val = Number(e.target.value);
+                        if (val > MAX) val = MAX;
+                        if (val < salaryRange[0] + STEP) val = salaryRange[0] + STEP;
+                        setSalaryRange([salaryRange[0], val]);
+                      }}
+                      className="px-2 py-1 bg-[#919EAB14] rounded-md text-sm text-[#1E1E1E] outline-none border border-transparent focus:border-[#1E1E1E33]"
+                    />
                 </div>
               </div>
 
-              {/* Slider */}
-              <div className="relative h-4">
-
-                {/* Rail */}
-                <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 bg-[#919EAB1F] rounded-full" />
-
-                {/* Active Track */}
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 h-1.5 bg-[#FFEB9C] rounded-full"
-                  style={{
-                    left: `${(salaryRange[0] / MAX_SALARY) * 100}%`,
-                    width: `${((salaryRange[1] - salaryRange[0]) / MAX_SALARY) * 100}%`,
+            {/* React Range Slider */}
+              <div className="mt-2">
+                <Range
+                  step={STEP}
+                  min={MIN}
+                  max={MAX}
+                  values={salaryRange}
+                  onChange={(values) => setSalaryRange(values as [number, number])}
+                  renderTrack={({ props, children }) => (
+                    <div
+                      {...props}
+                      className="h-1.5 bg-[#919EAB1F] rounded-full relative"
+                    >
+                      {/* Active Track */}
+                      <div
+                        className="absolute h-full bg-[#FFEB9C] rounded-full"
+                        style={{
+                          left: `${((salaryRange[0] - MIN) / (MAX - MIN)) * 100}%`,
+                          width: `${((salaryRange[1] - salaryRange[0]) / (MAX - MIN)) * 100}%`,
+                        }}
+                      />
+                      {children}
+                    </div>
+                  )}
+                 renderThumb={({ props, index }) => {
+                    const { key, ...rest } = props; // remove key from spread
+                    return (
+                      <div
+                        key={index} // Pass key directly
+                        {...rest}   // Spread the rest
+                        className="w-4 h-4 bg-white border border-gray-300 rounded-full shadow cursor-pointer"
+                      />
+                    );
                   }}
                 />
-
-                {/* Min Thumb */}
-                <input
-                  type="range"
-                  min={MIN_SALARY}
-                  max={MAX_SALARY}
-                  step={100}
-                  value={salaryRange[0]}
-                  onChange={(e) =>
-                    setSalaryRange([
-                      Math.min(Number(e.target.value), salaryRange[1] - 500),
-                      salaryRange[1],
-                    ])
-                  }
-                  className="range-thumb absolute w-full appearance-none bg-transparent z-30"
-                />
-
-                {/* Max Thumb */}
-                <input
-                  type="range"
-                  min={MIN_SALARY}
-                  max={MAX_SALARY}
-                  step={100}
-                  value={salaryRange[1]}
-                  onChange={(e) =>
-                    setSalaryRange([
-                      salaryRange[0],
-                      Math.max(Number(e.target.value), salaryRange[0] + 500),
-                    ])
-                  }
-                  className="range-thumb absolute w-full appearance-none bg-transparent z-20"
-                />
               </div>
-
+ 
               {/* Scale */}
               <div className="flex justify-between text-xs text-[#919EAB]">
                 <span>$0</span>

@@ -87,24 +87,35 @@ const SkillsModal: React.FC<SkillsModalProps> = ({
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setFormData({
-      skills: skills ?? [],
-    });
-  }, [skills, isOpen]);
+  // inside SkillsModal component
+const [inputValue, setInputValue] = useState(formData.skills.join(", "));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await onSave(formData);
-      onClose();
-    } catch (error) {
-      console.error("Error saving skills:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+useEffect(() => {
+  setFormData({ skills: skills ?? [] });
+  setInputValue((skills ?? []).join(", "));
+}, [skills, isOpen]);
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  const skillsArray = Array.from(
+    new Set(
+      inputValue
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    )
+  );
+  try {
+    await onSave({ skills: skillsArray });
+    onClose();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (!isOpen) return null;
 
@@ -146,28 +157,17 @@ const SkillsModal: React.FC<SkillsModalProps> = ({
         </div>
 
         {/* Form - scrollable */}
-        <form
+        <div
             className="flex-1 flex flex-col gap-4 p-4  bg-white "
             onSubmit={handleSubmit}
         >
 
-          <ParallelogramInput
-            label="Skills Name"
-            placeholder="Ex: HTML,CSS,PHP"
-            value={formData.skills.join(", ")}
-            onChange={(e) =>
-                setFormData({
-                  skills: Array.from(
-                    new Set(
-                      e.target.value
-                        .split(",")
-                        .map((s) => s.trim())
-                        .filter(Boolean)
-                    )
-                  ),
-                })
-              }
-          />
+           <ParallelogramInput
+    label="Skills Name"
+    placeholder="Ex: HTML,CSS,PHP"
+    value={inputValue}
+    onChange={(e) => setInputValue(e.target.value)}
+  />
           {/* Add multiple skills separate by comma */}
           <span
             className="ml-5"
@@ -186,7 +186,7 @@ const SkillsModal: React.FC<SkillsModalProps> = ({
           >
             Add multiple skills separate by comma
           </span>
-             
+              </div>
         {/* Footer */}
         <div
             className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
@@ -205,6 +205,7 @@ const SkillsModal: React.FC<SkillsModalProps> = ({
 
             <button
                 type="submit"
+                onClick={handleSubmit}   // 👈 manually call submit
                 disabled={loading}
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
             >
@@ -214,7 +215,7 @@ const SkillsModal: React.FC<SkillsModalProps> = ({
             </button>
             </div>
         </div>
-        </form>
+       
         </div>
     </div>
     );

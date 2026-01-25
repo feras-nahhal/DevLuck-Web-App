@@ -162,11 +162,11 @@ const Card = ({
         className="
           absolute top-1/2 left-[9.82%] right-[9.19%]
           -translate-y-1/2
-          flex flex-col gap-[5px] skew-x-12
+          flex flex-col gap-[5px] 
         "
       >
         {/* Label */}
-        <span className="text-[12px] leading-[18px] text-black/60">
+        <span className="text-[12px] skew-x-12 leading-[18px] text-black/60">
           {title}
         </span>
 
@@ -176,10 +176,10 @@ const Card = ({
             flex items-center justify-between
             px-4 py-[5px]
             bg-[rgba(145,158,171,0.12)]
-            rounded-[12px]
+            rounded-[12px] 
           "
         >
-          <span className="text-[24px] leading-[36px] font-bold text-[#1E1E1E]">
+          <span className="text-[24px] skew-x-12 leading-[36px] font-bold text-[#1E1E1E]">
             {value}
           </span>
 
@@ -189,7 +189,7 @@ const Card = ({
           className={`
             transition-transform duration-200 ease-out
             group-hover:translate-x-0.5
-            group-hover:-translate-y-0.5
+            group-hover:-translate-y-0.5 skew-x-12
 
          
           `}
@@ -333,15 +333,17 @@ export default function DashboardPage() {
           }}
         >
                   {/* ✅ CONTENT CONTAINER */}
-    <div className="mx-auto max-w-[1400px] ">
-        <div
-        className="
-          flex flex-col items-start
-          justify-start mt-80 sm:mt-0 px-4 sm:px-0
-        "
-      >
+      <div className="w-full flex justify-center px-4">
+        <div className="w-full max-w-[1400px] flex flex-col mt-80 sm:mt-0">
         {/* Frame 254 */}
-        <div className="flex sm:flex-row flex-col items-start gap-10 w-full h-[278px] sm:mb-0 mb-80">
+        <div className="
+          flex flex-col
+          sm:flex-row
+          sm:items-start
+          sm:justify-between
+          gap-10
+          w-full
+        ">
           {/* Left side */}
           <div className="flex-[8] flex sm:flex-row flex-col h-full rounded-[32px] p-6 gap-10">
             <div className="flex flex-col gap-2">
@@ -435,20 +437,26 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right side */}
-          <div className="flex-[4] grid grid-cols-2 grid-rows-2 gap-4 flex-1">
+         {/* Right side */}
+          <div className="
+            flex-[4]
+            grid
+            grid-cols-1
+            sm:grid-cols-2
+            gap-4
+            flex-1
+            justify-items-center
+            sm:justify-items-stretch
+          ">
             <Card title="All Opportunity" value={totalOpportunities.toString()} />
             <Card title="Total Applied" value={totalApplied.toString()} />
             <Card title="Upcoming Interview" value={upcomingInterviews.toString()} />
             <Card title="Total Rejected" value={totalRejected.toString()} />
           </div>
-
         </div>
-
-
-
+        
         {/* Frame 267 */}
-        <div className="flex flex-col sm:flex-row w-full gap-10 sm:gap-15 mt-10 ">
+        <div className="flex flex-col sm:flex-row w-full gap-10 sm:gap-15 mt-15 ">
 
 
           {/* Frame 266 */}
@@ -647,18 +655,19 @@ export default function DashboardPage() {
 
                                       {/* Action Button */}
                                       <button
-                                        onClick={() =>
-                                          router.push(`/Student/dashboard/${contract.id}`)
-                                        }
-                                        className="
-                                          w-10 h-10
-                                          rounded-full
-                                          bg-black
-                                          flex items-center justify-center
-                                          hover:scale-105
-                                          transition
-                                        "
-                                      >
+                                          onClick={() => router.push(`/Student/dashboard/${contract.id}`)}
+                                          className="
+                                            w-10 h-10
+                                            min-w-[40px] min-h-[40px]
+                                            shrink-0
+                                            rounded-full
+                                            bg-black
+                                            flex items-center justify-center
+                                            hover:scale-105
+                                            transition
+                                          "
+                                        >
+
                                         <ArrowUpRight size={18} className="text-white" />
                                       </button>
                                     </div>
@@ -678,21 +687,27 @@ export default function DashboardPage() {
           </div>
 
          {/* Frame 240 */}
-          <div className="flex-[4] flex flex-col ">
+          <div className="flex-[4] flex flex-col">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
                 New Opportunity
               </h3>
             </div>
+
             {/* Opportunities list */}
-            <div className="flex flex-wrap ">
+            <div className="flex flex-wrap justify-center gap-4 w-full ">
               {opportunitiesLoading ? (
-                <p className="text-[#555] font-publicSans">Loading opportunities...</p>
+                <p className="text-[#555] font-publicSans">
+                  Loading opportunities...
+                </p>
               ) : mappedOpportunities.length > 0 ? (
                 mappedOpportunities.map((opp) => (
-                  <Card1 key={opp.id} contract={opp} onClick={() =>
-                    router.push(`/Student/dashboard/${opp.id}`)
-                  } />
+                  <div key={opp.id} className="flex justify-center">
+                    <Card1
+                      contract={opp}
+                      onClick={() => router.push(`/Student/dashboard/${opp.id}`)}
+                    />
+                  </div>
                 ))
               ) : (
                 <p className="text-[#555] font-publicSans">
@@ -700,9 +715,8 @@ export default function DashboardPage() {
                 </p>
               )}
             </div>
-
-          
           </div>
+
 
 
         </div>

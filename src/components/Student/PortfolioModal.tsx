@@ -354,7 +354,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ portfolio, isOpen, onCl
             onChange={(e) => handleInputChange("link", e.target.value)}
           />
 
-
+        </form>
         {/* Footer */}
         <div
             className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
@@ -373,6 +373,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ portfolio, isOpen, onCl
 
             <button
                 type="submit"
+                onClick={handleSubmit}   // 👈 manually call submit
                 disabled={loading}
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
             >
@@ -382,7 +383,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ portfolio, isOpen, onCl
             </button>
             </div>
         </div>
-        </form>
+       
         </div>
     </div>
     );

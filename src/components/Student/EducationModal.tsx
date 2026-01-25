@@ -344,7 +344,7 @@ const EducationModal: React.FC<EducationModalProps> = ({ education, isOpen, onCl
         </div>
 
         {/* Form - scrollable */}
-        <form
+        <div
             className="flex-1 flex flex-col gap-4 p-4  bg-white "
             onSubmit={handleSubmit}
         >
@@ -355,7 +355,7 @@ const EducationModal: React.FC<EducationModalProps> = ({ education, isOpen, onCl
           <ParallelogramInput label="Description" placeholder="Enter description" value={formData.description} onChange={(e) => handleInputChange("description", e.target.value)} />
           <ParallelogramDatePicker label="Start Date" placeholder="Select start date" value={formData.startDate} onChange={(value) => handleInputChange("startDate", value)} />
           <ParallelogramDatePicker label="End Date" placeholder="Select end date" value={formData.endDate} onChange={(value) => handleInputChange("endDate", value)} />
-
+</div>
         {/* Footer */}
         <div
             className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
@@ -373,6 +373,7 @@ const EducationModal: React.FC<EducationModalProps> = ({ education, isOpen, onCl
             </button>
 
             <button
+                onClick={handleSubmit}   // 👈 manually call submit
                 type="submit"
                 disabled={loading}
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
@@ -383,7 +384,6 @@ const EducationModal: React.FC<EducationModalProps> = ({ education, isOpen, onCl
             </button>
             </div>
         </div>
-        </form>
         </div>
     </div>
     );

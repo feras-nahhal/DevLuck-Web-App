@@ -426,6 +426,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
         {/* Form - scrollable */}
         <form
+            id="profileForm"
             className="flex-1 flex flex-col gap-4 p-4  bg-white "
             onSubmit={handleSubmit}
         >
@@ -468,7 +469,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           />
 
           
-
+</form>
         {/* Footer */}
         <div
             className="flex items-center justify-center w-full h-[90px] flex-shrink-0 bg-cover bg-center px-4"
@@ -488,6 +489,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             <button
                 type="submit"
                 disabled={loading}
+                form="profileForm" 
                 className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
             >
                 <span className="skew-x-[12deg] font-bold text-black">
@@ -496,7 +498,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             </button>
             </div>
         </div>
-        </form>
+        
         </div>
     </div>
     );
