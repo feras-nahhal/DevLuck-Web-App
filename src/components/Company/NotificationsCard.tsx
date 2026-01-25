@@ -83,7 +83,7 @@ export default function NotificationsCard({
           <div className="flex flex-col items-start gap-1 min-w-0">
              <span
               className={`text-sm font-semibold truncate ${
-                read ? "text-gray-700" : "text-blue-600"
+                read ? "text-gray-700" : "text-[#FFE066]"
               }`}
             >
               {title || "No title"}
@@ -98,7 +98,7 @@ export default function NotificationsCard({
 
           {/* ✅ Blue dot at end if unread */}
           {!read && (
-            <div className="w-2.5 h-2.5 rounded-full bg-blue-500 flex-shrink-0 mr-2" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FFE066] flex-shrink-0 mr-2" />
           )}
         </div>
       </div>
