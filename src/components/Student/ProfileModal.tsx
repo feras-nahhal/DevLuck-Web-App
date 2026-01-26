@@ -9,8 +9,10 @@ import "react-day-picker/dist/style.css";
 interface ProfileData {
   id?: string;
   name: string;
+  email: string;
   description: string;
   availability: string;
+  salaryExpectation?: string;
   image?: string;
 }
 
@@ -279,18 +281,24 @@ const ParallelogramFileInput = ({
   image?: string;
   onChange: (file: File | null) => void;
 }) => {
-  const defaultImage = "/avatars/nina.jpeg"; // Path from public folder
+  const defaultImage = "/avatars/nina.jpeg";
   const [preview, setPreview] = useState<string | null>(image || null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // Update preview when `image` prop changes
   useEffect(() => {
-    setPreview(image || null);
-  }, [image]);
+    if (selectedFile) {
+      setPreview(URL.createObjectURL(selectedFile));
+    } else if (image) {
+      setPreview(image);
+    } else {
+      setPreview(null);
+    }
+  }, [image, selectedFile]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setPreview(URL.createObjectURL(file));
+      setSelectedFile(file);
       onChange(file);
     }
   };
@@ -311,11 +319,10 @@ const ParallelogramFileInput = ({
           </div>
         </div>
 
-        {/* Image preview */}
         <img
           src={preview || defaultImage}
           alt="Preview"
-          className="w-[128px] h-[128px] rounded-full object-cover z-0"
+          className="absolute w-[128px] h-[128px] rounded-full object-cover z-0"
         />
 
         {/* Hidden file input */}
@@ -348,23 +355,29 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<ProfileData>({
     name: "",
+    email: "",
     description: "",
     availability: "",
+    salaryExpectation: "",
   });
 
   const availabilityOptions = ["Hybrid", "Remote", "Onsite"];
 
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
    useEffect(() => {
     if (profile) {
       setFormData({
         name: profile.name || "",
+        email: (profile as any).email || "",
         description: profile.description || "",
-        availability: profile.availability || ""
+        availability: profile.availability || "",
+        salaryExpectation: (profile as any).salaryExpectation ? String((profile as any).salaryExpectation) : ""
       });
     } else {
-      setFormData({ name: "", description: "", availability: "" });
+      setFormData({ name: "", email: "", description: "", availability: "", salaryExpectation: "" });
     }
   }, [profile, isOpen]);
 
@@ -373,11 +386,62 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const uploadImageToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const token = localStorage.getItem('devluck_token');
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/upload/image`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to upload image');
+    }
+
+    const data = await response.json();
+    return data.data.url;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.email || formData.email.trim() === '') {
+      alert('Email is required');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email.trim())) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
     setLoading(true);
     try {
-      await onSave(formData);
+      let imageUrl = formData.image || profile?.image;
+
+      if (selectedFile) {
+        setUploadingImage(true);
+        try {
+          imageUrl = await uploadImageToCloudinary(selectedFile);
+        } catch (error: any) {
+          console.error("Error uploading image:", error);
+          alert(`Failed to upload image: ${error.message}`);
+          setUploadingImage(false);
+          setLoading(false);
+          return;
+        } finally {
+          setUploadingImage(false);
+        }
+      }
+
+      await onSave({ ...formData, image: imageUrl });
       onClose();
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -430,17 +494,20 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             className="flex-1 flex flex-col gap-4 p-4  bg-white "
             onSubmit={handleSubmit}
         >
-
+<div className="flex flex-col gap-4">
           <div className="flex justify-center">
             <ParallelogramFileInput
               label="Profile Photo"
-              image={formData.image}
+              image={profile?.image || formData.image}
               onChange={(file) => {
                 if (file) {
+                  setSelectedFile(file);
                   setFormData((prev) => ({
                     ...prev,
                     image: URL.createObjectURL(file),
                   }));
+                } else {
+                  setSelectedFile(null);
                 }
               }}
             />
@@ -452,6 +519,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             onChange={(e) => handleInputChange("name", e.target.value)}
           />
 
+          <ParallelogramInput
+            label="Email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            type="email"
+          />
+
           <ParallelogramSelect
             label="Availability"
             placeholder="Select availability"
@@ -461,13 +536,21 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           />
 
           <ParallelogramInput
+            label="Salary Expectation"
+            placeholder="Enter expected salary"
+            value={formData.salaryExpectation || ""}
+            onChange={(e) => handleInputChange("salaryExpectation", e.target.value)}
+            type="number"
+          />
+
+          <ParallelogramInput
             label="About Me"
             placeholder="Ex: Shortly Write yourself"
             value={formData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
             type="textarea"
           />
-
+</div>
           
 </form>
         {/* Footer */}
@@ -488,12 +571,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
             <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || uploadingImage}
                 form="profileForm" 
-                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
+                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <span className="skew-x-[12deg] font-bold text-black">
-                {loading ? <Loader2 className="animate-spin" /> : profile ? "Update" : "Add"}
+                {loading || uploadingImage ? <Loader2 className="animate-spin" /> : profile ? "Update" : "Add"}
                 </span>
             </button>
             </div>

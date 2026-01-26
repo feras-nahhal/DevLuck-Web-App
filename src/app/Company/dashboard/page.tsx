@@ -610,7 +610,7 @@ const dashboardLoading =
                     key={application.id}
                     studentName={application.student?.name || 'Unknown Student'}
                     studentNumber={application.student?.id?.substring(0, 3) || application.id.substring(0, 3)}
-                    imageUrl={undefined}
+                    imageUrl={application.student?.image}
                     applicationId={application.id}
                     onClick={() => {
                       if (application.student?.id) {

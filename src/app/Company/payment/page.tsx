@@ -706,12 +706,37 @@ export default function PaymentPage() {
 
     const { payments,  error, listPayments } = usePaymentHandler();
 
-
   // Fetch all payments and contracts on mount
   useEffect(() => {
-    listPayments(1, 1000); // get all payments
-    listContracts(1, 1000); // get all contracts
+    const fetchData = async () => {
+      await listPayments(1, 1000); // get all payments
+      await listContracts(1, 1000); // get all contracts
+    };
+    fetchData();
   }, [listPayments, listContracts]);
+
+  // Refresh payments when page becomes visible or focused (user navigates back)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        listPayments(1, 1000);
+      }
+    };
+
+    const handleFocus = () => {
+      listPayments(1, 1000);
+    };
+
+    if (typeof window !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('focus', handleFocus);
+
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('focus', handleFocus);
+      };
+    }
+  }, [listPayments]);
 
   // Compute totals dynamically
   const stats = useMemo(() => {

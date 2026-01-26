@@ -395,114 +395,121 @@
 }
 
 /* ===============================
-   DATE PICKER OVERRIDES
+   DATE PICKER OVERRIDES - FULL YELLOW
 =============================== */
 
-/* Days hover and selected */
-.rdp-day:hover {
-  background-color: #ffeb9c !important; /* yellow hover */
-  color: #1e1e1e !important;           /* dark text */
+/* Calendar container */
+.react-calendar,
+.react-date-picker__wrapper {
+  border-radius: 16px !important;
+  overflow: hidden;
+  border: 1px solid #1c252e;
 }
 
-.rdp-day_selected {
-  background-color: #ffeb9c !important; /* yellow selected */
-  color: #1e1e1e !important;           /* dark text */
-  font-weight: 600;
-}
-
-/* Remove blue circle around today or selected day */
-.rdp-day_today,
-.rdp-day:focus-visible,
-.rdp-day_selected:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Navigation arrows < and > */
-.rdp-nav button {
-  color: #1e1e1e !important;         /* black arrows */
-  background: transparent;
-  border: none;
-  outline: none;
-  transition: color 0.2s;
-}
-
-/* Hover effect with rounded corners */
-.rdp-nav button:hover {
-  background-color: #ffeb9c;       /* yellow hover */
+/* Days hover */
+.rdp-day button:hover {
+  background-color: #ffeb9c !important;
   color: #1e1e1e !important;
-  border-color: #ffeb9c;           /* match hover */
-  border-radius: 8px;              /* maintain rounded corners */
-  transform: scale(1.05);          /* slight scale for modern feel */
-}
-/* Optional: increase arrow size */
-.rdp-nav button svg {
-  width: 16px;
-  height: 16px;
+  border-radius: 50% !important;
+  transition: all 0.2s;
 }
 
-/* Remove blue focus outline and add black shadow on nav buttons */
+/* Selected day */
+.rdp-day_selected,
+.rdp-day_selected:focus-visible {
+  background-color: #ffeb9c !important;
+  color: #1e1e1e !important;
+  font-weight: 600;
+  border-radius: 25% !important;
+}
+
+/* Today highlight */
+.rdp-day_today button {
+  border-radius: 25% !important;
+  border: 1px solid #1e1e1e !important;
+  background-color: #fff !important;
+  color: #1e1e1e !important;
+}
+
+/* Remove blue outlines */
+.rdp-day button:focus-visible,
 .rdp-nav button:focus-visible {
   outline: none !important;
-  box-shadow: 0 0 8px 2px rgba(30, 30, 30, 0.7) !important;
-  border-radius: 8px !important;
-}
-
-/* Ensure no blue outline or shadow on day buttons */
-.rdp-day button:focus-visible {
-  outline: none !important;
   box-shadow: none !important;
 }
 
-/* Also target the day cells themselves */
-.rdp-day:focus-visible,
-.rdp-day_selected:focus-visible,
-.rdp-day_today {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Nav buttons basics */
+/* Navigation buttons */
 .rdp-nav button {
-  color: #1e1e1e !important; /* black arrows */
+  color: #1e1e1e !important;
   background: transparent !important;
   border: none !important;
-  outline: none !important;
-  transition: color 0.2s, box-shadow 0.2s !important;
-  box-shadow: none !important;
+  border-radius: 25% !important;
+  padding: 6px;
+  transition: transform 0.2s, background-color 0.2s;
 }
 
-/* Nav button hover */
 .rdp-nav button:hover {
-  background-color: #ffeb9c !important; /* yellow hover */
-  color: #1e1e1e !important;
-  border-radius: 8px !important;
-  transform: scale(1.05);
+  background-color: #ffeb9c !important;
+  transform: scale(1.1);
 }
 
-/* Nav button SVG size */
 .rdp-nav button svg {
   width: 16px !important;
   height: 16px !important;
 }
 
-/* Days hover and selected */
-.rdp-day:hover {
-  background-color: #ffeb9c !important;
+/* Month/Year dropdowns */
+.react-calendar__tile--active,
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus,
+.react-calendar__tile--now {
+  background-color: #ffeb9c !important; /* yellow active */
   color: #1e1e1e !important;
+  border-radius: 25% !important;
 }
 
-.rdp-day_selected {
-  background-color: #ffeb9c !important;
+/* Hover on month/year tiles */
+.react-calendar__tile:hover {
+  background-color: #e0e0e0 !important;
   color: #1e1e1e !important;
-  font-weight: 600;
+  border-radius: 25% !important;
 }
 
-/* Disable focus outline on all buttons inside DayPicker */
-.rdp-day button,
-.rdp-nav button {
-  outline: none !important;
+/* Optional: rounded header */
+.react-calendar__navigation {
+  border-radius: 12px 12px 0 0 !important;
+  border-bottom: 1px solid #e0e0e0;
 }
+
+/* ===============================
+   REACT CALENDAR – FINAL FIX
+   (No Fit warnings, no clipping)
+=============================== */
+
+.react-calendar {
+  max-height: unset !important;
+  overflow: visible !important;
+}
+
+.react-calendar__viewContainer {
+  max-height: unset !important;
+  overflow: visible !important;
+}
+
+/* Prevent Fit recalculations */
+.react-calendar__month-view,
+.react-calendar__year-view,
+.react-calendar__decade-view,
+.react-calendar__century-view {
+  height: auto;
+}
+
+
+
+
+/* ===============================
+   CUSTOM SCROLLBAR STYLES
+=============================== */
 
 
 /* ===== Transparent Scrollbar ===== */

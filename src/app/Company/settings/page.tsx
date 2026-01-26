@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import AddressModal from "@/src/components/common/AddressModal";
+import DeleteConfirmationModal from "@/src/components/common/DeleteConfirmationModal";
 import { useAuth } from "@/src/hooks/useAuth";
 import { useCompanySettingsHandler } from "@/src/hooks/companyapihandler/useCompanySettingsHandler";
 import { Eye, EyeOff } from "lucide-react";
@@ -47,6 +48,8 @@ export default function SettingsPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingProfile, setDeletingProfile] = useState(false);
   const { logout } = useAuth();
   const router = useRouter();
 
@@ -59,7 +62,14 @@ export default function SettingsPage() {
     updateSettings,
     changePasswordLoading,
     changePasswordError,
-    changePassword
+    changePassword,
+    deleteProfile,
+    addresses,
+    addressLoading,
+    getAddresses,
+    createAddress,
+    updateAddress,
+    deleteAddress
   } = useCompanySettingsHandler();
 
   // Theme state from API
@@ -81,9 +91,10 @@ export default function SettingsPage() {
     }
   };
 
-  // Load settings on component mount
+  // Load settings and addresses on component mount
   useEffect(() => {
     getSettings().catch(console.error);
+    getAddresses().catch(console.error);
   }, []);
 
   // Handle theme update
@@ -325,8 +336,10 @@ export default function SettingsPage() {
                 </div>
                 <div className={`w-full sm:max-w-[655px] sm:min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 h-[200px]`}>
                   <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                     {mockUniversityAddresses.length > 0 ? (
-                      mockUniversityAddresses.map((item) => (
+                     {addressLoading ? (
+                      <p className="text-[#555] text-[14px] font-publicSans">Loading addresses...</p>
+                     ) : addresses.length > 0 ? (
+                      addresses.map((item) => (
                       <div
                         key={item.id}
                         className="flex flex-row items-start gap-5 w-full"
@@ -456,7 +469,10 @@ export default function SettingsPage() {
                         </span>
 
                         {/* Delete Button */}
-                        <button className="flex items-center px-[16px] -skew-x-20 rounded-[10px]  border border-[#FF5630] h-[32px]">
+                        <button 
+                          onClick={() => setShowDeleteConfirm(true)}
+                          className="flex items-center px-[16px] -skew-x-20 rounded-[10px]  border border-[#FF5630] h-[32px] hover:bg-[#FF5630]/10 transition-colors"
+                        >
                             <span className="font-public-sans font-bold skew-x-20 text-[14px] leading-[24px] text-[#FF5630]">
                               Delete Profile
                             </span>
@@ -772,11 +788,46 @@ export default function SettingsPage() {
       <AddressModal
       isOpen={isModalOpen}
       address={editingAddress}
-      onClose={() => setIsModalOpen(false)}
-      onSave={(data) => {
-        console.log("Address saved:", data);
+      onClose={() => {
         setIsModalOpen(false);
+        setEditingAddress(null);
       }}
+      onSave={async (data) => {
+        try {
+          if (editingAddress?.id) {
+            await updateAddress(editingAddress.id, data);
+          } else {
+            await createAddress(data);
+          }
+          setIsModalOpen(false);
+          setEditingAddress(null);
+          await getAddresses();
+        } catch (error) {
+          console.error("Failed to save address:", error);
+          alert('Failed to save address. Please try again.');
+        }
+      }}
+    />
+
+    <DeleteConfirmationModal
+      isOpen={showDeleteConfirm}
+      onClose={() => setShowDeleteConfirm(false)}
+      onConfirm={async () => {
+        setDeletingProfile(true);
+        try {
+          await deleteProfile();
+          await logout();
+          router.push("/auth");
+        } catch (error) {
+          console.error("Failed to delete profile:", error);
+          alert('Failed to delete profile. Please try again.');
+        } finally {
+          setDeletingProfile(false);
+        }
+      }}
+      title="Delete Account"
+      message="Are you sure you want to permanently delete your account? This will delete all your data including profile, opportunities, contracts, and payments. This action cannot be undone."
+      isLoading={deletingProfile}
     />
     </DashboardLayout>
     );

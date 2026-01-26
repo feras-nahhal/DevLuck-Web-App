@@ -28,8 +28,9 @@ interface UseStudentApplicationHandlerReturn {
   error: string | null
   getApplications: (page?: number, pageSize?: number, status?: string) => Promise<ListApplicationsResponse>
   getApplication: (id: string) => Promise<Application>
-  createApplication: (opportunityId: string) => Promise<Application>
-  withdrawApplication: (id: string) => Promise<Application>
+  checkApplicationExists: (opportunityId: string) => Promise<boolean>
+  createApplication: (opportunityId: string, answers?: Array<{ questionId: string; answer: string | string[] | number }>) => Promise<Application>
+  withdrawApplication: (id: string) => Promise<void>
   deleteApplication: (id: string) => Promise<void>
   clearError: () => void
 }
@@ -86,12 +87,25 @@ export const useStudentApplicationHandler = (): UseStudentApplicationHandlerRetu
     }
   }, [])
 
-  const createApplication = useCallback(async (opportunityId: string): Promise<Application> => {
+  const checkApplicationExists = useCallback(async (opportunityId: string): Promise<boolean> => {
+    setError(null)
+    try {
+      const response = await api.get<{ status: string; data: { hasApplied: boolean } }>(`/api/student/applications/check/${opportunityId}`)
+      return response.data.data.hasApplied
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to check application'
+      setError(errorMessage)
+      return false
+    }
+  }, [])
+
+  const createApplication = useCallback(async (opportunityId: string, answers?: Array<{ questionId: string; answer: string | string[] | number }>): Promise<Application> => {
     setLoading(true)
     setError(null)
     try {
       const response = await api.post<{ status: string; data: Application }>('/api/student/applications', {
-        opportunityId
+        opportunityId,
+        answers: answers || []
       })
       setApplications(prev => [response.data.data, ...prev])
       return response.data.data
@@ -104,13 +118,15 @@ export const useStudentApplicationHandler = (): UseStudentApplicationHandlerRetu
     }
   }, [])
 
-  const withdrawApplication = useCallback(async (id: string): Promise<Application> => {
+  const withdrawApplication = useCallback(async (id: string): Promise<void> => {
     setLoading(true)
     setError(null)
     try {
-      const response = await api.put<{ status: string; data: Application }>(`/api/student/applications/${id}/withdraw`)
-      setApplications(prev => prev.map(app => app.id === id ? response.data.data : app))
-      return response.data.data
+      await api.put(`/api/student/applications/${id}/withdraw`)
+      setApplications(prev => prev.filter(app => app.id !== id))
+      if (application?.id === id) {
+        setApplication(null)
+      }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Failed to withdraw application'
       setError(errorMessage)
@@ -118,7 +134,7 @@ export const useStudentApplicationHandler = (): UseStudentApplicationHandlerRetu
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [application])
 
   const deleteApplication = useCallback(async (id: string): Promise<void> => {
     setLoading(true)
@@ -145,6 +161,7 @@ export const useStudentApplicationHandler = (): UseStudentApplicationHandlerRetu
     error,
     getApplications,
     getApplication,
+    checkApplicationExists,
     createApplication,
     withdrawApplication,
     deleteApplication,

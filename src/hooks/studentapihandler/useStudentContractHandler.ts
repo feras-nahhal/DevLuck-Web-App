@@ -18,6 +18,7 @@ interface Contract {
   note?: string
   status: string
   companyId: string
+  opportunityId?: string
   company?: {
     id: string
     name: string
@@ -26,6 +27,20 @@ interface Contract {
     location?: string
     website?: string
     description?: string
+  }
+  opportunity?: {
+    id: string
+    title: string
+    details: string
+    skills: string[]
+    benefits: string[]
+    keyResponsibilities: string[]
+    whyYouWillLoveWorkingHere: string[]
+    location?: string
+    type?: string
+    timeLength?: string
+    currency?: string
+    allowance?: string
   }
   createdAt: string
   updatedAt: string

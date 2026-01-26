@@ -1,22 +1,21 @@
-// src/app/Company/contract-template/page.tsx
 "use client";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { ArrowUpRight } from 'lucide-react';
 import { useState, useMemo, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-// Helper function to format date without time
+
 const formatDate = (dateString: string) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 };
 
-// Helper function to truncate ID to 2 digits
 const truncateId = (id: string) => {
   if (!id) return "00";
   return id.substring(0, 2);
 };
 import ContractModal from "@/src/components/Company/ContractTemplateModal";
+import DeleteConfirmationModal from "@/src/components/common/DeleteConfirmationModal";
 import { useRouter } from "next/navigation";
 import { useContractTemplateHandler } from "@/src/hooks/companyapihandler/useContractTemplateHandler";
 
@@ -47,8 +46,8 @@ const Card = ({
           <path
             d="M244.278 8C252.822 8 258.583 18.8815 258.583 27.4258C258.583 45.0952 272.907 59.4197 290.576 59.4199C298.805 59.4199 308.932 64.9539 308.932 73.1832V123.865C308.932 139.881 295.948 152.865 279.932 152.865H49C32.9837 152.865 20 139.881 20 123.865V37C20 20.9837 32.9837 8 49 8H244.278Z"
             fill="none"
-            stroke="#e6e5eb02"      // border color
-            strokeWidth="2"         // border thickness
+            stroke="#e6e5eb02"
+            strokeWidth="2"
           />
 
           {/* FILL */}
@@ -181,25 +180,25 @@ const ContractCard = ({
       {/* SVG Card Body */}
       <svg width="410" height="220" viewBox="0 0 439 223" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g filter="url(#filter0_dd_12766_51720)">
-        <path d="M312.624 8C317.795 8 323.634 20.8672 323.634 26.0381C323.634 36.9089 332.447 45.7217 343.317 45.7217H404.804C410.447 45.7217 418.373 49.6268 418.373 55.2699V87.2611C418.373 93.5935 415.394 99.5569 410.331 103.36L300.137 186.124C295.981 189.246 290.923 190.934 285.724 190.934H167.447C155.161 190.934 145.2 180.973 145.2 168.687C145.2 156.4 135.24 146.439 122.953 146.439H44C30.7452 146.439 20 135.694 20 122.439V32C20 18.7452 30.7452 8 44 8H312.624Z" fill="white"/>
+          <path d="M312.624 8C317.795 8 323.634 20.8672 323.634 26.0381C323.634 36.9089 332.447 45.7217 343.317 45.7217H404.804C410.447 45.7217 418.373 49.6268 418.373 55.2699V87.2611C418.373 93.5935 415.394 99.5569 410.331 103.36L300.137 186.124C295.981 189.246 290.923 190.934 285.724 190.934H167.447C155.161 190.934 145.2 180.973 145.2 168.687C145.2 156.4 135.24 146.439 122.953 146.439H44C30.7452 146.439 20 135.694 20 122.439V32C20 18.7452 30.7452 8 44 8H312.624Z" fill="white" />
         </g>
         <defs>
         <filter id="filter0_dd_12766_51720" x="0" y="0" width="438.373" height="222.934" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-        <feFlood floodOpacity="0" result="BackgroundImageFix"/>
-        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-        <feMorphology radius="4" operator="erode" in="SourceAlpha" result="effect1_dropShadow_12766_51720"/>
-        <feOffset dy="12"/>
-        <feGaussianBlur stdDeviation="12"/>
-        <feComposite in2="hardAlpha" operator="out"/>
-        <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0"/>
-        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_12766_51720"/>
-        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-        <feOffset/>
-        <feGaussianBlur stdDeviation="1"/>
-        <feComposite in2="hardAlpha" operator="out"/>
-        <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0"/>
-        <feBlend mode="normal" in2="effect1_dropShadow_12766_51720" result="effect2_dropShadow_12766_51720"/>
-        <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_12766_51720" result="shape"/>
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+            <feMorphology radius="4" operator="erode" in="SourceAlpha" result="effect1_dropShadow_12766_51720" />
+            <feOffset dy="12" />
+            <feGaussianBlur stdDeviation="12" />
+            <feComposite in2="hardAlpha" operator="out" />
+            <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0" />
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_12766_51720" />
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+            <feOffset />
+            <feGaussianBlur stdDeviation="1" />
+            <feComposite in2="hardAlpha" operator="out" />
+            <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0" />
+            <feBlend mode="normal" in2="effect1_dropShadow_12766_51720" result="effect2_dropShadow_12766_51720" />
+            <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_12766_51720" result="shape" />
         </filter>
         </defs>
       </svg>
@@ -276,12 +275,13 @@ const ContractCard = ({
 };
 
 type ContractRowProps = {
-  contract: any; // Using any for now since ContractTemplate type is from hook
+  contract: any;
   onView: (contract: any) => void;
+  onDelete?: (contract: any) => void;
   showCheckbox?: boolean;
 };
 
-const ContractRow = ({ contract, onView, showCheckbox = false }: ContractRowProps) => {
+const ContractRow = ({ contract, onView, onDelete, showCheckbox = false }: ContractRowProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [checked, setChecked] = useState(false);
@@ -293,7 +293,6 @@ const ContractRow = ({ contract, onView, showCheckbox = false }: ContractRowProp
     };
 
   
-    // Close when clicking outside
     useEffect(() => {
       const handler = (e: MouseEvent) => {
         if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -318,7 +317,7 @@ const ContractRow = ({ contract, onView, showCheckbox = false }: ContractRowProp
           <div
             className="flex items-center skew-x-[12deg] justify-center w-11 h-full pl-2 cursor-pointer"
             onClick={(e) => {
-              e.stopPropagation(); // 🔥 prevent row click
+              e.stopPropagation();
               setChecked((prev) => !prev);
             }}
           >
@@ -424,7 +423,7 @@ const ContractRow = ({ contract, onView, showCheckbox = false }: ContractRowProp
           const rect = e.currentTarget.getBoundingClientRect();
 
          setMenuPos({
-            top: rect.top + window.scrollY ,
+            top: rect.top + window.scrollY,
             left: rect.right + window.scrollX - 230,
           });
           setMenuOpen((prev) => !prev);
@@ -435,13 +434,13 @@ const ContractRow = ({ contract, onView, showCheckbox = false }: ContractRowProp
           {/* Example Frame 295 content */}
           <div className="flex flex-col items-center justify-center gap-1">
             <svg width="77" height="72" viewBox="0 0 77 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="76.4667" height="72" fill="#FFF9E0"/>
-              <path d="M27.7333 20H23.0852C18.1121 20 13.5891 22.8805 11.486 27.3871L7.08281 36.8226C3.78263 43.8944 8.94481 52 16.7488 52H27.7333" stroke="#1E1E1E" strokeWidth="1.06667"/>
-              <path d="M24.7334 20V20.5H48.7334V20V19.5H24.7334V20ZM48.7334 52V51.5H24.7334V52V52.5H48.7334V52Z" fill="#1E1E1E"/>
-              <path d="M36.7334 38C37.838 38 38.7334 37.1046 38.7334 36C38.7334 34.8954 37.838 34 36.7334 34C35.6288 34 34.7334 34.8954 34.7334 36C34.7334 37.1046 35.6288 38 36.7334 38Z" fill="#1E1E1E"/>
-              <path d="M36.7334 31C37.838 31 38.7334 30.1046 38.7334 29C38.7334 27.8954 37.838 27 36.7334 27C35.6288 27 34.7334 27.8954 34.7334 29C34.7334 30.1046 35.6288 31 36.7334 31Z" fill="#1E1E1E"/>
-              <path d="M36.7334 45C37.838 45 38.7334 44.1046 38.7334 43C38.7334 41.8954 37.838 41 36.7334 41C35.6288 41 34.7334 41.8954 34.7334 43C34.7334 44.1046 35.6288 45 36.7334 45Z" fill="#1E1E1E"/>
-              <path d="M45.7335 52L50.3816 52C55.3547 52 59.8777 49.1195 61.9808 44.6129L66.384 35.1774C69.6842 28.1056 64.522 20 56.718 20L45.7335 20" stroke="#1E1E1E" strokeWidth="1.06667"/>
+              <rect width="76.4667" height="72" fill="#FFF9E0" />
+              <path d="M27.7333 20H23.0852C18.1121 20 13.5891 22.8805 11.486 27.3871L7.08281 36.8226C3.78263 43.8944 8.94481 52 16.7488 52H27.7333" stroke="#1E1E1E" strokeWidth="1.06667" />
+              <path d="M24.7334 20V20.5H48.7334V20V19.5H24.7334V20ZM48.7334 52V51.5H24.7334V52V52.5H48.7334V52Z" fill="#1E1E1E" />
+              <path d="M36.7334 38C37.838 38 38.7334 37.1046 38.7334 36C38.7334 34.8954 37.838 34 36.7334 34C35.6288 34 34.7334 34.8954 34.7334 36C34.7334 37.1046 35.6288 38 36.7334 38Z" fill="#1E1E1E" />
+              <path d="M36.7334 31C37.838 31 38.7334 30.1046 38.7334 29C38.7334 27.8954 37.838 27 36.7334 27C35.6288 27 34.7334 27.8954 34.7334 29C34.7334 30.1046 35.6288 31 36.7334 31Z" fill="#1E1E1E" />
+              <path d="M36.7334 45C37.838 45 38.7334 44.1046 38.7334 43C38.7334 41.8954 37.838 41 36.7334 41C35.6288 41 34.7334 41.8954 34.7334 43C34.7334 44.1046 35.6288 45 36.7334 45Z" fill="#1E1E1E" />
+              <path d="M45.7335 52L50.3816 52C55.3547 52 59.8777 49.1195 61.9808 44.6129L66.384 35.1774C69.6842 28.1056 64.522 20 56.718 20L45.7335 20" stroke="#1E1E1E" strokeWidth="1.06667" />
             </svg>
 
             {/* Menu */}
@@ -461,14 +460,25 @@ const ContractRow = ({ contract, onView, showCheckbox = false }: ContractRowProp
                               className="w-full flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
                               onClick={() => onView(contract)}
                             >
-                              <svg fill="#000000" width="20px" height="20px" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><title/><path d="M84.4373,11.577a18.0012,18.0012,0,0,0-25.46,0L8.0639,62.4848A5.9955,5.9955,0,0,0,6.306,66.7271V83.6964a5.9968,5.9968,0,0,0,6,6H29.2813a5.9959,5.9959,0,0,0,4.2423-1.7579l50.92-50.9078A18.0419,18.0419,0,0,0,84.4373,11.577Zm-8.49,8.4847a6.014,6.014,0,0,1,.0058,8.4846l-4.243,4.243-8.4891-8.4861,4.2416-4.2415A5.998,5.998,0,0,1,75.9468,20.0617Zm-49.15,57.6345h-8.49V69.2116L54.7352,32.7871l8.489,8.4861Z"/></svg>
+                    <svg fill="#000000" width="20px" height="20px" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><title /><path d="M84.4373,11.577a18.0012,18.0012,0,0,0-25.46,0L8.0639,62.4848A5.9955,5.9955,0,0,0,6.306,66.7271V83.6964a5.9968,5.9968,0,0,0,6,6H29.2813a5.9959,5.9959,0,0,0,4.2423-1.7579l50.92-50.9078A18.0419,18.0419,0,0,0,84.4373,11.577Zm-8.49,8.4847a6.014,6.014,0,0,1,.0058,8.4846l-4.243,4.243-8.4891-8.4861,4.2416-4.2415A5.998,5.998,0,0,1,75.9468,20.0617Zm-49.15,57.6345h-8.49V69.2116L54.7352,32.7871l8.489,8.4861Z" /></svg>
             
                               <span>Edit</span>
                             </button>
                             
-                            <button className="w-full flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
-                            >
-                            {/* SVG Icon */}
+                  <button
+                    className="w-full flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      setMenuOpen(false);
+                      // Use setTimeout to ensure menu closes before modal opens
+                      setTimeout(() => {
+                        if (onDelete) {
+                          onDelete(contract);
+                        }
+                      }, 0);
+                    }}
+                  >
                             <svg
                               width="20"
                               height="20"
@@ -484,7 +494,6 @@ const ContractRow = ({ contract, onView, showCheckbox = false }: ContractRowProp
                               />
                             </svg>
             
-                            {/* Text */}
                             <span>Delete</span>
                           </button>
             
@@ -511,78 +520,91 @@ export default function ContractTemplatePage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalTemplates, setTotalTemplates] = useState(0);
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    inactive: 0,
+    draft: 0,
+    latestActive: null as string | null,
+    latestInactive: null as string | null,
+    latestDraft: null as string | null,
+    latest: null as string | null
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   const {
     createContractTemplate,
     updateContractTemplate,
+    deleteContractTemplate,
     listContractTemplates,
+    getContractTemplateStats,
     contractTemplates,
     loading,
     error
   } = useContractTemplateHandler();
 
-  // Load contract templates on component mount and when page/search changes
+  const itemsPerPage = 9;
+
+  const fetchStats = async () => {
+    setStatsLoading(true);
+    try {
+      const statsData = await getContractTemplateStats();
+      setStats(statsData);
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    listContractTemplates(); // call backend once, no pagination or search params
-  }, [listContractTemplates]);
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const response = await listContractTemplates(currentPage, itemsPerPage, searchQuery);
+        setTotalPages(response.totalPages || 1);
+        setTotalTemplates(response.total || 0);
+      } catch (error) {
+        console.error("Failed to fetch templates:", error);
+      }
+    };
+    fetchTemplates();
+  }, [currentPage, searchQuery]);
 
 
-  // Multi-select arrays instead of single string
   type ContractStatus = "Active" | "Inactive" | "Draft";
 
   const CONTRACT_STATUSES: ContractStatus[] = ["Active", "Inactive", "Draft"];
   const [editingContract, setEditingContract] = useState<any>(null);
   const [selectedContractStatus, setSelectedContractStatus] = useState<(ContractStatus | "All")[]>([]);
-  // Calculate statistics from real data
-  const totalContracts = contractTemplates.length;
-  const activeTemplates = contractTemplates.filter(c => c.status === "Active").length;
-  const inactiveTemplates = contractTemplates.filter(c => c.status === "Inactive").length;
-  const draftTemplates = contractTemplates.filter(c => c.status === "Draft").length;
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [templateToDelete, setTemplateToDelete] = useState<any>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  // Get latest contract date
-  const latestContract = contractTemplates.length > 0
-    ? contractTemplates.reduce((latest, contract) =>
-      new Date(contract.createdAt) > new Date(latest.createdAt) ? contract : latest
-    )
-    : null;
-
-  // 🔍 Filter jobs
   const filteredJobs = useMemo(() => {
+    if (selectedContractStatus.length === 0 || selectedContractStatus.includes("All")) {
+      return contractTemplates;
+    }
     return contractTemplates.filter(template => {
-      // Search filter
-      const searchMatch =
-        !searchQuery.trim() ||
-        template.contractTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        template.status.toLowerCase().includes(searchQuery.toLowerCase());
-
-      // Status filter (optional, like applicants)
-      const statusMatch =
-        selectedContractStatus.length === 0 || // empty = no filter
-        selectedContractStatus.includes("All") || // "All" = include all
-        selectedContractStatus.includes(template.status as ContractStatus);
-
-      return searchMatch && statusMatch;
+      return selectedContractStatus.some(selectedStatus =>
+        template.status?.toLowerCase() === selectedStatus.toLowerCase()
+      );
     });
-  }, [searchQuery, selectedContractStatus, contractTemplates]);
-
-  // 📄 Pagination
-    const itemsPerPage = 9; // static number
-    const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
-
-    const paginatedJobs = useMemo(() => {
-      const start = (currentPage - 1) * itemsPerPage;
-      const end = currentPage * itemsPerPage;
-      return filteredJobs.slice(start, end);
-    }, [filteredJobs, currentPage]);
-
+  }, [selectedContractStatus, contractTemplates]);
 
     useEffect(() => {
       setCurrentPage(1);
     }, [searchQuery, selectedContractStatus]);
 
     const goToPage = (page: number) => {
-      if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
     };
 
     const goToPrevious = () => {
@@ -608,7 +630,7 @@ export default function ContractTemplatePage() {
             <button
               className="relative w-[180px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
               onClick={() => {
-                setEditingContract(null); // clear previous data
+                setEditingContract(null);
                 setIsModalOpen(true);
               }}
             >
@@ -622,10 +644,26 @@ export default function ContractTemplatePage() {
 
         {/* Top row: 4 cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 place-items-center">
-          <Card title="Total Templates" value={totalContracts} subtitle={latestContract ? `Last: ${formatDate(latestContract.createdAt)}` : 'No templates yet'} />
-          <Card title="Active" value={activeTemplates} subtitle={latestContract ? `Last: ${formatDate(latestContract.createdAt)}` : 'No templates yet'} />
-          <Card title="Inactive" value={inactiveTemplates} subtitle={latestContract ? `Last: ${formatDate(latestContract.createdAt)}` : 'No templates yet'} />
-          <Card title="Draft" value={draftTemplates} subtitle={latestContract ? `Last: ${formatDate(latestContract.createdAt)}` : 'No templates yet'} />
+          <Card
+            title="Total Templates"
+            value={statsLoading ? "..." : stats.total}
+            subtitle={statsLoading ? "Loading..." : (stats.latest ? `Last: ${formatDate(stats.latest)}` : 'No templates yet')}
+          />
+          <Card
+            title="Active"
+            value={statsLoading ? "..." : stats.active}
+            subtitle={statsLoading ? "Loading..." : (stats.latestActive ? `Last: ${formatDate(stats.latestActive)}` : stats.active > 0 ? 'No date available' : 'No active templates')}
+          />
+          <Card
+            title="Inactive"
+            value={statsLoading ? "..." : stats.inactive}
+            subtitle={statsLoading ? "Loading..." : (stats.latestInactive ? `Last: ${formatDate(stats.latestInactive)}` : stats.inactive > 0 ? 'No date available' : 'No inactive templates')}
+          />
+          <Card
+            title="Draft (Pending)"
+            value={statsLoading ? "..." : stats.draft}
+            subtitle={statsLoading ? "Loading..." : (stats.latestDraft ? `Last: ${formatDate(stats.latestDraft)}` : stats.draft > 0 ? 'No date available' : 'No draft templates')}
+          />
         </div>
 
         {/* Jobs Section */}
@@ -717,7 +755,7 @@ export default function ContractTemplatePage() {
                 {menuOpen && (
                   <div
                     className="absolute sm:top-[47%]  sm:left-[70%] top-[110%] left-[5%] mt-2 sm:w-[420px]  w-[360px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
-                    onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+                  onClick={(e) => e.stopPropagation()}
                   >
                     <div className="p-2">
                       {/* Contract Status */}
@@ -736,8 +774,8 @@ export default function ContractTemplatePage() {
                                 } else {
                                   setSelectedContractStatus((prev) =>
                                     prev.includes(status as ContractStatus)
-                                      ? prev.filter((s) => s !== status && s !== "All") // remove it
-                                      : [...prev.filter((s) => s !== "All"), status as ContractStatus] // add it
+                                    ? prev.filter((s) => s !== status && s !== "All")
+                                    : [...prev.filter((s) => s !== "All"), status as ContractStatus]
                                   );
                                 }
                               }}
@@ -790,12 +828,12 @@ export default function ContractTemplatePage() {
                   <div className="col-span-full text-center py-8 text-red-500">
                     Error: {error}
                   </div>
-                ) : paginatedJobs.length === 0 ? (
+              ) : filteredJobs.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 col-span-full text-gray-500  mt-50">
                     No contracts found
                   </div>
                 ) : (
-                  paginatedJobs.map((contract, index) => (
+                filteredJobs.map((contract, index) => (
                     <ContractCard
                       key={contract.id || index}
                       contractId={contract.id}
@@ -826,12 +864,12 @@ export default function ContractTemplatePage() {
                   <div className="col-span-full text-center py-8 text-red-500">
                     Error: {error}
                   </div>
-                ) : paginatedJobs.length === 0 ? (
+              ) : filteredJobs.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 col-span-full text-gray-500  mt-50">
                     No contracts found
                   </div>
                 ) : (
-                  paginatedJobs.map((contract, index) => (
+                filteredJobs.map((contract, index) => (
                     <ContractRow
                       key={contract.id || index}
                       contract={contract}
@@ -839,6 +877,10 @@ export default function ContractTemplatePage() {
                         setEditingContract(contract);
                         setIsModalOpen(true);
                       }}
+                    onDelete={(contract) => {
+                      setTemplateToDelete(contract);
+                      setDeleteConfirmOpen(true);
+                    }}
                       showCheckbox={true}
                     />
                   ))
@@ -909,8 +951,11 @@ export default function ContractTemplatePage() {
       {/* Next */}
       <ContractModal
         isOpen={isModalOpen}
-        contract={editingContract} // null for new opportunity
-        onClose={() => setIsModalOpen(false)}
+        contract={editingContract}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingContract(null);
+        }}
         onSave={async (data) => {
           try {
             if (editingContract?.id) {
@@ -918,12 +963,47 @@ export default function ContractTemplatePage() {
             } else {
               await createContractTemplate(data);
             }
-            await listContractTemplates(currentPage, itemsPerPage, searchQuery);
+            await Promise.all([
+              listContractTemplates(currentPage, itemsPerPage, searchQuery),
+              fetchStats()
+            ]);
             setIsModalOpen(false);
+            setEditingContract(null);
           } catch (error) {
             console.error("Failed to save contract template:", error);
+            throw error;
           }
         }}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={deleteConfirmOpen}
+        onClose={() => {
+          setDeleteConfirmOpen(false);
+          setTemplateToDelete(null);
+        }}
+        onConfirm={async () => {
+          if (!templateToDelete?.id) return;
+          setDeleting(true);
+          try {
+            await deleteContractTemplate(templateToDelete.id);
+            await Promise.all([
+              listContractTemplates(currentPage, itemsPerPage, searchQuery),
+              fetchStats()
+            ]);
+            setDeleteConfirmOpen(false);
+            setTemplateToDelete(null);
+          } catch (error) {
+            console.error("Failed to delete contract template:", error);
+            alert("Failed to delete contract template. Please try again.");
+          } finally {
+            setDeleting(false);
+          }
+        }}
+        title="Delete Template"
+        itemName={templateToDelete?.name || templateToDelete?.contractTitle}
+        message="Are you sure you want to delete this template? This action cannot be undone."
+        isLoading={deleting}
       />
     </DashboardLayout>
   );

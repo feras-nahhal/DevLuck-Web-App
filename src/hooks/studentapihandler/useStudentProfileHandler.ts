@@ -6,9 +6,12 @@ import { api } from '@/src/lib/api'
 // Profile interfaces
 interface ProfileData {
   name?: string
+  email?: string
   description?: string
   status?: string
   availability?: string
+  salaryExpectation?: number | string
+  image?: string
   profileRanking?: number
   profileComplete?: number
 }
@@ -93,6 +96,7 @@ interface UseStudentProfileHandlerReturn {
   getProfile: () => Promise<StudentProfile>
   updateProfile: (data: ProfileData) => Promise<StudentProfile>
   createProfile: (data: ProfileData) => Promise<StudentProfile>
+  deleteProfile: () => Promise<void>
 
   // Skills
   skills: Skill[]
@@ -235,6 +239,20 @@ export const useStudentProfileHandler = (): UseStudentProfileHandlerReturn => {
       return response.data.data
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Failed to update profile'
+      setProfileError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setProfileLoading(false)
+    }
+  }, [])
+
+  const deleteProfile = useCallback(async (): Promise<void> => {
+    setProfileLoading(true)
+    setProfileError(null)
+    try {
+      await api.delete('/api/student/profile')
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete profile'
       setProfileError(errorMessage)
       throw new Error(errorMessage)
     } finally {
@@ -619,6 +637,7 @@ export const useStudentProfileHandler = (): UseStudentProfileHandlerReturn => {
     getProfile,
     updateProfile,
     createProfile,
+    deleteProfile,
 
     // Skills
     skills,
