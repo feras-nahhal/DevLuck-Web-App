@@ -1,13 +1,12 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
-import { mockContracts } from "@/src/mocks/mockContract";
-import { mockPayments } from "@/src/mocks/mockPayments";
-import { mockReviews } from "@/src/mocks/mockReviews";
-import { mockApplicants } from "@/src/mocks/mockApplicants";
-import { mockCompanies } from "@/src/mocks/mockCompanies";
+import { useStudentOpportunityHandler } from "@/src/hooks/studentapihandler/useStudentOpportunityHandler";
+import { useStudentApplicationHandler } from "@/src/hooks/studentapihandler/useStudentApplicationHandler";
+import { useStudentReviewHandler } from "@/src/hooks/studentapihandler/useStudentReviewHandler";
+import { Toast } from "@/src/components/common/Toast";
 
 interface ClipImageProps {
   src?: string;
@@ -67,13 +66,21 @@ const ClipImage = ({ src, width = 239, height = 271 }: ClipImageProps) => {
 };
 
 
+interface ApplicantCardProps {
+  applicant: {
+    image1?: string;
+    city?: string;
+    name?: string;
+    profileComplete?: number;
+    [key: string]: any;
+  };
+  onClick?: () => void;
+}
+
 const ApplicantCard = ({
   applicant,
   onClick,
-}: {
-  applicant: typeof mockApplicants[0];
-  onClick?: () => void;
-}) => {
+}: ApplicantCardProps) => {
   return (
     <div className="relative w-[268px] h-[462px]">
       {/* SVG Card Body */}
@@ -614,7 +621,7 @@ const ApplicantCard = ({
             alignItems: "center",
           }}
         >
-          {applicant.city.split("").map((char, index) => (
+          {(applicant.city || "").split("").map((char, index) => (
             <span key={index}>{char}</span>
           ))}
         </div>
@@ -733,7 +740,9 @@ const ApplicantCard = ({
 
 
 type PaymentRowProps = {
-  payment: typeof mockPayments[0];
+  payment: {
+    [key: string]: any;
+  };
   showCheckbox?: boolean;
 
 };
@@ -832,46 +841,105 @@ const PaymentRow = ({ payment,showCheckbox = false }: PaymentRowProps) => {
 export default function contractDetailPage() {
     const [review, setReview] = useState("");
     const [starRating, setStarRating] = useState(0);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [applying, setApplying] = useState(false);
+    const [reviews, setReviews] = useState<any[]>([]);
 
-
+    const { contractId } = useParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const opportunityId = contractId as string;
     
-   const { contractId } = useParams();
-  const router = useRouter();
+    // Check if coming from applied opportunities page
+    const fromApplied = searchParams.get('from') === 'applied';
+    const [hasApplied, setHasApplied] = useState(fromApplied);
 
-  const [activeTab, setActiveTab] = useState<"Description" | "Company Details">(
-    "Description"
-  );
+    const { opportunity, loading: opportunityLoading, getOpportunityById, getOpportunityQuestions } = useStudentOpportunityHandler();
+    const { createApplication, checkApplicationExists } = useStudentApplicationHandler();
+    const { getReviewsByCompanyId, loading: reviewsLoading } = useStudentReviewHandler();
 
-  // Find contract by ID from mockContracts
-  const contract = mockContracts.find(
-    (c) => c.id.toString() === contractId
-  );
-
-  if (!contract) {
-    return (
-      <DashboardLayout>
-        <div className="p-6 text-center">
-          <h2 className="text-xl font-bold">contract Not Found</h2>
-          <button
-            className="mt-4 px-4 py-2 bg-yellow-300 rounded hover:bg-yellow-400"
-            onClick={() => router.back()}
-          >
-            Go Back
-          </button>
-        </div>
-      </DashboardLayout>
+    const [activeTab, setActiveTab] = useState<"Description" | "Company Details">(
+        "Description"
     );
-  }
 
+    useEffect(() => {
+        if (opportunityId) {
+            loadOpportunity();
+        }
+    }, [opportunityId]);
 
-    const payments = useMemo(() => {
-  return mockPayments.filter(
-    (p) => p.contractId.toString() === contractId
-  );
-}, [contractId]);
+    const loadOpportunity = async () => {
+        try {
+            const opp = await getOpportunityById(opportunityId);
+            // Load reviews for the company
+            if (opp?.companyId) {
+                try {
+                    const companyReviews = await getReviewsByCompanyId(opp.companyId);
+                    setReviews(companyReviews);
+                } catch (error: any) {
+                    console.error('Failed to load reviews:', error);
+                    setReviews([]);
+                }
+            }
+            
+            // Only check backend if not coming from applied opportunities page
+            if (!fromApplied) {
+                try {
+                    const hasAppliedToThis = await checkApplicationExists(opportunityId);
+                    setHasApplied(hasAppliedToThis);
+                } catch (error: any) {
+                    console.error('Failed to check application:', error);
+                }
+            }
+        } catch (error: any) {
+            setToast({ message: error.message || 'Failed to load opportunity', type: 'error' });
+        }
+    };
 
+    const handleApply = async () => {
+        try {
+            setApplying(true);
+            const questions = await getOpportunityQuestions(opportunityId);
+            
+            if (questions && questions.length > 0) {
+                router.push(`/Student/opportunity/${opportunityId}/questions`);
+            } else {
+                await createApplication(opportunityId);
+                setHasApplied(true); // Update state after successful application
+                setToast({ message: "Application submitted successfully!", type: 'success' });
+            }
+        } catch (error: any) {
+            setToast({ message: error.message || "Failed to submit application", type: 'error' });
+        } finally {
+            setApplying(false);
+        }
+    };
 
-const reviews = mockReviews
+    if (opportunityLoading) {
+        return (
+            <DashboardLayout>
+                <div className="p-6 text-center">
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black mx-auto" />
+                </div>
+            </DashboardLayout>
+        );
+    }
+
+    if (!opportunity) {
+        return (
+            <DashboardLayout>
+                <div className="p-6 text-center">
+                    <h2 className="text-xl font-bold">Opportunity Not Found</h2>
+                    <button
+                        className="mt-4 px-4 py-2 bg-yellow-300 rounded hover:bg-yellow-400"
+                        onClick={() => router.push("/Student/opportunity")}
+                    >
+                        Go Back
+                    </button>
+                </div>
+            </DashboardLayout>
+        );
+    }
 
   return (
     
@@ -909,9 +977,14 @@ const reviews = mockReviews
                     </span>
                     </button>
                     {/* Apply Button */}
-                    <button className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center rounded-lg transition hover:scale-105 sm:ml-22 ml-5 "
-                    onClick={() => router.push(`/Student/opportunity/${contractId}/questions`)}>
-                      Apply
+                    <button 
+                        className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center rounded-lg transition hover:scale-105 sm:ml-22 ml-5 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={handleApply}
+                        disabled={applying || hasApplied}
+                    >
+                        <span className="skew-x-[12deg]">
+                            {hasApplied ? 'Applied' : applying ? 'Applying...' : 'Apply'}
+                        </span>
                     </button>
                 </div>
 
@@ -920,13 +993,13 @@ const reviews = mockReviews
                     <div className="flex flex-col gap-6">
                       <section>
                           <h2 className="font-semibold text-xl mb-2">Job Description</h2>
-                          <p>{contract.jobDescription}</p>
+                          <p>{opportunity.details || 'No description available'}</p>
                       </section>
 
                       <section>
                           <h3 className="font-semibold mb-2">Key Responsibilities</h3>
                           <ul className="list-disc pl-6 space-y-1">
-                          {contract.keyResponsibilities.map((item, i) => (
+                          {(opportunity.keyResponsibilities || []).map((item, i) => (
                               <li key={i}>{item}</li>
                           ))}
                           </ul>
@@ -935,7 +1008,7 @@ const reviews = mockReviews
                       <section>
                           <h3 className="font-semibold mb-2">Why You'll Love Working Here</h3>
                           <ul className="list-disc pl-6 space-y-1">
-                          {contract.whyYoullLoveWorkingHere.map((item, i) => (
+                          {(opportunity.whyYouWillLoveWorkingHere || []).map((item, i) => (
                               <li key={i}>{item}</li>
                           ))}
                           </ul>
@@ -945,7 +1018,7 @@ const reviews = mockReviews
                         <section>
                           <h3 className="font-semibold mb-2">Skills</h3>
                           <div className="flex flex-wrap gap-2">
-                            {contract.skills.map((skill, i) => (
+                            {(opportunity.skills || []).map((skill, i) => (
                               <span
                                 key={i}
                                 className="px-3 py-1 text-sm skew-x-[-12deg]  rounded-[6px] border border-black "
@@ -960,7 +1033,7 @@ const reviews = mockReviews
                         <section>
                           <h3 className="font-semibold mb-2">Benefits</h3>
                           <div className="flex flex-wrap gap-2">
-                            {contract.benefits.map((benefit, i) => (
+                            {(opportunity.benefits || []).map((benefit, i) => (
                               <span
                                 key={i}
                                 className="px-3 py-1 text-sm skew-x-[-12deg]  rounded-[6px] border border-black "
@@ -976,8 +1049,7 @@ const reviews = mockReviews
                 )}
                 {/* Content */}
                 {activeTab === "Company Details" && (() => {
-                  // Find the company for this contract
-                  const company = mockCompanies.find(c => c.id === contract.companyId);
+                  const company = opportunity.company;
 
                   if (!company) {
                     return <div>Company not found</div>;
@@ -986,50 +1058,33 @@ const reviews = mockReviews
                   return (
                     <div>
                       <div className="flex items-center gap-4">
-                        <img
-                          src={company.image}
-                          alt={company.name}
-                          className="w-24 h-24 rounded-lg object-cover"
-                        />
+                        {company.logo && (
+                          <img
+                            src={company.logo}
+                            alt={company.name}
+                            className="w-24 h-24 rounded-lg object-cover"
+                          />
+                        )}
                         <div>
                           <h2 className="text-xl font-bold">{company.name}</h2>
-                          <p className="text-sm text-gray-600">{company.city}</p>
-                          <p className="text-sm text-gray-600">{company.address}</p>
-                          <p className="text-sm text-gray-600">Email: {company.email}</p>
-                          <p className="text-sm text-gray-600">Phone: {company.phoneNumber}</p>
+                          {company.location && (
+                            <p className="text-sm text-gray-600">{company.location}</p>
+                          )}
+                          {company.industry && (
+                            <p className="text-sm text-gray-600">Industry: {company.industry}</p>
+                          )}
+                          {company.website && (
+                            <p className="text-sm text-gray-600">Website: {company.website}</p>
+                          )}
                         </div>
                       </div>
 
-                      <div>
-                        <h3 className="font-semibold mt-4 mb-2">Corporate Info</h3>
-                        <p className="text-sm text-gray-700">{company.corporate}</p>
-                      </div>
-
-                      <div className="flex flex-wrap  gap-2 mt-4">
-                        <span className="px-3 py-1 text-sm  rounded-[6px] bg-[#FFEB9C] ">
-                          Employees: {company.employeeNumber}
-                        </span>
-                        <span className="px-3 py-1 text-sm  rounded-[6px] bg-[#FFEB9C] ">
-                          Profile Ranking: {company.profileRanking}
-                        </span>
-                        <span className="px-3 py-1 text-sm  rounded-[6px] bg-[#FFEB9C] ">
-                          Status: {company.status}
-                        </span>
-                      </div>
-
-                      <div className="mt-4">
-                        <h3 className="font-semibold mb-2">Programs</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {company.programs.map((program, i) => (
-                            <span
-                              key={i}
-                              className="px-3 py-1 text-sm skew-x-[-12deg]  rounded-[6px] border border-black "
-                            >
-                              {program}
-                            </span>
-                          ))}
+                      {company.description && (
+                        <div>
+                          <h3 className="font-semibold mt-4 mb-2">About</h3>
+                          <p className="text-sm text-gray-700">{company.description}</p>
                         </div>
-                      </div>
+                      )}
                     </div>
                   );
                 })()}
@@ -1053,18 +1108,8 @@ const reviews = mockReviews
 
                           {/* Horizontal scroll row */}
                           <div className="flex scale-[0.9] gap-4 overflow-x-auto no-scrollbar">
-                            {mockApplicants
-                              .filter(applicant =>
-                                contract.applicantIds.includes(Number(applicant.applicantId))
-                              )
-                              .map(applicant => (
-                                <ApplicantCard
-                                  key={applicant.applicantId}
-                                  applicant={applicant}
-                                  onClick={() => console.log(applicant.applicantId)}
-                                />
-                              ))
-                            }
+                            {/* Current employees section - can be populated later with real data */}
+                            <p className="text-gray-500 text-sm">No current employees to display</p>
                           </div>
 
 
@@ -1074,38 +1119,43 @@ const reviews = mockReviews
 
                     </div>
                     {/* Review Label */}
-                        <h3 className="text-lg font-semibold mb-4">
-                        Review
-                        </h3>
+                        <h4
+                            style={{
+                            fontFamily: "'Public Sans', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "18px",
+                            marginBottom: "12px",
+                            }}
+                        >
+                            Reviews
+                        </h4>
 
-                         <div
-                          style={{
-                            maxHeight: "400px",
+                        <div
+                            style={{
+                            flex: 1,
                             overflowY: "auto",
                             display: "flex",
                             flexDirection: "column",
-                            gap: "16px",
-                            padding: "12px",        // ✅ IMPORTANT
-                            paddingLeft: "20px",    // extra space for skew
-                            paddingRight: "20px",
-                          }}
+                            gap: "12px",
+                            }}
                         >
-
-               {reviews.map((review) => (
-                    <div className="skew-x-[-12deg] rounded-[8px] max-w-[600px] h-[320px] shadow-lg bg-white  "
-                        key={review.id}
-                        style={{
-                        padding: "12px",
-                        borderRadius: "12px",
-                 
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "6px",
-                        }}
-                    >
-                        {/* Reviewer Info + Rating Stars */}
-                        <div className="skew-x-[12deg] "
-                         style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+               {reviewsLoading ? (
+                 <p className="text-[#555] font-publicSans py-4">Loading reviews...</p>
+               ) : reviews.length > 0 ? (
+                 reviews.map((review) => (
+                     <div
+                         key={review.id}
+                         style={{
+                         padding: "12px",
+                         borderRadius: "12px",
+                    
+                         display: "flex",
+                         flexDirection: "column",
+                         gap: "6px",
+                         }}
+                     >
+                         {/* Reviewer Info + Rating Stars */}
+                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         {/* Reviewer Info */}
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                             <img
@@ -1160,9 +1210,11 @@ const reviews = mockReviews
                         {/* Review Text */}
                         <div style={{ fontSize: "13px", color: "#333" }}>{review.reviewText}</div>
                     </div>
-                    ))}
-
-                </div>
+                    ))
+                 ) : (
+                   <p className="text-[#555] font-publicSans py-4">No reviews available for this company.</p>
+                 )}
+                         </div>
 
 
             
@@ -1172,7 +1224,12 @@ const reviews = mockReviews
 
     </div>
         </div>
-
+        <Toast
+            message={toast?.message || ''}
+            type={toast?.type || 'success'}
+            isVisible={!!toast}
+            onClose={() => setToast(null)}
+        />
     </DashboardLayout>
   );
 }

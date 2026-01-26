@@ -818,9 +818,11 @@ return (
               <ApplicantCard
                 key={contract.originalId || index}
                 applicant={contract}
-                onClick={() =>
-                  router.push(`/Student/applied-Opportunity/${contract.originalId || contract.id}`)
-                }
+                onClick={() => {
+                  if (contract.opportunityId) {
+                    router.push(`/Student/applied-Opportunity/${contract.opportunityId}?from=applied`);
+                  }
+                }}
                 onWithdraw={() => handleWithdraw(contract.originalId)}
                 isWithdrawing={withdrawingApplicationId !== null}
               />
@@ -839,7 +841,7 @@ return (
               applicantName="Student"
               onMainClick={() => {
                 if (contract.opportunityId) {
-                  router.push(`/Student/applied-Opportunity/${contract.opportunityId}`);
+                  router.push(`/Student/applied-Opportunity/${contract.opportunityId}?from=applied`);
                 }
               }}
               onWithdraw={() => handleWithdraw(contract.originalId)}

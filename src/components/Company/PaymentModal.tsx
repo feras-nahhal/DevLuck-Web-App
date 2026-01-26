@@ -6,6 +6,9 @@ import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 import { usePaymentHandler } from "@/src/hooks/companyapihandler/usePaymentHandler";
+import DatePicker from "react-date-picker";
+import "react-date-picker/dist/DatePicker.css";
+import "react-calendar/dist/Calendar.css";
 
 interface PaymentData {
   id?: string;
@@ -137,7 +140,7 @@ const ParallelogramSelect = ({
   );
 };
 
-// Parallelogram DatePicker Component
+type Value = Date | null | [Date | null, Date | null];
 const ParallelogramDatePicker = ({
   label,
   placeholder,
@@ -163,7 +166,7 @@ const ParallelogramDatePicker = ({
   }, []);
 
   return (
-    <div ref={ref} className="relative w-full h-[48px]">
+    <div ref={ref} className="relative w-full">
       {/* Label */}
       <label className="absolute -top-2 left-5 h-[18px] px-3 bg-[#FFEB9C] text-xs text-[#1E1E1E] flex items-center skew-x-[-12deg] z-30 rounded-md">
         <span className="skew-x-[12deg]">{label}</span>
@@ -173,7 +176,7 @@ const ParallelogramDatePicker = ({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="relative w-full h-full"
+        className="relative w-full h-[48px]"
       >
         <div
           className="h-full w-full border border-[#1C252E] rounded-[12px]"
@@ -194,32 +197,31 @@ const ParallelogramDatePicker = ({
         </div>
       </button>
 
-     {/* Calendar */}
-{open && (
-  <div
-    className="absolute z-50"
-    style={{
-      top: "-230px", // move slightly higher
-      left: "50%",   // center horizontally relative to the input
-      transform: "translateX(-50%)", // center and keep parallelogram skew
-      minWidth: "250px", // normal width
-      maxWidth: "350px",
-    }}
-  >
-    <div className="bg-white border rounded-[12px] p-3 shadow-lg">
-        <DayPicker
-          mode="single"
-          selected={value ? new Date(value) : undefined}
-          onSelect={(date) => {
-            if (date) {
-              onChange(format(date, "yyyy-MM-dd"));
-              setOpen(false);
-            }
+      {/* react-date-picker */}
+      {open && (
+        <div
+          className="absolute z-50"
+          style={{
+            top: "-230px",
+            left: "50%",
+            transform: "translateX(-50%)",
           }}
-        />
-    </div>
-  </div>
-)}
+        >
+          <DatePicker
+  value={value ? new Date(value) : null}
+  onChange={(val: Value) => {
+    if (val instanceof Date) {
+      onChange(val.toISOString().split("T")[0]);
+      setOpen(false);
+    }
+  }}
+  calendarIcon={null}
+  clearIcon={null}
+  isOpen={true}
+
+/>
+        </div>
+      )}
     </div>
   );
 };
@@ -317,7 +319,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         : "";
       setFormData({
         applicantName: contract.name || "",
-        contractId: contract.inContractNumber || "",
+        contractId: contract.id || "",
         nextPayment: "",
         monthlyAllowance: allowance,
         note: "",
@@ -412,9 +414,10 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         {/* Form - scrollable */}
         <form
             id="payment-form"
-            className="flex-1 flex flex-col gap-4 p-4  bg-white "
+            className="flex-1 flex flex-col gap-4 p-4  bg-white overflow-y-auto "
             onSubmit={handleSubmit}
         >
+          <div className="flex flex-col gap-4">
             <ParallelogramInput
             label="Applicant Name"
             placeholder="Enter applicant name"
@@ -453,6 +456,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             value={formData.note ?? ""}
             onChange={(e) => handleInputChange("note", e.target.value)}
             />
+
+            </div>
             
             {submitError && (
               <div className="bg-red-50 border border-red-200 rounded-md p-3">

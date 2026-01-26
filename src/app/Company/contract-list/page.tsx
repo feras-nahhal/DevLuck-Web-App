@@ -5,6 +5,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { ArrowUpRight, Check } from "lucide-react";
 import ContractModal from "@/src/components/Company/ContractModal";
+import DeleteConfirmationModal from "@/src/components/common/DeleteConfirmationModal";
 import { createPortal } from "react-dom";
 import { useContractHandler } from "@/src/hooks/companyapihandler/useContractHandler";
 
@@ -466,10 +467,11 @@ type ContractRowProps = {
   applicant: MappedContract;
   onMainClick?: () => void;
   onEdit?: () => void;
+  onDelete?: () => void;
   showCheckbox?: boolean;
 };
 
-const ContractRow = ({ applicant,onMainClick,onEdit,showCheckbox = false }: ContractRowProps) => {
+const ContractRow = ({ applicant,onMainClick,onEdit,onDelete,showCheckbox = false }: ContractRowProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [checked, setChecked] = useState(false);
@@ -651,7 +653,12 @@ const ContractRow = ({ applicant,onMainClick,onEdit,showCheckbox = false }: Cont
                   <span>Edit</span>
                 </button>
                 
-                <button className="w-full flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
+                <button 
+                  className="w-full flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onDelete?.();
+                  }}
                 >
                 {/* SVG Icon */}
                 <svg
@@ -722,10 +729,19 @@ export default function ContractListPage() {
       const [currentPage, setCurrentPage] = useState(1);
       const [isModalOpen, setIsModalOpen] = useState(false);
 
-      const { contracts, loading, error, listContracts } = useContractHandler();
+      const { contracts, loading, error, listContracts, getContractStats, updateContract, deleteContract } = useContractHandler();
       const [totalContracts, setTotalContracts] = useState(0);
       const [totalPages, setTotalPages] = useState(1);
-      const [allContractsForStats, setAllContractsForStats] = useState<MappedContract[]>([]);
+      const [statsLoading, setStatsLoading] = useState(true);
+      const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+      const [contractToDelete, setContractToDelete] = useState<string | null>(null);
+      const [deleting, setDeleting] = useState(false);
+      const [contractStatsData, setContractStatsData] = useState({
+        total: 0,
+        running: 0,
+        completed: 0,
+        other: 0
+      });
 
       useEffect(() => {
         const fetchContracts = async () => {
@@ -764,41 +780,34 @@ export default function ContractListPage() {
       }, [itemsPerPage]);
 
       useEffect(() => {
-        const fetchAllForStats = async () => {
+        const fetchStats = async () => {
+          setStatsLoading(true);
           try {
-            const response = await listContracts(1, 1000);
-            const allMapped = response.items.map(contract => {
-              const createdDate = new Date(contract.createdDate || contract.createdAt);
-              const durationMonths = contract.duration ? parseInt(contract.duration.split(' ')[0]) : 0;
-              const endDate = new Date(createdDate);
-              endDate.setMonth(endDate.getMonth() + durationMonths);
-
-              const fullId = contract.inContractNumber || contract.id;
-              const truncatedId = fullId.length > 3 ? fullId.substring(fullId.length - 3) : fullId;
-
-              return {
-                applicantId: truncatedId,
-                name: contract.name,
-                contractTitle: contract.contractTitle,
-                startDate: createdDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }),
-                endDate: endDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }),
-                contractStatus: contract.status,
-                id: contract.id,
-                image: '',
-                salaryPaid: contract.monthlyAllowance ? `${contract.currency || 'USD'} ${contract.monthlyAllowance}` : 'N/A',
-                workProgress: 0
-              };
-            });
-            setAllContractsForStats(allMapped);
+            const stats = await getContractStats();
+            setContractStatsData(stats);
           } catch (err) {
-            console.error("Failed to fetch contracts for stats:", err);
+            console.error("Failed to fetch contract stats:", err);
+          } finally {
+            setStatsLoading(false);
           }
         };
 
-        if (!searchQuery && selectedContractStatus.length === 0) {
-          fetchAllForStats();
+        // Always fetch stats on mount, and when filters are cleared
+        fetchStats();
+      }, [getContractStats]);
+
+      // Function to refresh stats (can be called after contract creation)
+      const refreshStats = async () => {
+        setStatsLoading(true);
+        try {
+          const stats = await getContractStats();
+          setContractStatsData(stats);
+        } catch (err) {
+          console.error("Failed to fetch contract stats:", err);
+        } finally {
+          setStatsLoading(false);
         }
-      }, [listContracts, searchQuery, selectedContractStatus]);
+      };
 
       const mappedContracts: MappedContract[] = useMemo(() => {
         return contracts.map(contract => {
@@ -847,18 +856,17 @@ export default function ContractListPage() {
       };
 
       const contractStats = useMemo(() => {
-      const total = allContractsForStats.length;
-      const running = allContractsForStats.filter(c => c.contractStatus === "Running").length;
-      const completed = allContractsForStats.filter(c => c.contractStatus === "Completed").length;
-      const other = total - running - completed;
-
+      const formatValue = (val: number) => {
+        return statsLoading ? "..." : val.toString();
+      };
+      
       return [
-        { title: "Total Contracts", value: total.toString(), subtitle: "All contracts in the system" },
-        { title: "Running", value: running.toString(), subtitle: "Currently active contracts" },
-        { title: "Completed", value: completed.toString(), subtitle: "Finished contracts" },
-        { title: "Other", value: other.toString(), subtitle: "Contracts with other status" },
+        { title: "Total Contracts", value: formatValue(contractStatsData.total), subtitle: "All contracts in the system" },
+        { title: "Running", value: formatValue(contractStatsData.running), subtitle: "Currently active contracts" },
+        { title: "Completed", value: formatValue(contractStatsData.completed), subtitle: "Finished contracts" },
+        { title: "Other", value: formatValue(contractStatsData.other), subtitle: "Contracts with other status" },
       ];
-    }, [allContractsForStats]);
+    }, [contractStatsData, statsLoading]);
   
     
 return (
@@ -1037,29 +1045,35 @@ return (
         </div>
 
       {/* Applicants Grid */}
-      {showApplicants && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 max-w-[1200px] mx-auto">
-          {loading ? (
-            <div className="flex items-center justify-center py-12 mt-50">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
-            </div>
-          ) : error ? (
-            <div className="col-span-5 text-center py-8 text-red-500  mt-50">Error: {error}</div>
-          ) : paginatedApplicants.length === 0 ? (
-            <div className="flex flex-col items-center justify-center mt-50 ">No contracts found</div>
-          ) : (
-            paginatedApplicants.map((applicant, index) => (
-              <ApplicantCard
-                key={applicant.id}
-                applicant={applicant}
-                onClick={() =>
-                  router.push(`/Company/contract-list/${applicant.id}`)
-                }
-              />
-            ))
+          {showApplicants && (
+            <>
+              {loading ? (
+                <div className="flex items-center justify-center py-12 mt-50">
+                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
+                </div>
+              ) : error ? (
+                <div className="col-span-5 text-center py-8 text-red-500 mt-50">
+                  Error: {error}
+                </div>
+              ) : paginatedApplicants.length === 0 ? (
+                <div className="flex flex-col items-center justify-center mt-50">
+                  No contracts found
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 max-w-[1200px] mx-auto">
+                  {paginatedApplicants.map((applicant, index) => (
+                    <ApplicantCard
+                      key={applicant.id || index}
+                      applicant={applicant}
+                      onClick={() =>
+                        router.push(`/Company/contract-list/${applicant.id}`)
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
-        </div>
-      )}
 
          {/* Contracts Grid */}
       {!showApplicants && (
@@ -1081,8 +1095,38 @@ return (
                   router.push(`/Company/contract-list/${applicant.id}`)
                 }
                 onEdit={() => {
-                  setEditingContract(applicant);
-                  setIsModalOpen(true);
+                  // Find the original contract from the contracts array - it has all the fields we need
+                  const originalContract = contracts.find(c => c.id === applicant.id);
+                  if (originalContract) {
+                    // Calculate dates from the contract data
+                    const createdDate = new Date(originalContract.createdDate || originalContract.createdAt);
+                    const durationMonths = originalContract.duration ? parseInt(originalContract.duration.split(' ')[0]) : 0;
+                    const endDate = new Date(createdDate);
+                    endDate.setMonth(endDate.getMonth() + durationMonths);
+                    
+                    // Map the contract to the format expected by ContractModal
+                    // All fields are available in the original contract from the list
+                    const contractForModal = {
+                      email: (originalContract as any).email || "",
+                      name: originalContract.name || "",
+                      contractTitle: originalContract.contractTitle || "",
+                      Contract: originalContract.duration || "",
+                      startDate: createdDate.toISOString().split('T')[0],
+                      endDate: endDate.toISOString().split('T')[0],
+                      salary: originalContract.salary ? originalContract.salary.toString() : (originalContract.monthlyAllowance ? originalContract.monthlyAllowance.toString() : ""),
+                      note: originalContract.note || "",
+                      contractStatus: originalContract.status || "",
+                      id: originalContract.id
+                    };
+                    
+                    // Open modal immediately with the data
+                    setEditingContract(contractForModal);
+                    setIsModalOpen(true);
+                  }
+                }}
+                onDelete={() => {
+                  setContractToDelete(applicant.id);
+                  setDeleteConfirmOpen(true);
                 }}
                 showCheckbox={true}
               />
@@ -1151,11 +1195,48 @@ return (
     }}
     onSave={async (data) => {
       setIsModalOpen(false);
+      const wasEditing = editingContract && (editingContract as any).id;
       setEditingContract(null);
       setCurrentPage(1);
-      await listContracts(1, itemsPerPage, searchQuery || undefined);
+      // Refresh both contract list and stats
+      await Promise.all([
+        listContracts(1, itemsPerPage, searchQuery || undefined),
+        refreshStats()
+      ]);
     }}
 />
+
+    {/* Delete Confirmation Modal */}
+    <DeleteConfirmationModal
+      isOpen={deleteConfirmOpen}
+      onClose={() => {
+        setDeleteConfirmOpen(false);
+        setContractToDelete(null);
+      }}
+      onConfirm={async () => {
+        if (!contractToDelete) return;
+        setDeleting(true);
+        try {
+          await deleteContract(contractToDelete);
+          // Refresh both contract list and stats after deletion
+          const statusFilter = selectedContractStatus.length > 0 && !selectedContractStatus.includes("All") ? selectedContractStatus[0] : undefined;
+          await Promise.all([
+            listContracts(currentPage, itemsPerPage, searchQuery || undefined, statusFilter),
+            refreshStats()
+          ]);
+          setDeleteConfirmOpen(false);
+          setContractToDelete(null);
+        } catch (error) {
+          console.error("Failed to delete contract:", error);
+          alert("Failed to delete contract. Please try again.");
+        } finally {
+          setDeleting(false);
+        }
+      }}
+      title="Delete Contract"
+      message="Are you sure you want to delete this contract? This action cannot be undone."
+      isLoading={deleting}
+    />
   </DashboardLayout>
 );
 }

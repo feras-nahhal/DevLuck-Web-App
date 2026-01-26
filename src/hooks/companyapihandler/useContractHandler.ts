@@ -33,9 +33,32 @@ interface ListContractsResponse {
   totalPages: number
 }
 
+interface ContractStats {
+  total: number
+  running: number
+  completed: number
+  other: number
+}
+
+interface Employee {
+  id: string
+  contractTitle: string
+  contractNumber: string
+  status: string
+  student: {
+    id: string
+    name: string
+    email: string
+    image?: string
+    profileComplete: number
+    status: string
+  } | null
+}
+
 interface UseContractHandlerReturn {
   contracts: Contract[]
   contract: Contract | null
+  employees: Employee[]
   loading: boolean
   error: string | null
   createContract: (data: ContractData) => Promise<Contract>
@@ -43,12 +66,15 @@ interface UseContractHandlerReturn {
   deleteContract: (id: string) => Promise<void>
   getContractById: (id: string) => Promise<Contract>
   listContracts: (page?: number, pageSize?: number, search?: string, status?: string) => Promise<ListContractsResponse>
+  getContractStats: () => Promise<ContractStats>
+  getEmployees: () => Promise<Employee[]>
   clearError: () => void
 }
 
 export const useContractHandler = (): UseContractHandlerReturn => {
   const [contracts, setContracts] = useState<Contract[]>([])
   const [contract, setContract] = useState<Contract | null>(null)
+  const [employees, setEmployees] = useState<Employee[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -160,9 +186,43 @@ export const useContractHandler = (): UseContractHandlerReturn => {
     []
   )
 
+  const getContractStats = useCallback(async (): Promise<ContractStats> => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await api.get<{ status: string; data: ContractStats }>('/company/contracts/stats')
+      return response.data.data
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || err.message || 'Failed to get contract statistics'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const getEmployees = useCallback(async (): Promise<Employee[]> => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await api.get<{ status: string; data: Employee[] }>('/company/contracts/employees')
+      setEmployees(response.data.data)
+      return response.data.data
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || err.message || 'Failed to get employees'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   return {
     contracts,
     contract,
+    employees,
     loading,
     error,
     createContract,
@@ -170,6 +230,8 @@ export const useContractHandler = (): UseContractHandlerReturn => {
     deleteContract,
     getContractById,
     listContracts,
+    getContractStats,
+    getEmployees,
     clearError
   }
 }

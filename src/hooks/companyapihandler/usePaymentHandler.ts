@@ -31,6 +31,21 @@ interface ListPaymentsResponse {
   totalPages: number
 }
 
+interface PaymentStats {
+  totalPaid: {
+    amount: number
+    count: number
+  }
+  pending: {
+    amount: number
+    count: number
+  }
+  due: {
+    amount: number
+    count: number
+  }
+}
+
 interface UsePaymentHandlerReturn {
   payments: Payment[]
   payment: Payment | null
@@ -38,7 +53,8 @@ interface UsePaymentHandlerReturn {
   error: string | null
   createPayment: (data: PaymentData) => Promise<Payment>
   updatePayment: (id: string, data: PaymentData) => Promise<Payment>
-  listPayments: (page?: number, pageSize?: number, search?: string, status?: string) => Promise<ListPaymentsResponse>
+  listPayments: (page?: number, pageSize?: number, search?: string, status?: string, contractId?: string) => Promise<ListPaymentsResponse>
+  getPaymentStats: (contractId: string) => Promise<PaymentStats>
   deletePayment: (id: string) => Promise<void>
   clearError: () => void
 }
@@ -71,13 +87,14 @@ export const usePaymentHandler = (): UsePaymentHandlerReturn => {
   }, [])
 
   const listPayments = useCallback(
-    async (page: number = 1, pageSize: number = 10, search?: string, status?: string): Promise<ListPaymentsResponse> => {
+    async (page: number = 1, pageSize: number = 10, search?: string, status?: string, contractId?: string): Promise<ListPaymentsResponse> => {
       setLoading(true)
       setError(null)
       try {
         const params: any = { page, pageSize }
         if (search) params.search = search
         if (status) params.status = status
+        if (contractId) params.contractId = contractId
 
         const response = await api.get<{ status: string; data: ListPaymentsResponse }>('/company/payments', {
           params
@@ -115,6 +132,24 @@ export const usePaymentHandler = (): UsePaymentHandlerReturn => {
     }
   }, [])
 
+  const getPaymentStats = useCallback(async (contractId: string): Promise<PaymentStats> => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await api.get<{ status: string; data: PaymentStats }>('/company/payments/stats', {
+        params: { contractId }
+      })
+      return response.data.data
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || err.message || 'Failed to get payment statistics'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   const deletePayment = useCallback(async (id: string): Promise<void> => {
     setLoading(true)
     setError(null)
@@ -139,6 +174,7 @@ export const usePaymentHandler = (): UsePaymentHandlerReturn => {
     createPayment,
     updatePayment,
     listPayments,
+    getPaymentStats,
     deletePayment,
     clearError
   }

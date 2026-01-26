@@ -1,88 +1,165 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
+import { useQuestionHandler, Question } from "@/src/hooks/companyapihandler/useQuestionHandler";
+import { Toast } from "@/src/components/common/Toast";
 
 type QuestionType = "text" | "select" | "checkbox" | "rating";
 
 interface NewQuestion {
-  id: string;
+  id?: string;
   question: string;
   type: QuestionType;
-  options?: string[]; // for select and checkbox
+  options?: string[];
+  isRequired?: boolean;
 }
 
 export default function AddQuestionsPage() {
+  const { jobId } = useParams();
+  const router = useRouter();
+  const opportunityId = jobId as string;
+
+  const {
+    questions: savedQuestions,
+    loading,
+    error,
+    getQuestions,
+    createQuestion,
+    updateQuestion,
+    deleteQuestion,
+    bulkUpdateQuestions,
+    clearError
+  } = useQuestionHandler();
+
   const [questions, setQuestions] = useState<NewQuestion[]>([]);
   const [questionInput, setQuestionInput] = useState("");
   const [questionType, setQuestionType] = useState<QuestionType>("text");
-  const [optionsInput, setOptionsInput] = useState(""); // comma separated
-  const [answers, setAnswers] = useState<{ [questionId: string]: string | string[] | number }>({});
+  const [optionsInput, setOptionsInput] = useState("");
+  const [isRequired, setIsRequired] = useState(false);
   const [questionTypeDropdownOpen, setQuestionTypeDropdownOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    if (error) {
+      setToast({ message: error, type: 'error' });
+      clearError();
+    }
+  }, [error, clearError]);
+
+  useEffect(() => {
+    if (opportunityId) {
+      loadQuestions();
+    }
+  }, [opportunityId]);
+
+  const loadQuestions = async () => {
+    try {
+      const loadedQuestions = await getQuestions(opportunityId);
+      setQuestions(loadedQuestions.map(q => ({
+        id: q.id,
+        question: q.question,
+        type: q.type,
+        options: q.options || [],
+        isRequired: q.isRequired
+      })));
+    } catch (error) {
+      console.error("Failed to load questions:", error);
+    }
+  };
 
 
-  // Add new question
+  // Add new question (local state only, saved when user clicks Save)
   const addQuestion = () => {
-    if (!questionInput) return;
+    if (!questionInput.trim()) return;
 
     const newQuestion: NewQuestion = {
-      id: Date.now().toString(),
-      question: questionInput,
+      question: questionInput.trim(),
       type: questionType,
       options: (questionType === "select" || questionType === "checkbox")
         ? optionsInput.split(",").map(o => o.trim()).filter(o => o)
-        : undefined,
+        : [],
+      isRequired: isRequired
     };
 
     setQuestions([...questions, newQuestion]);
     setQuestionInput("");
     setOptionsInput("");
     setQuestionType("text");
+    setIsRequired(false);
   };
 
   // Delete a question
-  const deleteQuestion = (id: string) => {
-    setQuestions(questions.filter(q => q.id !== id));
-    const updatedAnswers = { ...answers };
-    delete updatedAnswers[id];
-    setAnswers(updatedAnswers);
+  const handleDeleteQuestion = async (id: string) => {
+    if (id) {
+      try {
+        await deleteQuestion(opportunityId, id);
+        setQuestions(questions.filter(q => q.id !== id));
+        setToast({ message: 'Question deleted successfully', type: 'success' });
+      } catch (error: any) {
+        setToast({ message: error.message || 'Failed to delete question', type: 'error' });
+      }
+    } else {
+      const questionIndex = questions.findIndex(q => !q.id);
+      if (questionIndex !== -1) {
+        setQuestions(questions.filter((_, index) => index !== questionIndex));
+      }
+    }
+  };
+
+  // Save all questions
+  const handleSaveQuestions = async () => {
+    if (questions.length === 0) {
+      setToast({ message: 'Please add at least one question', type: 'error' });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await bulkUpdateQuestions(opportunityId, questions.map((q, index) => ({
+        id: q.id,
+        question: q.question,
+        type: q.type,
+        options: q.options || [],
+        order: index,
+        isRequired: q.isRequired || false
+      })));
+      setToast({ message: 'Questions saved successfully!', type: 'success' });
+      await loadQuestions();
+    } catch (error: any) {
+      setToast({ message: error.message || 'Failed to save questions', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Delete a single option from select/checkbox
-  const deleteOption = (qId: string, opt: string) => {
-    setQuestions(prev => prev.map(q => {
-      if (q.id === qId && q.options) {
+  const deleteOption = (qIndex: number, opt: string) => {
+    setQuestions(prev => prev.map((q, idx) => {
+      if (idx === qIndex && q.options) {
         return { ...q, options: q.options.filter(o => o !== opt) };
       }
       return q;
     }));
-    const updatedAnswers = answers[qId];
-    if (Array.isArray(updatedAnswers)) {
-      setAnswers({ ...answers, [qId]: updatedAnswers.filter(v => v !== opt) });
-    } else if (updatedAnswers === opt) {
-      setAnswers({ ...answers, [qId]: "" });
-    }
   };
 
-  // Handle answer selection
-  const handleAnswer = (qId: string, value: string | number, type: QuestionType, checked?: boolean) => {
-    if (type === "checkbox") {
-      const prev = (answers[qId] as string[]) || [];
-      let updated: string[];
-      if (checked) updated = [...prev, value as string];
-      else updated = prev.filter(v => v !== value);
-      setAnswers({ ...answers, [qId]: updated });
-    } else {
-      setAnswers({ ...answers, [qId]: value });
-    }
-  };
 
   return (
     <DashboardLayout>
       <div className="px-6 py-6 min-h-[calc(100vh-120px)]">
-        <h1 className="text-3xl font-bold mb-2 text-center">Create opportunity exam Form</h1>
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => router.push(`/Company/opportunity/${opportunityId}`)}
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+          >
+            ← Back to Opportunity
+          </button>
+        </div>
+        <h1 className="text-3xl font-bold mb-2 text-center">Create Opportunity Questions</h1>
         <p className="text-center text-gray-500 mb-8">
-        Insert questions for the contract application exam.
+        Add questions for candidates applying to this opportunity. Questions are optional.
         </p>
 
 
@@ -179,6 +256,19 @@ export default function AddQuestionsPage() {
             </>
           )}
 
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="isRequired"
+              checked={isRequired}
+              onChange={(e) => setIsRequired(e.target.checked)}
+              className="w-4 h-4 accent-yellow-300"
+            />
+            <label htmlFor="isRequired" className="text-sm font-medium">
+              Required question
+            </label>
+          </div>
+
           <button
             onClick={addQuestion}
             className="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-bold py-2 rounded-lg transition shadow"
@@ -190,125 +280,83 @@ export default function AddQuestionsPage() {
         {/* Questions Preview */}
         {questions.length > 0 && (
           <div className="mt-10 max-w-[800px] mx-auto flex flex-col gap-6">
-            <h2 className="text-2xl font-bold mb-4 text-center">Questions & Answers</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-center">Questions</h2>
+              <button
+                onClick={handleSaveQuestions}
+                disabled={saving || loading}
+                className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition shadow disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? 'Saving...' : 'Save All Questions'}
+              </button>
+            </div>
+
+            {loading && (
+              <div className="text-center py-4">
+                <p className="text-gray-500">Loading questions...</p>
+              </div>
+            )}
 
             {questions.map((q, idx) => (
-              <div key={q.id} className="bg-white shadow-lg rounded-xl p-6 flex flex-col gap-4">
+              <div key={q.id || `temp-${idx}`} className="bg-white shadow-lg rounded-xl p-6 flex flex-col gap-4">
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-lg">{idx + 1}. {q.question}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-lg">{idx + 1}. {q.question}</span>
+                    {q.isRequired && (
+                      <span className="px-2 py-1 text-xs bg-red-100 text-red-600 rounded">Required</span>
+                    )}
+                    <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded capitalize">{q.type}</span>
+                  </div>
                   <button
-                    onClick={() => deleteQuestion(q.id)}
+                    onClick={() => handleDeleteQuestion(q.id || '')}
                     className="text-red-500 hover:text-red-700 font-bold transition"
                   >
                     Delete
                   </button>
                 </div>
 
-                {/* Answer Inputs */}
-                {q.type === "text" && (
-                  <input
-                    type="text"
-                    value={answers[q.id] as string || ""}
-                    placeholder="Your answer..."
-                    onChange={(e) => handleAnswer(q.id, e.target.value, "text")}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 outline-none"
-                  />
-                )}
-
-                {q.type === "select" && (
+                {/* Options Display */}
+                {q.type === "select" && q.options && q.options.length > 0 && (
                   <div className="flex flex-col gap-2">
-                    {q.options?.map(opt => (
-                      <div key={opt} className="flex items-center justify-between">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="radio"
-                            name={q.id}
-                            value={opt}
-                            checked={answers[q.id] === opt}
-                            onChange={(e) => handleAnswer(q.id, e.target.value, "select")}
-                            className="accent-yellow-300"
-                          />
-                          <span>{opt}</span>
-                        </label>
+                    <p className="text-sm text-gray-600 font-medium">Options:</p>
+                    {q.options.map(opt => (
+                      <div key={opt} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                        <span className="text-sm">{opt}</span>
                         <button
-                          onClick={() => deleteOption(q.id, opt)}
-                          className="text-red-500 hover:text-red-700 text-sm"
+                          onClick={() => deleteOption(idx, opt)}
+                          className="text-red-500 hover:text-red-700 text-sm font-bold"
                         >
-                          x
+                          ×
                         </button>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Custom Checkbox */}
-                {q.type === "checkbox" && (
-                <div className="flex flex-col gap-2">
-                    {q.options?.map((opt) => {
-                    const isChecked = (answers[q.id] as string[] || []).includes(opt);
-                    return (
-                        <div key={opt} className="flex items-center justify-between">
-                        <div
-                            className="flex items-center gap-2 cursor-pointer"
-                            onClick={(e) => {
-                            e.stopPropagation(); // prevent row click issues
-                            handleAnswer(q.id, opt, "checkbox", !isChecked);
-                            }}
-                        >
-                            {/* Custom SVG */}
-                            <div className="flex items-center justify-center w-9 h-9">
-                            {isChecked ? (
-                                /* ✅ SELECTED */
-                                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                                <path
-                                    d="M15.0537 9.16113C16.6809 7.53396 19.3191 7.53395 20.9463 9.16113L26.8389 15.0537C28.4659 16.6809 28.466 19.3192 26.8389 20.9463L20.9463 26.8389C19.3192 28.466 16.6809 28.4659 15.0537 26.8389L9.16113 20.9463C7.53395 19.3191 7.53396 16.6809 9.16113 15.0537L15.0537 9.16113Z"
-                                    fill="#FFEB9C"
-                                />
-                                <path
-                                    d="M31.5873 8.96738C25.7014 13.6017 22.2888 16.641 18.7083 22.3035C18.6366 22.4169 18.4767 22.4333 18.3856 22.3348L12.7212 16.2001C12.6426 16.115 12.6504 15.9817 12.7383 15.9064L15.8265 13.2606C15.9194 13.181 16.0609 13.2004 16.129 13.3019L18.3444 16.6048C24.2049 11.4469 29.2798 9.33343 31.3963 8.61265C31.6142 8.53845 31.7681 8.82499 31.5873 8.96738Z"
-                                    fill="#1E1E1E"
-                                />
-                                </svg>
-                            ) : (
-                                /* ⬜ UNSELECTED */
-                                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                                <path
-                                    fillRule="evenodd"
-                                    clipRule="evenodd"
-                                    d="M20.9463 9.16112C19.3191 7.53394 16.6809 7.53394 15.0537 9.16112L9.16117 15.0537C7.53398 16.6809 7.53398 19.319 9.16117 20.9462L15.0537 26.8388C16.6809 28.466 19.3191 28.466 20.9463 26.8388L26.8388 20.9462C28.466 19.319 28.466 16.6809 26.8388 15.0537L20.9463 9.16112ZM20.357 10.3396C19.0553 9.03789 16.9447 9.03789 15.643 10.3396L10.3397 15.6429C9.03793 16.9447 9.03793 19.0552 10.3397 20.357L15.643 25.6603C16.9447 26.962 19.0553 26.962 20.357 25.6603L25.6603 20.357C26.9621 19.0552 26.9621 16.9447 25.6603 15.6429L20.357 10.3396Z"
-                                    fill="#637381"
-                                />
-                                </svg>
-                            )}
-                            </div>
-
-                            {/* Option text */}
-                            <span>{opt}</span>
-                        </div>
-
-                        {/* Delete option */}
+                {q.type === "checkbox" && q.options && q.options.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm text-gray-600 font-medium">Options:</p>
+                    {q.options.map(opt => (
+                      <div key={opt} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                        <span className="text-sm">{opt}</span>
                         <button
-                            onClick={() => deleteOption(q.id, opt)}
-                            className="text-red-500 hover:text-red-700 text-sm"
+                          onClick={() => deleteOption(idx, opt)}
+                          className="text-red-500 hover:text-red-700 text-sm font-bold"
                         >
-                            x
+                          ×
                         </button>
-                        </div>
-                    );
-                    })}
-                </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
 
-
                 {q.type === "rating" && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
+                    <span className="text-sm text-gray-600">Rating scale: </span>
                     {[1, 2, 3, 4, 5].map(star => (
                       <svg
                         key={star}
-                        onClick={() => handleAnswer(q.id, star, "rating")}
-                        className={`w-8 h-8 cursor-pointer transition-colors ${
-                          (answers[q.id] as number) >= star ? "text-yellow-400" : "text-gray-300"
-                        }`}
+                        className="w-6 h-6 text-yellow-400"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -321,7 +369,19 @@ export default function AddQuestionsPage() {
             ))}
           </div>
         )}
+
+        {questions.length === 0 && !loading && (
+          <div className="mt-10 max-w-[800px] mx-auto text-center py-8">
+            <p className="text-gray-500 text-lg">No questions added yet. Add your first question above.</p>
+          </div>
+        )}
       </div>
+      <Toast
+        message={toast?.message || ''}
+        type={toast?.type || 'success'}
+        isVisible={!!toast}
+        onClose={() => setToast(null)}
+      />
     </DashboardLayout>
   );
 }

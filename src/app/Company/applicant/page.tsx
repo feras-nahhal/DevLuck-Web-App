@@ -321,7 +321,7 @@ const ContractRow = ({ applicant, onMainClick, onSideClick, showCheckbox = false
     <div className="flex gap-4 items-center">
       {/* Main 80% section */}
       <div
-        className="flex items-center flex-1 min-w-[400px] max-w-[700px] skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg  bg-white cursor-pointer hover:bg-gray-50"
+        className="flex items-center flex-1 min-w-[400px] max-w-[1100px] skew-x-[-12deg] rounded-[8] h-[72px] shadow-lg  bg-white cursor-pointer hover:bg-gray-50"
         onClick={onMainClick}
       >
 
@@ -396,6 +396,18 @@ const ContractRow = ({ applicant, onMainClick, onSideClick, showCheckbox = false
               {applicant.status ? applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1) : "N/A"}
             </div>
             <span className="text-xs text-gray-400">Status</span>
+          </div>
+          {/* Email */}
+          <div className="flex flex-col justify-center w-[140px] ml-2">
+            <span className="text-sm font-semibold text-gray-900">{(applicant as any).email || "N/A"}</span>
+            <span className="text-xs text-gray-400">Email</span>
+          </div>
+          {/* Salary Expectation */}
+          <div className="flex flex-col justify-center w-[140px] ml-2">
+            <span className="text-sm font-semibold text-gray-900">
+              {(applicant as any).salaryExpectation ? (applicant as any).salaryExpectation.toLocaleString() : "N/A"}
+            </span>
+            <span className="text-xs text-gray-400">Salary Expectation</span>
           </div>
         </div>
       </div>
@@ -576,6 +588,8 @@ export default function ApplicantPage() {
                 image: "/images/A1.jpeg",
                 image1: "/images/A11.jpeg",
                 city: "",
+                email: (student as any)?.email || "—",
+                salaryExpectation: (student as any)?.salaryExpectation || null,
               };
             });
             
@@ -635,6 +649,8 @@ export default function ApplicantPage() {
               image: "/images/A1.jpeg",
               image1: "/images/A11.jpeg",
               city: "",
+              email: (student as any)?.email || "—",
+              salaryExpectation: (student as any)?.salaryExpectation || null,
             };
           });
           

@@ -162,61 +162,23 @@ export default function ApplicantPage() {
               </div>
             </div>
             <div className="flex flex-col gap-4 w-[62px] h-[152px] mx-auto">
-              {/* First pair */}
-              <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-                <img 
-                  src="/cards/tag.svg" 
-                  alt="Tag Icon"
-                />
-                  {/* Frame 97 - Label container */}
+              {[
+                { value: (student as any)?.email ?? "—", label: "Email", key: "email" },
+                { value: student?.availability ?? "—", label: "Availability", key: "availability" },
+                { value: (student as any)?.salaryExpectation ? (student as any).salaryExpectation.toLocaleString() : "—", label: "Salary Expectation", key: "salaryExpectation" },
+              ].map((item) => (
+                <div key={item.key} className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                  <img src="/cards/tag.svg" alt="Tag Icon" />
                 <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
-                  {/* body2 text */}
                   <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
-                    {student?.availability || "N/A"}
+                      {item.value}
                   </span>
-                  {/* caption text */}
-                  <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
-                    Availability
+                    <span className="w-[77px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                      {item.label}
                   </span>
                 </div>
-              </div>
-
-              {/* Second pair */}
-              <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-                <img 
-                  src="/cards/tag.svg" 
-                  alt="Tag Icon"
-                />
-                  {/* Frame 97 - Label container */}
-                <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
-                  {/* body2 text */}
-                  <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
-                    {student?.status || "N/A"}
-                  </span>
-                  {/* caption text */}
-                  <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
-                    Status
-                  </span>
                 </div>
-              </div>
-              {/* Third pair */}
-              <div className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
-                <img 
-                  src="/cards/tag.svg" 
-                  alt="Tag Icon"
-                />
-                  {/* Frame 97 - Label container */}
-                <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
-                  {/* body2 text */}
-                  <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
-                    {student?.name || "N/A"}
-                  </span>
-                  {/* caption text */}
-                  <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
-                    Name
-                  </span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

@@ -404,9 +404,11 @@ export default function PaymentPage() {
     const contractId = params.applicantId;
 
     const { getContractById, loading: contractLoading } = useContractHandler();
-    const { listPayments: fetchPayments, deletePayment: deletePaymentApi } = usePaymentHandler();
+    const { listPayments: fetchPayments, deletePayment: deletePaymentApi, getPaymentStats } = usePaymentHandler();
     const [contract, setContract] = useState<any>(null);
     const [payments, setPayments] = useState<any[]>([]);
+    const [paymentStats, setPaymentStats] = useState<{ totalPaid: { amount: number; count: number }; pending: { amount: number; count: number }; due: { amount: number; count: number } } | null>(null);
+    const [statsLoading, setStatsLoading] = useState(true);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -423,14 +425,19 @@ export default function PaymentPage() {
                 });
 
                 try {
-                    const paymentsResponse = await fetchPayments(1, 100);
-                    const contractPayments = paymentsResponse.items.filter(
-                        (p: any) => p.contractId === contractData.inContractNumber
-                    );
-                    setPayments(contractPayments);
+                    const contractUuid = contractData.id;
+                    const [paymentsResponse, statsResponse] = await Promise.all([
+                        fetchPayments(1, 100, undefined, undefined, contractUuid),
+                        getPaymentStats(contractUuid)
+                    ]);
+                    setPayments(paymentsResponse.items);
+                    setPaymentStats(statsResponse);
                 } catch (error) {
-                    console.error("Failed to fetch payments:", error);
+                    console.error("Failed to fetch payments or stats:", error);
                     setPayments([]);
+                    setPaymentStats(null);
+                } finally {
+                    setStatsLoading(false);
                 }
             } catch (error) {
                 console.error("Failed to fetch contract:", error);
@@ -493,29 +500,6 @@ export default function PaymentPage() {
       return `${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${contract?.currency || 'SAR'}`;
     };
 
-    const stats = useMemo(() => {
-      let totalPaid = 0;
-      let pendingPayment = 0;
-      let duePayment = 0;
-
-      payments.forEach((payment) => {
-        const amount = parseFloat(payment.monthlyAllowance) || 0;
-        const status = (payment.paymentStatus || "").trim();
-
-        if (status === "Paid") {
-          totalPaid += amount;
-        } else if (status === "Pending") {
-          pendingPayment += amount;
-        }
-      });
-
-      return {
-        totalPaid,
-        pendingPayment,
-        duePayment: 0,
-      };
-    }, [payments, contract?.currency]);
-
     
     const goToPage = (page: number) => {
       if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -568,9 +552,21 @@ return (
       
       {/* Top row: 3 cards */}
       <div className="grid grid-cols-1 sm:grid-cols-1 xl:grid-cols-3 gap-4 mb-8 ">
-        <Card title="Total Paid" value={formatCurrency(stats.totalPaid)} subtitle={`${payments.filter(p => p.paymentStatus === "Paid").length} payments`} />
-        <Card title="Pending Payment" value={formatCurrency(stats.pendingPayment)} subtitle={`${payments.filter(p => p.paymentStatus === "Pending").length} pending`} />
-        <Card title="Due" value={formatCurrency(stats.duePayment)} subtitle={`${payments.filter(p => p.paymentStatus === "Due").length} due`} />
+        <Card 
+          title="Total Paid" 
+          value={statsLoading ? "..." : formatCurrency(paymentStats?.totalPaid.amount || 0)} 
+          subtitle={statsLoading ? "Loading..." : `${paymentStats?.totalPaid.count || 0} payments`} 
+        />
+        <Card 
+          title="Pending Payment" 
+          value={statsLoading ? "..." : formatCurrency(paymentStats?.pending.amount || 0)} 
+          subtitle={statsLoading ? "Loading..." : `${paymentStats?.pending.count || 0} pending`} 
+        />
+        <Card 
+          title="Due" 
+          value={statsLoading ? "..." : formatCurrency(paymentStats?.due.amount || 0)} 
+          subtitle={statsLoading ? "Loading..." : `${paymentStats?.due.count || 0} due`} 
+        />
       </div>
 
       {/* Main Column */}
@@ -796,11 +792,13 @@ return (
         setEditingPayment(null);
         if (contract) {
           try {
-            const paymentsResponse = await fetchPayments(1, 100);
-            const contractPayments = paymentsResponse.items.filter(
-              (p: any) => p.contractId === contract.inContractNumber
-            );
-            setPayments(contractPayments);
+            const contractUuid = contract.id;
+            const [paymentsResponse, statsResponse] = await Promise.all([
+              fetchPayments(1, 100, undefined, undefined, contractUuid),
+              getPaymentStats(contractUuid)
+            ]);
+            setPayments(paymentsResponse.items);
+            setPaymentStats(statsResponse);
             setCurrentPage(1);
           } catch (error) {
             console.error("Failed to refresh payments:", error);
@@ -832,12 +830,14 @@ return (
                   setDeleting(true);
                   try {
                     await deletePaymentApi(paymentToDelete);
-                    const paymentsResponse = await fetchPayments(1, 100);
                     if (contract) {
-                      const contractPayments = paymentsResponse.items.filter(
-                        (p: any) => p.contractId === contract.inContractNumber
-                      );
-                      setPayments(contractPayments);
+                      const contractUuid = contract.id;
+                      const [paymentsResponse, statsResponse] = await Promise.all([
+                        fetchPayments(1, 100, undefined, undefined, contractUuid),
+                        getPaymentStats(contractUuid)
+                      ]);
+                      setPayments(paymentsResponse.items);
+                      setPaymentStats(statsResponse);
                     }
                     setDeleteConfirmOpen(false);
                     setPaymentToDelete(null);

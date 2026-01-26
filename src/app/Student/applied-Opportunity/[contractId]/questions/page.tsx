@@ -42,7 +42,7 @@ export default function ContractQuestionsPage() {
       const loadedQuestions = await getOpportunityQuestions(opportunityId);
       setQuestions(loadedQuestions);
       if (loadedQuestions.length === 0) {
-        router.push(`/Student/opportunity/${opportunityId}`);
+        router.push(`/Student/applied-Opportunity/${opportunityId}`);
       }
     } catch (error: any) {
       setToast({ message: error.message || 'Failed to load questions', type: 'error' });
@@ -107,7 +107,7 @@ export default function ContractQuestionsPage() {
       setIsSubmitting(false);
       
       setTimeout(() => {
-        router.push('/Student/opportunity');
+        router.push('/Student/applied-Opportunity');
       }, 1500);
     } catch (error: any) {
       setToast({ message: error.message || 'Failed to submit application', type: 'error' });

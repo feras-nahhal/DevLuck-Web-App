@@ -298,16 +298,26 @@ const AddressModal: React.FC<AddressModalProps> = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) {
     e.preventDefault();
+    }
+    
+    if (!formData.name || !formData.tag || !formData.address || !formData.phoneNumber) {
+      alert('Please fill in all fields');
+      return;
+    }
+
     setLoading(true);
 
-    // Mock save
-    setTimeout(() => {
-      onSave(formData);
-      setLoading(false);
+    try {
+      await onSave(formData);
       onClose();
-    }, 500);
+    } catch (error) {
+      console.error("Error saving address:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -396,9 +406,10 @@ const AddressModal: React.FC<AddressModalProps> = ({
             </button>
 
             <button
-                type="submit"
+                type="button"
+                onClick={handleSubmit}
                 disabled={loading}
-                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
+                className="relative w-[100px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <span className="skew-x-[12deg] font-bold text-black">
                 {loading ? <Loader2 className="animate-spin" /> : address ? "Update" : "Confirm"}

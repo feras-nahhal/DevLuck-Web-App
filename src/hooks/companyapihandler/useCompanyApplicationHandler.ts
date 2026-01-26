@@ -61,6 +61,12 @@ interface RecentApplicationsResponse {
   limit: number
 }
 
+interface EmailSuggestion {
+  email: string
+  id: string
+  name: string
+}
+
 interface UseCompanyApplicationHandlerReturn {
   applications: Application[]
   application: Application | null
@@ -72,7 +78,7 @@ interface UseCompanyApplicationHandlerReturn {
   getApplicationById: (id: string) => Promise<Application>
   getStudentProfileById: (studentId: string) => Promise<Student>
   searchStudentByName: (name: string) => Promise<Student>
-  searchUserByEmail: (email: string) => Promise<void>
+  searchUserByEmail: (email: string) => Promise<EmailSuggestion[]>
   getRecentApplicants: (limit?: number) => Promise<RecentApplicationsResponse>
   updateApplicationStatus: (id: string, status: 'pending' | 'accepted' | 'rejected') => Promise<Application>
   deleteApplication: (id: string) => Promise<void>
@@ -194,17 +200,19 @@ export const useCompanyApplicationHandler = (): UseCompanyApplicationHandlerRetu
     }
   }, [])
 
-  const searchUserByEmail = useCallback(async (email: string): Promise<void> => {
+  const searchUserByEmail = useCallback(async (email: string): Promise<EmailSuggestion[]> => {
     setLoading(true)
     setError(null)
     try {
-      await api.get<{ status: string; message: string }>('/api/company/students/search/by-email', {
+      const response = await api.get<{ status: string; data: EmailSuggestion[] }>('/api/company/students/search/by-email', {
         params: { email }
       })
+      return response.data.data || []
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Failed to search user by email'
       setError(errorMessage)
-      throw new Error(errorMessage)
+      // Return empty array on error instead of throwing, so autocomplete can still work
+      return []
     } finally {
       setLoading(false)
     }

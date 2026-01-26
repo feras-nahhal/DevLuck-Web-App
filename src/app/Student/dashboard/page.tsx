@@ -6,6 +6,7 @@ import { mockContracts} from "@/src/mocks/mockContract";
 import { useRouter } from "next/navigation";
 import { useStudentProfileHandler } from "@/src/hooks/studentapihandler/useStudentProfileHandler";
 import { useStudentOpportunityHandler } from "@/src/hooks/studentapihandler/useStudentOpportunityHandler";
+import { useStudentDashboardHandler } from "@/src/hooks/studentapihandler/useStudentDashboardHandler";
 import { useEffect, useMemo } from "react";
 
 interface Card1Contract {
@@ -224,6 +225,12 @@ export default function DashboardPage() {
     listOpportunities,
   } = useStudentOpportunityHandler();
 
+  const {
+    stats,
+    loading: statsLoading,
+    getDashboardStats,
+  } = useStudentDashboardHandler();
+
   const router = useRouter();
 
   useEffect(() => {
@@ -234,14 +241,15 @@ export default function DashboardPage() {
           getExperiences(),
           getEducations(),
           getSkills(),
-          listOpportunities(1, 4)
+          listOpportunities(1, 4),
+          getDashboardStats()
         ]);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       }
     };
     fetchData();
-  }, [getProfile, getExperiences, getEducations, getSkills, listOpportunities]);
+  }, [getProfile, getExperiences, getEducations, getSkills, listOpportunities, getDashboardStats]);
 
   const mappedOpportunities = useMemo(() => {
     if (!opportunities || !Array.isArray(opportunities)) {
@@ -274,35 +282,18 @@ export default function DashboardPage() {
     }));
   }, [opportunities]);
 
-  const applicantIdNum = 201;
-  const applicantContracts = mockContracts.filter(
-    contract => contract.applicantId === applicantIdNum
-  );
-
-  // Total opportunities assigned to this applicant
-  const totalOpportunities = applicantContracts.length;
-
-  // Total applied (assuming applied means contract exists for them)
-  const totalApplied = applicantContracts.filter(
-    (contract) => contract.opportunityStatus !== "Rejected"
-  ).length;
-
-  // Upcoming interviews
-  const upcomingInterviews = applicantContracts.filter(
-    (contract) => contract.opportunityStatus === "Upcoming Interview"
-  ).length;
-
-  // Total rejected
-  const totalRejected = applicantContracts.filter(
-    (contract) => contract.opportunityStatus === "Rejected"
-  ).length;
+  const totalOpportunities = stats?.totalOpportunities ?? 0;
+  const totalApplied = stats?.totalApplied ?? 0;
+  const totalRejected = stats?.totalRejected ?? 0;
+  const upcomingInterviews = 0;
 
   const isLoading =
   profileLoading ||
   experienceLoading ||
   educationLoading ||
   skillsLoading ||
-  opportunitiesLoading;
+  opportunitiesLoading ||
+  statsLoading;
 
   if (isLoading) {
     return (
@@ -414,25 +405,25 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Salary & Availability */}
-              <div className="flex flex-col gap-2">
-              
-                <div className="flex flex-col justify-center items-start w-[77px] h-[40px]">
-                  <span className="text-[14px] font-normal leading-[22px] text-[#1E1E1E]">
-                    {profile?.availability ?? "-"}
-                  </span>
-                  <span className="text-[12px] font-normal leading-[18px] text-[#00000090]">
-                    Availability
-                  </span>
-                </div>
-                <div className="flex flex-col justify-center items-start w-[100px] h-[40px]">
-                  <span className="text-[14px] font-normal leading-[22px] text-[#1E1E1E]">
-                    -
-                  </span>
-                  <span className="text-[12px] font-normal leading-[18px] text-[#00000090]">
-                    Salary Expectation
-                  </span>
-                </div>
+              {/* Email, Availability & Salary Expectation */}
+              <div className="flex flex-col gap-4 w-[62px] h-[152px]">
+                {[
+                  { value: (profile as any)?.email ?? "—", label: "Email", key: "email" },
+                  { value: profile?.availability ?? "—", label: "Availability", key: "availability" },
+                  { value: (profile as any)?.salaryExpectation ? (profile as any).salaryExpectation.toLocaleString() : "—", label: "Salary Expectation", key: "salaryExpectation" },
+                ].map((item) => (
+                  <div key={item.key} className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                    <img src="/cards/tag.svg" alt="Tag Icon" />
+                    <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                      <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                        {item.value}
+                      </span>
+                      <span className="w-[77px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                        {item.label}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -630,54 +621,9 @@ export default function DashboardPage() {
                         </div>
                         <div className={`w-full sm:max-w-[360px] sm:min-w-[340px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 max-h-[250px]`}>
                           <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                            {mockContracts.filter(
-                                (contract) =>
-                                  contract.applicantId === applicantIdNum
-                              &&
-                                  contract.opportunityStatus === "Upcoming Interview"
-                              ).length ? (
-                                mockContracts
-                                  .filter(
-                                    (contract) =>
-                                      contract.applicantId === applicantIdNum
-                              &&
-                                      contract.opportunityStatus === "Upcoming Interview"
-                                  )
-                                  .map((contract) => (
-                                    <div
-                                      key={contract.id}
-                                      className="flex items-center justify-between px-0.5 py-3 w-full "
-                                    >
-                                      {/* Contract Title */}
-                                      <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
-                                        {contract.contractTitle}
-                                      </h4>
-
-                                      {/* Action Button */}
-                                      <button
-                                          onClick={() => router.push(`/Student/dashboard/${contract.id}`)}
-                                          className="
-                                            w-10 h-10
-                                            min-w-[40px] min-h-[40px]
-                                            shrink-0
-                                            rounded-full
-                                            bg-black
-                                            flex items-center justify-center
-                                            hover:scale-105
-                                            transition
-                                          "
-                                        >
-
-                                        <ArrowUpRight size={18} className="text-white" />
-                                      </button>
-                                    </div>
-                                  ))
-                              ) : (
-                                <p className="text-[#555] font-publicSans py-4">
-                                  No upcoming interviews.
-                                </p>
-                              )}
-
+                            <p className="text-[#555] font-publicSans py-4">
+                              No upcoming interviews.
+                            </p>
                           </div>
                         </div>
                       </div>

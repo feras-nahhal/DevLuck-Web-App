@@ -14,7 +14,7 @@ interface ContractData {
   duration: string;
   monthlyAllowance?: string;
   workLocation: "Hybrid" | "Remote" | "Onsite";
-  status: "Running" | "Hold" | "Reject";
+  status: "Active" | "Inactive" | "Draft";
 }
 
 interface ContractModalProps {
@@ -283,22 +283,31 @@ const ContractModal: React.FC<ContractModalProps> = ({
     duration: "",
     monthlyAllowance: "",
     workLocation: "Hybrid",
-    status: "Running",
+    status: "Active",
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (isOpen) {
     if (contract) {
+        // Prefill form with contract data when editing
+        const monthlyAllowanceValue = (contract as any).monthlyAllowance;
+        // Convert number to string, handle null/undefined, and preserve 0
+        const monthlyAllowanceStr = monthlyAllowanceValue !== null && monthlyAllowanceValue !== undefined 
+          ? String(monthlyAllowanceValue) 
+          : "";
+        
       setFormData({
         name: contract.name || "",
         contractTitle: contract.contractTitle || "",
         currency: contract.currency || "",
         duration: contract.duration || "",
-        monthlyAllowance: contract.monthlyAllowance || "",
-        workLocation: contract.workLocation || "Hybrid",
-        status: contract.status || "Running",
+          monthlyAllowance: monthlyAllowanceStr,
+          workLocation: (contract.workLocation as "Hybrid" | "Remote" | "Onsite") || "Hybrid",
+          status: (contract.status as "Active" | "Inactive" | "Draft") || "Active",
       });
     } else {
+        // Reset form for new template
       setFormData({
         name: "",
         contractTitle: "",
@@ -306,8 +315,9 @@ const ContractModal: React.FC<ContractModalProps> = ({
         duration: "",
         monthlyAllowance: "",
         workLocation: "Hybrid",
-        status: "Running",
+          status: "Active",
       });
+      }
     }
   }, [contract, isOpen]);
 
@@ -321,9 +331,10 @@ const ContractModal: React.FC<ContractModalProps> = ({
 
     try {
       await onSave(formData);
-      onClose();
+      // Don't close here - let the parent handle it after successful save
     } catch (error) {
       console.error("Failed to save contract template:", error);
+      // Keep modal open on error so user can see the error and retry
     } finally {
       setLoading(false);
     }
@@ -363,7 +374,7 @@ const ContractModal: React.FC<ContractModalProps> = ({
               lineHeight: "36px",
             }}
           >
-            {contract ? "Edit Opportunity" : "Create Opportunity"}
+            {contract ? "Edit Template" : "Create Template"}
           </h2>
         </div>
 
@@ -417,6 +428,15 @@ const ContractModal: React.FC<ContractModalProps> = ({
             placeholder="Enter amount"
             value={formData.monthlyAllowance || ""}
             onChange={(e) => handleInputChange("monthlyAllowance", e.target.value)}
+          />
+          <ParallelogramSelect
+            label="Status"
+            placeholder="Select status"
+            value={formData.status}
+            options={["Active", "Inactive", "Draft"]}
+            onChange={(val) =>
+              handleInputChange("status", val as ContractData["status"])
+            }
           />
 
         </form>

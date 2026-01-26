@@ -9,12 +9,15 @@ interface ContractTemplateData {
     content?: string
     currency?: string
     duration?: string
+    monthlyAllowance?: number | string
     workLocation?: string
     fields?: any
+    status?: string
 }
 
 interface ContractTemplate extends ContractTemplateData {
     id: string
+    monthlyAllowance?: number
     status: string
     createdAt: string
     updatedAt: string
@@ -28,6 +31,17 @@ interface ListContractTemplatesResponse {
     totalPages: number
 }
 
+interface ContractTemplateStats {
+    total: number
+    active: number
+    inactive: number
+    draft: number
+    latestActive: string | null
+    latestInactive: string | null
+    latestDraft: string | null
+    latest: string | null
+}
+
 interface UseContractTemplateHandlerReturn {
     contractTemplates: ContractTemplate[]
     contractTemplate: ContractTemplate | null
@@ -38,6 +52,7 @@ interface UseContractTemplateHandlerReturn {
     deleteContractTemplate: (id: string) => Promise<void>
     getContractTemplateById: (id: string) => Promise<ContractTemplate>
     listContractTemplates: (page?: number, pageSize?: number, search?: string) => Promise<ListContractTemplatesResponse>
+    getContractTemplateStats: () => Promise<ContractTemplateStats>
     clearError: () => void
 }
 
@@ -145,6 +160,22 @@ export const useContractTemplateHandler = (): UseContractTemplateHandlerReturn =
         []
     )
 
+    const getContractTemplateStats = useCallback(async (): Promise<ContractTemplateStats> => {
+        setLoading(true)
+        setError(null)
+        try {
+            const response = await api.get<{ status: string; data: ContractTemplateStats }>('/company/contract-templates/stats')
+            return response.data.data
+        } catch (err: any) {
+            const errorMessage =
+                err.response?.data?.message || err.message || 'Failed to get contract template stats'
+            setError(errorMessage)
+            throw new Error(errorMessage)
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+
     return {
         contractTemplates,
         contractTemplate,
@@ -155,6 +186,7 @@ export const useContractTemplateHandler = (): UseContractTemplateHandlerReturn =
         deleteContractTemplate,
         getContractTemplateById,
         listContractTemplates,
+        getContractTemplateStats,
         clearError
     }
 }

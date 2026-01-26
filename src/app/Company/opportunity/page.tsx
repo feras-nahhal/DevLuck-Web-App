@@ -373,34 +373,47 @@ const ContractRow = ({ job, onMainClick, onEdit, onDelete, showCheckbox = false 
         <div className="flex-1 flex items-center skew-x-[12deg] h-full px-4 gap-6">
 
           {/* Name */}
-          <div className="flex flex-col justify-center w-[180px]">
-            <span className="text-sm font-semibold text-gray-900">{job.jobNumber}</span>
+          <div className="flex flex-col justify-center w-[150px]">
+            <span className="text-sm font-semibold text-gray-900">{job.jobNumber || "N/A"}</span>
             <span className="text-xs text-gray-400">Job Number</span>
           </div>
 
           {/* Next Payment */}
-          <div className="flex flex-col justify-center w-[180px]">
-            <span className="text-sm font-semibold text-gray-900">{job.jobName}</span>
+          <div className="flex flex-col justify-center w-[150px]">
+            <span className="text-sm font-semibold text-gray-900">{job.jobName || "N/A"}</span>
             <span className="text-xs text-gray-400">Job Name</span>
           </div>
 
           {/* Monthly Allowance */}
-          <div className="flex flex-col justify-center w-[180px]">
-            <span className="text-sm font-semibold text-gray-900">{job.jobtype}</span>
+          <div className="flex flex-col justify-center w-[150px]">
+            <span className="text-sm font-semibold text-gray-900">{job.jobtype || "N/A"}</span>
             <span className="text-xs text-gray-400">Job Type</span>
           </div>
 
           {/* Transfer ID */}
-          <div className="flex flex-col justify-center w-[180px]">
-            <span className="text-sm font-semibold text-gray-900">{job.country}</span>
+          <div className="flex flex-col justify-center w-[150px]">
+            <span className="text-sm font-semibold text-gray-900">{job.country || "N/A"}</span>
             <span className="text-xs text-gray-400">Country</span>
           </div>
 
            {/* Note ID */}
-          <div className="flex flex-col justify-center w-[180px]">
-            <span className="text-sm font-semibold text-gray-900">{job.description.split(" ").slice(0, 3).join(" ")}</span>
+          <div className="flex flex-col justify-center w-[150px]">
+            <span className="text-sm font-semibold text-gray-900">
+              {job.description
+            ? job.description.length > 24
+              ? job.description.slice(0, 24) + "..."
+              : job.description
+            : "N/A"}
+            </span>
             <span className="text-xs text-gray-400">Description</span>
           </div>
+
+          {/* Transfer ID */}
+          <div className="flex flex-col justify-center w-[150px]">
+            <span className="text-sm font-semibold text-gray-900">{job.startDate ? job.startDate : "N/A"}</span>
+            <span className="text-xs text-gray-400">Start Date</span>
+          </div>
+
 
         </div>
       </div>
@@ -525,6 +538,9 @@ const ContractRow = ({ job, onMainClick, onEdit, onDelete, showCheckbox = false 
    Main Opportunity Page Component
 ────────────────────────────────────────────── */
 export default function OpportunityPage() {
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [opportunityToDelete, setopportunityToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [showApplicants, setShowApplicants] = useState(true);
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -665,6 +681,42 @@ export default function OpportunityPage() {
     return created >= sevenDaysAgo;
   }).length;
 
+  const opportunityStats = useMemo(() => {
+  const formatValue = (val: number) => {
+    return loading ? "..." : val.toString();
+  };
+
+  return [
+    {
+      title: "Total Opportunities",
+      value: formatValue(totalOpportunities),
+      subtitle: "All created opportunities",
+    },
+    {
+      title: "Total Applicants",
+      value: formatValue(totalApplicants),
+      subtitle: "Across all opportunities",
+    },
+    {
+      title: "Internships",
+      value: formatValue(internshipCount),
+      subtitle: "Internship positions",
+    },
+    {
+      title: "New This Week",
+      value: formatValue(recentOpportunities),
+      subtitle: "Created in last 7 days",
+    },
+  ];
+}, [
+  totalOpportunities,
+  totalApplicants,
+  internshipCount,
+  recentOpportunities,
+    loading
+]);
+
+
 
   return (
     <DashboardLayout>
@@ -702,31 +754,17 @@ export default function OpportunityPage() {
         )}
 
         {/* Top row: 4 cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 place-items-center">
-          <Card
-            title="Total Opportunities"
-            value={totalOpportunities.toString()}
-            subtitle="All created opportunities"
-          />
-
-          <Card
-            title="Total Applicants"
-            value={totalApplicants.toString()}
-            subtitle="Across all opportunities"
-          />
-
-          <Card
-            title="Internships"
-            value={internshipCount.toString()}
-            subtitle="Internship positions"
-          />
-
-          <Card
-            title="New This Week"
-            value={recentOpportunities.toString()}
-            subtitle="Created in last 7 days"
-          />
+       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 place-items-center">
+          {opportunityStats.map((stat) => (
+            <Card
+              key={stat.title}
+              title={stat.title}
+              value={stat.value}
+              subtitle={stat.subtitle}
+            />
+          ))}
         </div>
+
 
         {/* Jobs Section */}
       
@@ -848,10 +886,9 @@ export default function OpportunityPage() {
                         setIsModalOpen(true);
                       }}
                       onDelete={() => {
-                        if (job.id && confirm("Are you sure you want to delete this opportunity?")) {
-                          handleDelete(job.id);
-                        }
-                      }}
+                      setopportunityToDelete(job.id ?? null);
+                      setDeleteConfirmOpen(true);
+                    }}
                     />
                   ))
                 )}
@@ -931,6 +968,60 @@ export default function OpportunityPage() {
         }}
         onSave={handleSave}
       />
+
+       {deleteConfirmOpen && (
+  <div
+    className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    onClick={() => setDeleteConfirmOpen(false)}
+  >
+    <div
+      className="bg-white rounded-lg p-6 max-w-md w-full mx-4 skew-x-[-12deg]"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="skew-x-[12deg]">
+        <h3 className="text-xl font-bold mb-4">Delete Opportunity</h3>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete this opportunity? This action cannot be undone.
+        </p>
+        <div className="flex gap-4 justify-end">
+          <button
+            onClick={() => {
+              setDeleteConfirmOpen(false);
+              setopportunityToDelete(null);
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors skew-x-[-12deg]"
+            disabled={deleting}
+          >
+            <span className=" flex items-center justify-center skew-x-[12deg]">
+              Cancel
+            </span>
+          </button>
+          <button
+            onClick={async () => {
+              if (!opportunityToDelete) return;
+              setDeleting(true);
+              try {
+                await deleteOpportunity(opportunityToDelete);
+                await listOpportunities(1, 1000); // refresh list
+                setDeleteConfirmOpen(false);
+                setopportunityToDelete(null);
+              } catch (error) {
+                console.error("Failed to delete opportunity:", error);
+                alert("Failed to delete opportunity. Please try again.");
+              } finally {
+                setDeleting(false);
+              }
+            }}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed skew-x-[-12deg]"
+            disabled={deleting}
+          >
+            <span className=" flex items-center justify-center skew-x-[12deg]">{deleting ? "Deleting..." : "Delete"}</span> {/* reverse skew so text looks normal */}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </DashboardLayout>
   );
 }

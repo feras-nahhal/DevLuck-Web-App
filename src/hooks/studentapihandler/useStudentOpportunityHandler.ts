@@ -39,6 +39,18 @@ interface ListOpportunitiesResponse {
   totalPages: number
 }
 
+interface Question {
+  id: string
+  opportunityId: string
+  question: string
+  type: 'text' | 'select' | 'checkbox' | 'rating'
+  options: string[]
+  order: number
+  isRequired: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 interface UseStudentOpportunityHandlerReturn {
   opportunities: Opportunity[]
   opportunity: Opportunity | null
@@ -46,6 +58,7 @@ interface UseStudentOpportunityHandlerReturn {
   error: string | null
   listOpportunities: (page?: number, pageSize?: number) => Promise<ListOpportunitiesResponse>
   getOpportunityById: (id: string) => Promise<Opportunity>
+  getOpportunityQuestions: (opportunityId: string) => Promise<Question[]>
   clearError: () => void
 }
 
@@ -106,6 +119,23 @@ export const useStudentOpportunityHandler = (): UseStudentOpportunityHandlerRetu
     }
   }, [])
 
+  const getOpportunityQuestions = useCallback(async (opportunityId: string): Promise<Question[]> => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await api.get<{ status: string; data: Question[] }>(
+        `/api/student/opportunities/${opportunityId}/questions`
+      )
+      return response.data.data
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to get questions'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   return {
     opportunities,
     opportunity,
@@ -113,6 +143,7 @@ export const useStudentOpportunityHandler = (): UseStudentOpportunityHandlerRetu
     error,
     listOpportunities,
     getOpportunityById,
+    getOpportunityQuestions,
     clearError
   }
 }

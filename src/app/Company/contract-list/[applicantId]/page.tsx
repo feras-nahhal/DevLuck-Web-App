@@ -5,12 +5,15 @@ import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { mockApplicants } from "@/src/mocks/mockApplicants";
 import { educationData } from "@/src/mocks/mockEducation";
 import { experienceData } from "@/src/mocks/mockExperience";
-import { languageData  } from "@/src/mocks/mockLanguages";
-import { portfolioData  } from "@/src/mocks/mockPortfolio";
+import { languageData } from "@/src/mocks/mockLanguages";
+import { portfolioData } from "@/src/mocks/mockPortfolio";
 import { mockApplicantPayments } from "@/src/mocks/mockApplicantPayments";
 import { ArrowUpRight } from "lucide-react";
 import PaymentModal from "@/src/components/Company/PaymentModal";
 import { notFound } from "next/navigation";
+import { useContractHandler } from "@/src/hooks/companyapihandler/useContractHandler";
+import { usePaymentHandler } from "@/src/hooks/companyapihandler/usePaymentHandler";
+import { api } from "@/src/lib/api";
 
 /* ──────────────────────────────────────────────
    Card Component
@@ -30,22 +33,22 @@ const Card = ({
       {/* ========================
           SVG Card Background
       ======================== */}
-        <svg
+      <svg
         width="437"
         height="185"
         viewBox="0 0 437 185"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        >
+      >
         <g filter="url(#filter0_dd_12839_50658)">
-            <path
+          <path
             d="M333.25 8C341.794 8 347.555 18.8815 347.555 27.4258C347.555 45.0952 361.879 59.4197 379.548 59.4199H403.41C409.813 59.4199 416.68 63.8245 416.68 70.2269V123.865C416.68 139.881 403.696 152.865 387.68 152.865H49C32.9837 152.865 20 139.881 20 123.865V37C20 20.9837 32.9837 8 49 8H333.25Z"
             fill="white"
-            />
+          />
         </g>
 
         <defs>
-            <filter
+          <filter
             id="filter0_dd_12839_50658"
             x="0"
             y="0"
@@ -53,59 +56,59 @@ const Card = ({
             height="184.865"
             filterUnits="userSpaceOnUse"
             colorInterpolationFilters="sRGB"
-            >
+          >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feColorMatrix
-                in="SourceAlpha"
-                type="matrix"
-                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                result="hardAlpha"
+              in="SourceAlpha"
+              type="matrix"
+              values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+              result="hardAlpha"
             />
             <feMorphology
-                radius="4"
-                operator="erode"
-                in="SourceAlpha"
-                result="effect1_dropShadow_12839_50658"
+              radius="4"
+              operator="erode"
+              in="SourceAlpha"
+              result="effect1_dropShadow_12839_50658"
             />
             <feOffset dy="12" />
             <feGaussianBlur stdDeviation="12" />
             <feComposite in2="hardAlpha" operator="out" />
             <feColorMatrix
-                type="matrix"
-                values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0"
+              type="matrix"
+              values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0"
             />
             <feBlend
-                mode="normal"
-                in2="BackgroundImageFix"
-                result="effect1_dropShadow_12839_50658"
+              mode="normal"
+              in2="BackgroundImageFix"
+              result="effect1_dropShadow_12839_50658"
             />
             <feColorMatrix
-                in="SourceAlpha"
-                type="matrix"
-                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                result="hardAlpha"
+              in="SourceAlpha"
+              type="matrix"
+              values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+              result="hardAlpha"
             />
             <feOffset />
             <feGaussianBlur stdDeviation="1" />
             <feComposite in2="hardAlpha" operator="out" />
             <feColorMatrix
-                type="matrix"
-                values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0"
+              type="matrix"
+              values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0"
             />
             <feBlend
-                mode="normal"
-                in2="effect1_dropShadow_12839_50658"
-                result="effect2_dropShadow_12839_50658"
+              mode="normal"
+              in2="effect1_dropShadow_12839_50658"
+              result="effect2_dropShadow_12839_50658"
             />
             <feBlend
-                mode="normal"
-                in="SourceGraphic"
-                in2="effect2_dropShadow_12839_50658"
-                result="shape"
+              mode="normal"
+              in="SourceGraphic"
+              in2="effect2_dropShadow_12839_50658"
+              result="shape"
             />
-            </filter>
+          </filter>
         </defs>
-        </svg>
+      </svg>
 
 
       {/* ========================
@@ -175,7 +178,7 @@ type ContractRowProps = {
   showCheckbox?: boolean;
 };
 
-const ContractRow = ({ payment,onSideClick,showCheckbox = false }: ContractRowProps) => {
+const ContractRow = ({ payment, onSideClick, showCheckbox = false }: ContractRowProps) => {
   const [checked, setChecked] = useState(false);
   return (
     <div className="flex w-full gap-4">
@@ -190,7 +193,7 @@ const ContractRow = ({ payment,onSideClick,showCheckbox = false }: ContractRowPr
         {/* Left spacer */}
         <div className="w-6 h-full flex-none"></div>
 
-       {/* Checkbox */}
+        {/* Checkbox */}
         {showCheckbox && (
           <div
             className="flex items-center skew-x-[12deg] justify-center w-11 h-full pl-2 cursor-pointer"
@@ -247,33 +250,33 @@ const ContractRow = ({ payment,onSideClick,showCheckbox = false }: ContractRowPr
             <span className="text-xs text-gray-400">Transfer ID</span>
           </div>
 
-           {/* Method ID */}
+          {/* Method ID */}
           <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{payment.method}</span>
             <span className="text-xs text-gray-400">Method</span>
           </div>
 
-            {/* Note ID */}
+          {/* Note ID */}
           <div className="flex flex-col justify-center w-[140px]">
             <span className="text-sm font-semibold text-gray-900">{payment.note}</span>
             <span className="text-xs text-gray-400">Method</span>
           </div>
 
 
-            {/* Payment Status */}
-            <div className="flex flex-col justify-center items-center w-[140px]">
+          {/* Payment Status */}
+          <div className="flex flex-col justify-center items-center w-[140px]">
             <div
-                className={`
+              className={`
                 ml-4 px-3 py-1 skew-x-[-12deg] rounded-[8px] text-xs font-semibold flex items-center justify-center
                 ${payment.paymentStatus === "Paid" ? "bg-[#D3FCD2] border border-[#22C55E] text-[#22C55E]" : ""}
                 ${payment.paymentStatus === "Due" ? "bg-[#FFDCDC] border border-[#FF4D4F] text-[#FF4D4F]" : ""}
                 ${payment.paymentStatus === "Pending" ? "bg-[#FFF4CC] border border-[#F59E0B] text-[#F59E0B]" : ""}
                 `}
             >
-                {payment.paymentStatus}
+              {payment.paymentStatus}
             </div>
             <span className="text-xs text-gray-400">Payment Status</span>
-            </div>
+          </div>
 
         </div>
       </div>
@@ -330,16 +333,25 @@ const ContractRow = ({ payment,onSideClick,showCheckbox = false }: ContractRowPr
   );
 };
 
-  const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 6;
 export default function ApplicantPage() {
-   const router = useRouter();
+  const router = useRouter();
   const params = useParams<{ applicantId: string }>();
-  const applicantId = params.applicantId;
+  const contractId = params.applicantId; // This is actually the contract ID
 
   // ------------------ States -------------------
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState<any>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [contract, setContract] = useState<any>(null);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [paymentStats, setPaymentStats] = useState<{ totalPaid: { amount: number; count: number }; pending: { amount: number; count: number }; due: { amount: number; count: number } } | null>(null);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [contractLoading, setContractLoading] = useState(true);
+  const [contractError, setContractError] = useState<string | null>(null);
+  const [student, setStudent] = useState<any>(null);
+  const [studentLoading, setStudentLoading] = useState(true);
 
   const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<PaymentStatus[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -351,29 +363,115 @@ export default function ApplicantPage() {
   const [showAllPortfolio, setShowAllPortfolio] = useState(false);
   const [showAllSkills, setShowAllSkills] = useState(false);
 
-  // ------------------ Find applicant -------------------
-  const applicant = mockApplicants.find(a => a.applicantId === applicantId);
-  if (!applicant) return notFound();
+  // ------------------ Hooks -------------------
+  const { getContractById } = useContractHandler();
+  const { listPayments, getPaymentStats } = usePaymentHandler();
+
+  // ------------------ Fetch Contract, Student Profile, and Payments -------------------
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!contractId) {
+        setContractLoading(false);
+        setContractError("Contract ID is missing");
+        return;
+      }
+
+      try {
+        setContractLoading(true);
+        setContractError(null);
+        setStudentLoading(true);
+
+        // Fetch contract
+        const contractData = await getContractById(contractId);
+        setContract(contractData);
+
+        // Fetch student profile with full data if studentId exists
+        const contractWithStudentId = contractData as any;
+        if (contractWithStudentId.studentId) {
+          try {
+            const studentResponse = await api.get<{ status: string; data: any }>(
+              `/api/company/students/${contractWithStudentId.studentId}?fullProfile=true`
+            );
+            setStudent(studentResponse.data.data);
+          } catch (error: any) {
+            // Don't fail the whole page if student profile fails
+          } finally {
+            setStudentLoading(false);
+          }
+        } else {
+          setStudentLoading(false);
+        }
+
+        // Fetch payments and stats for this contract
+        setPaymentsLoading(true);
+        setStatsLoading(true);
+        try {
+          const contractUuid = contractData.id;
+          const [paymentsResponse, statsResponse] = await Promise.all([
+            listPayments(1, 100, undefined, undefined, contractUuid),
+            getPaymentStats(contractUuid)
+          ]);
+          setPayments(paymentsResponse.items);
+          setPaymentStats(statsResponse);
+        } catch (paymentError: any) {
+          setPayments([]);
+          setPaymentStats(null);
+        } finally {
+          setPaymentsLoading(false);
+          setStatsLoading(false);
+        }
+      } catch (error: any) {
+        setContractError(error.message || "Failed to fetch contract");
+        setContract(null);
+      } finally {
+        setContractLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [contractId, getContractById, listPayments, getPaymentStats]);
+
+  // ------------------ Find applicant (for backward compatibility with mock data sections) -------------------
+  // Note: contractId is a UUID, not a mock ID, so this will likely be undefined
+  // We keep this for backward compatibility with sections that still use mock data
+  const applicant = mockApplicants.find(a => a.applicantId === contractId);
 
   // ------------------ Filtered Payments -------------------
   type PaymentStatus = "Pending" | "Due" | "Paid" | "All";
   const PAYMENT_STATUSES: PaymentStatus[] = ["Pending", "Due", "Paid", "All"];
 
+  // Map API payments to match the expected format
+  const mappedPayments = useMemo(() => {
+    return payments.map((payment: any) => ({
+      id: payment.id,
+      applicantId: payment.studentId || payment.applicantId || "",
+      applicantName: payment.applicantName || "",
+      contractId: payment.contractId || "",
+      transferId: payment.transferId || "",
+      nextPayment: payment.nextPayment || "",
+      monthlyAllowance: payment.monthlyAllowance || "",
+      method: payment.method || "",
+      note: payment.note || "",
+      workLocation: payment.workLocation || "",
+      paymentStatus: payment.paymentStatus || "Pending"
+    }));
+  }, [payments]);
+
   const filteredPayments = useMemo(() => {
-    return mockApplicantPayments.filter(payment => {
+    return mappedPayments.filter(payment => {
       // Search filter
       const searchMatch =
         !searchQuery.trim() ||
-        payment.applicantId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.applicantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.contractId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.transferId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.method.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.workLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.monthlyAllowance.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.note.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.paymentStatus.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.nextPayment.toLowerCase().includes(searchQuery.toLowerCase());
+        (payment.applicantId && payment.applicantId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (payment.applicantName && payment.applicantName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (payment.contractId && payment.contractId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (payment.transferId && payment.transferId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (payment.method && payment.method.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (payment.workLocation && payment.workLocation.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (payment.monthlyAllowance && payment.monthlyAllowance.toString().toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (payment.note && payment.note.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (payment.paymentStatus && payment.paymentStatus.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (payment.nextPayment && payment.nextPayment.toLowerCase().includes(searchQuery.toLowerCase()));
 
       // Payment status filter
       const paymentMatch =
@@ -383,10 +481,10 @@ export default function ApplicantPage() {
 
       return searchMatch && paymentMatch;
     });
-  }, [searchQuery, selectedPaymentStatus]);
+  }, [mappedPayments, searchQuery, selectedPaymentStatus]);
 
-  // Payments only for this applicant
-  const applicantPayments = filteredPayments.filter(p => p.applicantId === applicantId);
+  // Payments for this contract
+  const applicantPayments = filteredPayments;
 
   // ------------------ Pagination -------------------
   const totalPages = Math.ceil(applicantPayments.length / ITEMS_PER_PAGE);
@@ -415,431 +513,466 @@ export default function ApplicantPage() {
     setIsModalOpen(false);
   };
 
-  if (!applicant) {
+  // ------------------ Loading and Error States (after all hooks) -------------------
+  if (contractLoading) {
     return (
       <DashboardLayout>
-        <div className="p-6 text-lg font-semibold text-red-600">
-          Applicant not found
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
         </div>
       </DashboardLayout>
     );
   }
 
+  if (contractError || !contract) {
+    return (
+      <DashboardLayout>
+        <div className="p-6 text-lg font-semibold text-red-600">
+          {contractError || "Contract not found"}
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Note: applicant is from mock data and may be undefined when using real contract data
+  // This is okay - we'll use contract data instead where needed
+
   return (
-  <DashboardLayout>
+    <DashboardLayout>
       <div
         className="py-6 min-h-[800px]"
         style={{
           backgroundImage: "url('/pages/applicantInfoBackground.svg')",
           backgroundPosition: "65% top",
           backgroundRepeat: "no-repeat",
-            transform: "scale(0.96)",
+          transform: "scale(0.96)",
           transformOrigin: "top center",
         }}
       >
         {/* ✅ CONTENT CONTAINER */}
-    <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
-        <div
-        className="
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
+          <div
+            className="
           flex flex-row items-start
           justify-start
         "
-      >
-        <div className="w-[450px] h-auto flex flex-col gap-4"> {/* <-- gap between sections */}
-  
-        <div className="flex flex-col gap-[10px] w-[500px]">
-  
-            {/* Name + Button Row */}
-            <div className="flex items-center justify-between w-full">
-              <h1 className="font-barlow font-extrabold text-[40px] leading-[64px] text-[#1E1E1E]">
-                {applicant ? applicant.name : applicantId}
-              </h1>
+          >
+            <div className="w-[450px] h-auto flex flex-col gap-4"> {/* <-- gap between sections */}
 
-             <div
-                className="relative w-[120px] h-[35px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
-              >
-                <span className="skew-x-[12deg] font-bold text-[14px] text-[#1E1E1E]">
-                  {applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1)}
-                </span>
-              </div>
+              <div className="flex flex-col gap-[10px] w-[500px]">
 
-            </div>
+                {/* Name + Button Row */}
+                <div className="flex items-center justify-between w-full">
+                  <h1 className="font-barlow font-extrabold text-[40px] leading-[64px] text-[#1E1E1E]">
+                    {student?.name || applicant?.name || contract?.name || contractId}
+                  </h1>
 
-            {/* Description */}
-            <p className="font-publicSans text-[16px] leading-[24px] text-[#1E1E1E]">
-              {applicant
-                ? applicant.description.length > 250
-                  ? applicant.description.slice(0, 250) + "..."
-                  : applicant.description
-                : "Applicant description not found."}
-            </p>
+                  <div
+                    className="relative w-[120px] h-[35px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
+                  >
+                    <span className="skew-x-[12deg] font-bold text-[14px] text-[#1E1E1E]">
+                      {student?.status ? student.status.charAt(0).toUpperCase() + student.status.slice(1) : applicant?.status ? applicant.status.charAt(0).toUpperCase() + applicant.status.slice(1) : contract?.status || "Unknown"}
+                    </span>
+                  </div>
 
-          </div>
-
-
-          {/* Frame 313 example */}
-          <div className="flex flex-row justify-between items-center gap-[10px] w-[557px] h-[175px]"> {/* <-- updated height */}
-
-            {/* Profile Ranking Card */}
-            <div className="relative flex flex-col items-center justify-center w-[250px] h-[260px]">
-
-              <div className="relative w-[250px] h-[175px]">
-                {/* Background number or placeholder */}
-                <div className="font-barlow font-extrabold text-[200px] leading-[175px] text-[#C2C2C2] flex  w-[225px] h-[175px]">
-                  {applicant ? applicant.profileRanking : "Applicant Ranking not found."}
                 </div>
 
-                {/* Profile Ranking label */}
-                <h4 className="absolute left-[70px] top-[85px] font-publicSans font-bold text-[24px] leading-[36px] text-[#1E1E1E] flex ">
-                  Profile Ranking 
-                </h4>
-              </div>
-              <div className=" justify-between items-center w-[250px] h-[81px] p-[16px] flex flex-col gap-[8px] bg-white/60 backdrop-blur-[17px] rounded-[21px]">
-              {/* Profile Progress Label */}
-              <div className="flex flex-row justify-between items-center w-[154px] h-[19px]">
-                <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
-                  Profile Progress
-                </span>
-                
-                <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
-                  {applicant.profileComplete}%
-                </span>
-              </div>
-
-              {/* Progress Bar Container */}
-              <div className="relative w-[154px] h-[16px] bg-[#1E1E1E] transform -skew-x-[20deg]  rounded-[4px]">
-                {/* Progress Fill */}
-                <div
-                  className="absolute left-0.5 top-1/2 h-[14px] -translate-y-1/2 rounded bg-[#FFEB9C]"
-                  style={{ width: `${applicant.profileComplete}%` }}
-                />
+                {/* Description */}
+                <p className="font-publicSans text-[16px] leading-[24px] text-[#1E1E1E]">
+                  {student?.description
+                    ? student.description.length > 250
+                      ? student.description.slice(0, 250) + "..."
+                      : student.description
+                    : applicant
+                    ? applicant.description.length > 250
+                      ? applicant.description.slice(0, 250) + "..."
+                      : applicant.description
+                    : "Applicant description not found."}
+                </p>
 
               </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4 w-[62px] h-[152px] mx-auto">
-              {/* First pair */}
-              <div className="flex flex-col gap-1">
-                <span className="font-publicSans text-[14px] leading-[22px] text-[#1C252E]">Label 1</span>
-                <span className="font-publicSans text-[12px] leading-[18px] text-[#1C252E]">Caption</span>
-              </div>
 
-              {/* Second pair */}
-              <div className="flex flex-col gap-1">
-                <span className="font-publicSans text-[14px] leading-[22px] text-[#1C252E]">Label 2</span>
-                <span className="font-publicSans text-[12px] leading-[18px] text-[#1C252E]">Caption</span>
-              </div>
-              {/* Third pair */}
-              <div className="flex flex-col gap-1">
-                <span className="font-publicSans text-[14px] leading-[22px] text-[#1C252E]">Label 3</span>
-                <span className="font-publicSans text-[12px] leading-[18px] text-[#1C252E]">Caption</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Skills Parallelogram Card */}
-        <div className="absolute top-50 left-80 w-[460px] h-auto relative">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
-            Skills
-          </h3>
-        </div>
+              {/* Frame 313 example */}
+              <div className="flex flex-row justify-between items-center gap-[10px] w-[557px] h-[175px]"> {/* <-- updated height */}
 
-        {/* Parallelogram background */}
-          <div
-            className="w-full max-w-[655px] min-w-[460px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden"
-            style={{ maxHeight: "250px" }} // <-- crucial
-          >
-             {/* Inner content (counter-skew) */}
-              <div className="transform skew-x-12 px-8 w-full h-full overflow-y-auto">
-              {applicant?.skills?.length ? (
-                <div className="flex flex-wrap gap-3">
-                  {applicant.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
-                    >
-                      {skill}
-                    </span>
+                {/* Profile Ranking Card */}
+                <div className="relative flex flex-col items-center justify-center w-[250px] h-[260px]">
+
+                  <div className="relative w-[250px] h-[175px]">
+                    {/* Background number or placeholder */}
+                    <div className="font-barlow font-extrabold text-[200px] leading-[175px] text-[#C2C2C2] flex  w-[225px] h-[175px]">
+                      {student?.profileRanking || applicant?.profileRanking || "N/A"}
+                    </div>
+
+                    {/* Profile Ranking label */}
+                    <h4 className="absolute left-[70px] top-[85px] font-publicSans font-bold text-[24px] leading-[36px] text-[#1E1E1E] flex ">
+                      Profile Ranking
+                    </h4>
+                  </div>
+                  <div className=" justify-between items-center w-[250px] h-[81px] p-[16px] flex flex-col gap-[8px] bg-white/60 backdrop-blur-[17px] rounded-[21px]">
+                    {/* Profile Progress Label */}
+                    <div className="flex flex-row justify-between items-center w-[154px] h-[19px]">
+                      <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
+                        Profile Progress
+                      </span>
+
+                      <span className="font-bold text-[12px] leading-[18px] uppercase text-[#1E1E1E]">
+                        {student?.profileComplete || applicant?.profileComplete || 0}%
+                      </span>
+                    </div>
+
+                    {/* Progress Bar Container */}
+                    <div className="relative w-[154px] h-[16px] bg-[#1E1E1E] transform -skew-x-[20deg]  rounded-[4px]">
+                      {/* Progress Fill */}
+                      <div
+                        className="absolute left-0.5 top-1/2 h-[14px] -translate-y-1/2 rounded bg-[#FFEB9C]"
+                        style={{ width: `${student?.profileComplete || applicant?.profileComplete || 0}%` }}
+                      />
+
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-4 w-[62px] h-[152px] mx-auto">
+                  {[
+                    { value: (student as any)?.email ?? "—", label: "Email", key: "email" },
+                    { value: student?.availability ?? "—", label: "Availability", key: "availability" },
+                    { value: (student as any)?.salaryExpectation ? (student as any).salaryExpectation.toLocaleString() : "—", label: "Salary Expectation", key: "salaryExpectation" },
+                  ].map((item) => (
+                    <div key={item.key} className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
+                      <img src="/cards/tag.svg" alt="Tag Icon" />
+                      <div className="flex flex-col justify-center items-start w-[77px] h-[40px] flex-none gap-1">
+                        <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
+                          {item.value}
+                        </span>
+                        <span className="w-[77px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                          {item.label}
+                        </span>
+                  </div>
+                  </div>
                   ))}
                 </div>
-              ) : (
-                <p className="text-[#555] font-publicSans">No skills info available.</p>
-              )}
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Skills Parallelogram Card */}
-      <div className="flex flex-col items-center justify-center mt-65 gap-10">
-        {/* Row 1 */}
-        <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
-
-
-          {/* Experience Card */}
-          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
-              Experience
-              </h3>
-            </div>
-            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllExp ? "max-h-[2000px]" : "max-h-[250px]"}`}>
-              <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-              {experienceData.filter(exp => exp.applicantId === applicant?.applicantId).length ? (
-                experienceData
-                  .filter(exp => exp.applicantId === applicant?.applicantId)
-                  .map((exp) => (
-                    <div key={exp.id} className="px-4 py-2 w-full">
-                      <div className="flex items-center justify-between">
-                        {/* Left side: SVG + Role */}
-                        <div className="flex items-center gap-2">
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
-                          </svg>
-                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
-                            {exp.role}
-                          </h4>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-[12px] text-[#555]">
-                        <span className="font-publicSans">{exp.companyName}</span>
-                        {/* small rotated square */}
-                        <svg
-                          width="8"
-                          height="8"
-                          viewBox="0 0 8 8"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="transform rotate-45"
-                        >
-                          <rect x="3.53564" width="5" height="5" fill="black" />
-                        </svg>
-                        <span className="font-publicSans">{exp.date}</span>
-                      </div>
-                      <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1 break-words">
-                        {exp.description.split(" ").slice(0, 10).join(" ")}
-                        {exp.description.split(" ").length > 10 ? "..." : ""}
-                      </p>
-                    </div>
-                  ))
-              ) : (
-                <p className="text-[#555] font-publicSans py-4">No experience info available.</p>
-              )}
-            </div>
-            </div>
-          </div>
-
-
-          {/* Card 2 */}
-          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
-            <div className="flex items-center justify-between mb-6">
-               <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E] ">
-                  Education
+            {/* Skills Parallelogram Card */}
+            <div className="absolute top-50 left-80 w-[460px] h-auto relative">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
+                  Skills
                 </h3>
-            </div>
-            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAll ? "max-h-[2000px]" : "max-h-[250px]"}`}>
-              <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-              {educationData.filter(edu => edu.applicantId === applicant?.applicantId).length ? (
-                educationData
-                  .filter(edu => edu.applicantId === applicant?.applicantId)
-                  .map((edu) => (
-                    <div key={edu.id} className="px-4 py-2 w-full">
-                      <div className="flex items-center justify-between">
-                        {/* Left side: SVG + Major */}
-                        <div className="flex items-center gap-2">
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
-                          </svg>
-                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
-                            {edu.major}
-                          </h4>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-[12px] text-[#555]">
-                        <span className="font-publicSans">{edu.name}</span>
-                        
-                        {/* small rotated square */}
-                        <svg
-                          width="8"
-                          height="8"
-                          viewBox="0 0 8 8"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="transform rotate-45"
+              </div>
+
+              {/* Parallelogram background */}
+              <div
+                className="w-full max-w-[655px] min-w-[460px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden"
+                style={{ maxHeight: "250px" }} // <-- crucial
+              >
+                {/* Inner content (counter-skew) */}
+                <div className="transform skew-x-12 px-8 w-full h-full overflow-y-auto">
+                  {student?.skills && student.skills.length > 0 ? (
+                    <div className="flex flex-wrap gap-3">
+                      {student.skills.map((skillItem: any) => (
+                        <span
+                          key={skillItem.skill?.id || skillItem.skillId}
+                          className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap"
                         >
-                          <rect x="3.53564" width="5" height="5" fill="black" />
-                        </svg>
-
-                        <span className="font-publicSans">{edu.date}</span>
-                      </div>
-                      <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1">
-                        {edu.description.split(" ").slice(0, 10).join(" ")}
-                        {edu.description.split(" ").length > 10 ? "..." : ""}
-                      </p>
+                          {skillItem.skill?.name || skillItem.name || 'Unknown'}
+                        </span>
+                      ))}
                     </div>
-                  ))
-              ) : (
-                <p className="text-[#555] font-publicSans py-4">No education info available.</p>
-              )}
-            </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Row 2 */}
-        <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
-
-          {/* Language Card */}
-          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
-              Languages
-              </h3>
-            </div>
-            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllLang ? "max-h-[2000px]" : "max-h-[250px]"}`}>
-              <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-              {languageData.filter(lang => lang.applicantId === applicant?.applicantId).length ? (
-                languageData
-                  .filter(lang => lang.applicantId === applicant?.applicantId)
-                  .map((lang) => (
-                    <div key={lang.id} className="px-4 py-2 w-full">
-                      <div className="flex items-center justify-between">
-                        {/* Left side: SVG + Language name */}
-                        <div className="flex items-center gap-2">
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
-                          </svg>
-                          <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
-                            {lang.name}
-                          </h4>
-                        </div>
-                      </div>
-
-                      {/* Level text (optional) */}
-                      <p className="font-publicSans text-[12px] text-[#555] mt-1">
-                        {lang.level}
-                      </p>
-                    </div>
-                  ))
-              ) : (
-                <p className="text-[#555] font-publicSans py-4">No language info available.</p>
-              )}
-            </div>
+                  ) : (
+                    <p className="text-[#555] font-publicSans">No skills info available.</p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
+          {/* Skills Parallelogram Card */}
+          <div className="flex flex-col items-center justify-center mt-65 gap-10">
+            {/* Row 1 */}
+            <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
 
-          {/* Portfolio Card */}
-          <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
-              Portfolio
-              </h3>
-            </div>
-            <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllPortfolio ? "max-h-[2000px]" : "max-h-[250px]"}`}>
-              <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
-                {portfolioData.filter(port => port.applicantId === applicant?.applicantId).length ? (
-                  portfolioData
-                    .filter(port => port.applicantId === applicant?.applicantId)
-                    .map((port) => (
-                      <div key={port.id} className="px-4 py-2 w-full">
-                        <div className="flex items-center justify-between">
-                          {/* Left side: SVG + Portfolio Name */}
-                          <div className="flex items-center gap-2">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C"/>
-                            </svg>
-                            <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
-                              {port.name}
-                            </h4>
+
+              {/* Experience Card */}
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
+                    Experience
+                  </h3>
+                </div>
+                <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllExp ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+                  <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
+                    {student?.experiences && student.experiences.length > 0 ? (
+                      student.experiences.map((exp: any) => (
+                        <div key={exp.id} className="px-4 py-2 w-full">
+                          <div className="flex items-center justify-between">
+                            {/* Left side: SVG + Role */}
+                            <div className="flex items-center gap-2">
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C" />
+                              </svg>
+                              <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                                {exp.role}
+                              </h4>
+                            </div>
                           </div>
-                        </div>
-
-                        {/* Portfolio link */}
-                        <div className="w-full flex items-center gap-2 mt-1">
-                          {/* Conditional SVG icon */}
-                          {port.name.toLowerCase() === "github" ? (
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <rect width="40" height="40" rx="8" fill="#FFEB9C"/>
-                              <g clipPath="url(#clip0)">
-                                <path d="M20 8.5C13.37 8.5 8 13.78 8 20.292C8 25.503 11.438 29.922 16.205 31.48C16.805 31.591 17.025 31.226 17.025 30.913C17.025 30.633 17.015 29.891 17.01 28.908C13.672 29.619 12.968 27.326 12.968 27.326C12.422 25.965 11.633 25.601 11.633 25.601C10.546 24.87 11.717 24.885 11.717 24.885C12.922 24.967 13.555 26.1 13.555 26.1C14.625 27.903 16.364 27.382 17.05 27.081C17.158 26.318 17.467 25.799 17.81 25.504C15.145 25.209 12.344 24.195 12.344 19.677C12.344 18.39 12.809 17.338 13.579 16.513C13.444 16.215 13.039 15.016 13.684 13.392C13.684 13.392 14.689 13.076 16.984 14.601C17.944 14.339 18.964 14.209 19.984 14.203C21.004 14.209 22.024 14.339 22.984 14.601C25.264 13.076 26.269 13.392 26.269 13.392C26.914 15.016 26.509 16.215 26.389 16.513C27.154 17.338 27.619 18.39 27.619 19.677C27.619 24.207 24.814 25.204 22.144 25.494C22.564 25.848 22.954 26.571 22.954 27.676C22.954 29.254 22.939 30.522 22.939 30.905C22.939 31.214 23.149 31.583 23.764 31.465C28.565 29.917 32 25.495 32 20.292C32 13.78 26.627 8.5 20 8.5Z" fill="black"/>
-                              </g>
-                              <defs>
-                                <clipPath id="clip0">
-                                  <rect width="24" height="24" fill="white" transform="translate(8 8)"/>
-                                </clipPath>
-                              </defs>
+                          <div className="flex items-center gap-2 text-[12px] text-[#555]">
+                            <span className="font-publicSans">{exp.companyName}</span>
+                            {/* small rotated square */}
+                            <svg
+                              width="8"
+                              height="8"
+                              viewBox="0 0 8 8"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="transform rotate-45"
+                            >
+                              <rect x="3.53564" width="5" height="5" fill="black" />
                             </svg>
-                          ) : (
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <rect width="40" height="40" rx="8" fill="#FFEB9C"/>
-                              <path d="M12.5 15.5C12.8978 15.5 13.2794 15.658 13.5607 15.9393C13.842 16.2206 14 16.6022 14 17V27.5C14 27.8978 13.842 28.2794 13.5607 28.5607C13.2794 28.842 12.8978 29 12.5 29H9.5C8.673 29 8 28.328 8 27.5V17C8 16.172 8.673 15.5 9.5 15.5H12.5ZM21.5 11C21.8978 11 22.2794 11.158 22.5607 11.4393C22.842 11.7206 23 12.1022 23 12.5V27.5C23 27.8978 22.842 28.2794 22.5607 28.5607C22.2794 28.842 21.8978 29 21.5 29H18.5C17.673 29 17 28.328 17 27.5V12.5C17 11.672 17.673 11 18.5 11H21.5ZM30.5 18.5C30.8978 18.5 31.2794 18.658 31.5607 18.9393C31.842 19.2206 32 19.6022 32 20V27.5C32 27.8978 31.842 28.2794 31.5607 28.5607C31.2794 28.842 30.8978 29 30.5 29H27.5C27.1022 29 26.7206 28.842 26.4393 28.5607C26.158 28.2794 26 27.8978 26 27.5V20C26 19.6022 26.158 19.2206 26.4393 18.9393C26.7206 18.658 27.1022 18.5 27.5 18.5H30.5Z" fill="black"/>
-                            </svg>
+                            <span className="font-publicSans">{exp.startDate} - {exp.endDate || "Present"}</span>
+                          </div>
+                          {exp.description && (
+                            <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1 break-words">
+                              {exp.description.split(" ").slice(0, 10).join(" ")}
+                              {exp.description.split(" ").length > 10 ? "..." : ""}
+                            </p>
                           )}
-
-                          {/* Link text */}
-                          <p className="font-publicSans text-[12px] text-[#555] break-words">
-                            {port.link.split(" ").slice(0, 10).join(" ")}
-                            {port.link.split(" ").length > 10 ? "..." : ""}
-                          </p>
                         </div>
-                      </div>
-                    ))
-                ) : (
-                  <p className="text-[#555] font-publicSans py-4">No portfolio info available.</p>
-                )}
+                      ))
+                    ) : (
+                      <p className="text-[#555] font-publicSans py-4">No experience info available.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+
+              {/* Card 2 */}
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E] ">
+                    Education
+                  </h3>
+                </div>
+                <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAll ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+                  <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
+                    {student?.educations && student.educations.length > 0 ? (
+                      student.educations.map((edu: any) => (
+                        <div key={edu.id} className="px-4 py-2 w-full">
+                          <div className="flex items-center justify-between">
+                            {/* Left side: SVG + Major */}
+                            <div className="flex items-center gap-2">
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C" />
+                              </svg>
+                              <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                                {edu.major || edu.degree || "Education"}
+                              </h4>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 text-[12px] text-[#555]">
+                            <span className="font-publicSans">{edu.institution || edu.name || "Institution"}</span>
+
+                            {/* small rotated square */}
+                            <svg
+                              width="8"
+                              height="8"
+                              viewBox="0 0 8 8"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="transform rotate-45"
+                            >
+                              <rect x="3.53564" width="5" height="5" fill="black" />
+                            </svg>
+
+                            <span className="font-publicSans">{edu.startDate} - {edu.endDate || "Present"}</span>
+                          </div>
+                          {edu.description && (
+                            <p className="font-publicSans text-[12px] text-[#1E1E1E] mt-1">
+                              {edu.description.split(" ").slice(0, 10).join(" ")}
+                              {edu.description.split(" ").length > 10 ? "..." : ""}
+                            </p>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-[#555] font-publicSans py-4">No education info available.</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+
+            {/* Row 2 */}
+            <div className="flex flex-row items-start xl:items-stretch justify-center gap-10 flex-wrap xl:flex-nowrap w-full">
+
+              {/* Language Card */}
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
+                    Languages
+                  </h3>
+                </div>
+                <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllLang ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+                  <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
+                    {student?.languages && student.languages.length > 0 ? (
+                      student.languages.map((lang: any) => (
+                        <div key={lang.id} className="px-4 py-2 w-full">
+                          <div className="flex items-center justify-between">
+                            {/* Left side: SVG + Language name */}
+                            <div className="flex items-center gap-2">
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C" />
+                              </svg>
+                              <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                                {lang.name || lang.language}
+                              </h4>
+                            </div>
+                          </div>
+
+                          {/* Level text (optional) */}
+                          {lang.level && (
+                            <p className="font-publicSans text-[12px] text-[#555] mt-1">
+                              {lang.level}
+                            </p>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-[#555] font-publicSans py-4">No language info available.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+
+              {/* Portfolio Card */}
+              <div className="w-full max-w-[655px] min-w-[580px] h-auto relative">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-barlow font-bold text-[24px] text-[#1E1E1E]">
+                    Portfolio
+                  </h3>
+                </div>
+                <div className={`w-full max-w-[655px] min-w-[580px] bg-white shadow-[0_4px_12px_rgba(145,158,171,0.3),0_0_4px_rgba(145,158,171,0.2)] transform -skew-x-12 rounded-[24px] flex flex-col items-start justify-start p-6 overflow-hidden transition-all duration-300 ${showAllPortfolio ? "max-h-[2000px]" : "max-h-[250px]"}`}>
+                  <div className="transform skew-x-12 px-8 w-full flex flex-col gap-3 overflow-y-auto">
+                    {student?.portfolios && student.portfolios.length > 0 ? (
+                      student.portfolios.map((port: any) => (
+                        <div key={port.id} className="px-4 py-2 w-full">
+                          <div className="flex items-center justify-between">
+                            {/* Left side: SVG + Portfolio Name */}
+                            <div className="flex items-center gap-2">
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="7.89111" width="11.16" height="11.16" transform="rotate(45 7.89111 0)" fill="#FFEB9C" />
+                              </svg>
+                              <h4 className="font-publicSans font-semibold text-[14px] text-[#1E1E1E]">
+                                {port.name || port.title || "Portfolio"}
+                              </h4>
+                            </div>
+                          </div>
+
+                          {/* Portfolio link */}
+                          {port.url && (
+                            <div className="w-full flex items-center gap-2 mt-1">
+                              {/* Conditional SVG icon */}
+                              {port.name && port.name.toLowerCase().includes("github") ? (
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <rect width="40" height="40" rx="8" fill="#FFEB9C" />
+                                  <g clipPath="url(#clip0)">
+                                    <path d="M20 8.5C13.37 8.5 8 13.78 8 20.292C8 25.503 11.438 29.922 16.205 31.48C16.805 31.591 17.025 31.226 17.025 30.913C17.025 30.633 17.015 29.891 17.01 28.908C13.672 29.619 12.968 27.326 12.968 27.326C12.422 25.965 11.633 25.601 11.633 25.601C10.546 24.87 11.717 24.885 11.717 24.885C12.922 24.967 13.555 26.1 13.555 26.1C14.625 27.903 16.364 27.382 17.05 27.081C17.158 26.318 17.467 25.799 17.81 25.504C15.145 25.209 12.344 24.195 12.344 19.677C12.344 18.39 12.809 17.338 13.579 16.513C13.444 16.215 13.039 15.016 13.684 13.392C13.684 13.392 14.689 13.076 16.984 14.601C17.944 14.339 18.964 14.209 19.984 14.203C21.004 14.209 22.024 14.339 22.984 14.601C25.264 13.076 26.269 13.392 26.269 13.392C26.914 15.016 26.509 16.215 26.389 16.513C27.154 17.338 27.619 18.39 27.619 19.677C27.619 24.207 24.814 25.204 22.144 25.494C22.564 25.848 22.954 26.571 22.954 27.676C22.954 29.254 22.939 30.522 22.939 30.905C22.939 31.214 23.149 31.583 23.764 31.465C28.565 29.917 32 25.495 32 20.292C32 13.78 26.627 8.5 20 8.5Z" fill="black" />
+                                  </g>
+                                  <defs>
+                                    <clipPath id="clip0">
+                                      <rect width="24" height="24" fill="white" transform="translate(8 8)" />
+                                    </clipPath>
+                                  </defs>
+                                </svg>
+                              ) : (
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <rect width="40" height="40" rx="8" fill="#FFEB9C" />
+                                  <path d="M12.5 15.5C12.8978 15.5 13.2794 15.658 13.5607 15.9393C13.842 16.2206 14 16.6022 14 17V27.5C14 27.8978 13.842 28.2794 13.5607 28.5607C13.2794 28.842 12.8978 29 12.5 29H9.5C8.673 29 8 28.328 8 27.5V17C8 16.172 8.673 15.5 9.5 15.5H12.5ZM21.5 11C21.8978 11 22.2794 11.158 22.5607 11.4393C22.842 11.7206 23 12.1022 23 12.5V27.5C23 27.8978 22.842 28.2794 22.5607 28.5607C22.2794 28.842 21.8978 29 21.5 29H18.5C17.673 29 17 28.328 17 27.5V12.5C17 11.672 17.673 11 18.5 11H21.5ZM30.5 18.5C30.8978 18.5 31.2794 18.658 31.5607 18.9393C31.842 19.2206 32 19.6022 32 20V27.5C32 27.8978 31.842 28.2794 31.5607 28.5607C31.2794 28.842 30.8978 29 30.5 29H27.5C27.1022 29 26.7206 28.842 26.4393 28.5607C26.158 28.2794 26 27.8978 26 27.5V20C26 19.6022 26.158 19.2206 26.4393 18.9393C26.7206 18.658 27.1022 18.5 27.5 18.5H30.5Z" fill="black" />
+                                </svg>
+                              )}
+
+                              {/* Link text */}
+                              <a
+                                href={port.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-publicSans text-[12px] text-[#555] break-words hover:underline"
+                              >
+                                {port.url.length > 50 ? port.url.substring(0, 50) + "..." : port.url}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-[#555] font-publicSans py-4">No portfolio info available.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-          {/* Payment section  */}
-          <div className="mx-auto max-w-[1400px] py-10 px-6 lg:px-10" >
+        {/* Payment section  */}
+        <div className="mx-auto max-w-[1400px] py-10 px-6 lg:px-10" >
 
-            {/* Page Title */}
-            <div className="flex items-center justify-between mb-8">
-              {/* Left: Title */}
-              <h1 className="text-[28px] font-bold text-[#1E1E1E]">
-                payment
-              </h1>
+          {/* Page Title */}
+          <div className="flex items-center justify-between mb-8">
+            {/* Left: Title */}
+            <h1 className="text-[28px] font-bold text-[#1E1E1E]">
+              payment
+            </h1>
 
-              {/* Right: Button group */}
-              <div className="flex items-center gap-4">
-                {/* Example Button 1 */}
-                <button
-                  className="relative w-[180px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
-                  onClick={() => {
-                    setEditingPayment(null); // clear previous data
-                    setIsModalOpen(true);
-                  }}
-                >
-                  <span className="skew-x-[12deg] font-bold text-[#1E1E1E] flex items-center justify-center">
-                    Create payment
-                  </span>
-                </button>
+            {/* Right: Button group */}
+            <div className="flex items-center gap-4">
+              {/* Example Button 1 */}
+              <button
+                className="relative w-[180px] h-[40px] skew-x-[-12deg] bg-[#FFEB9C] flex items-center justify-center overflow-hidden rounded-md hover:bg-[#FFE066] transition duration-200 hover:scale-105"
+                onClick={() => {
+                  setEditingPayment(null); // clear previous data
+                  setIsModalOpen(true);
+                }}
+              >
+                <span className="skew-x-[12deg] font-bold text-[#1E1E1E] flex items-center justify-center">
+                  Create payment
+                </span>
+              </button>
 
-              </div>
             </div>
-            
-            {/* Top row: 4 cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-1 xl:grid-cols-3 gap-4 mb-8 ">
-              <Card title="Total Paid" value="500 SAR" subtitle="2+ this week" />
-              <Card title="Pending Payment" value="345 SAR" subtitle="10% growth" />
-              <Card title="Due" value="200" subtitle="5% growth" />
-            </div>
+          </div>
 
-            {/* Main Column */}
-            <div className="flex flex-col gap-6">
-              {/* Search and Filters Row */}
-              <div className="flex items-center gap-2">
-                
-                {/* Search Input – Parallelogram */}
-                <div
-                  className="
+          {/* Top row: 3 cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-1 xl:grid-cols-3 gap-4 mb-8 ">
+            <Card
+              title="Total Paid"
+              value={statsLoading ? "..." : `${(paymentStats?.totalPaid.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${contract?.currency || 'SAR'}`}
+              subtitle={statsLoading ? "Loading..." : `${paymentStats?.totalPaid.count || 0} payments`}
+            />
+            <Card
+              title="Pending Payment"
+              value={statsLoading ? "..." : `${(paymentStats?.pending.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${contract?.currency || 'SAR'}`}
+              subtitle={statsLoading ? "Loading..." : `${paymentStats?.pending.count || 0} pending`}
+            />
+            <Card
+              title="Due"
+              value={statsLoading ? "..." : `${(paymentStats?.due.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${contract?.currency || 'SAR'}`}
+              subtitle={statsLoading ? "Loading..." : `${paymentStats?.due.count || 0} due`}
+            />
+          </div>
+
+          {/* Main Column */}
+          <div className="flex flex-col gap-6">
+            {/* Search and Filters Row */}
+            <div className="flex items-center gap-2">
+
+              {/* Search Input – Parallelogram */}
+              <div
+                className="
                     relative
                     w-full max-w-md
                     skew-x-[-12deg]
@@ -849,16 +982,16 @@ export default function ApplicantPage() {
                     focus-within:border-black
                     transition-all
                   "
-                >
-                  <input
-                    type="text"
-                    placeholder="Search payments..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="
+              >
+                <input
+                  type="text"
+                  placeholder="Search payments..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="
                       w-full
                       px-4 py-2
                       bg-transparent
@@ -867,124 +1000,134 @@ export default function ApplicantPage() {
                       focus:outline-none
                       skew-x-[12deg]
                     "
-                  />
-                  
-                  {/* Search Icon */}
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13.8067 12.86L11.54 10.6C12.2713 9.66831 12.6681 8.51777 12.6667 7.33334C12.6667 6.2785 12.3539 5.24736 11.7678 4.37029C11.1818 3.49323 10.3489 2.80965 9.37431 2.40598C8.39978 2.00231 7.32742 1.89669 6.29285 2.10248C5.25829 2.30827 4.30798 2.81622 3.5621 3.5621C2.81622 4.30798 2.30827 5.25829 2.10248 6.29285C1.89669 7.32742 2.00231 8.39978 2.40598 9.37431C2.80965 10.3489 3.49323 11.1818 4.37029 11.7678C5.24736 12.3539 6.2785 12.6667 7.33334 12.6667C8.51777 12.6681 9.66831 12.2713 10.6 11.54L12.86 13.8067C12.922 13.8692 12.9957 13.9188 13.077 13.9526C13.1582 13.9864 13.2453 14.0039 13.3333 14.0039C13.4213 14.0039 13.5085 13.9864 13.5897 13.9526C13.671 13.9188 13.7447 13.8692 13.8067 13.8067C13.8692 13.7447 13.9188 13.671 13.9526 13.5897C13.9864 13.5085 14.0039 13.4213 14.0039 13.3333C14.0039 13.2453 13.9864 13.1582 13.9526 13.077C13.9188 12.9957 13.8692 12.922 13.8067 12.86ZM3.33334 7.33334C3.33334 6.54221 3.56793 5.76885 4.00746 5.11106C4.44698 4.45326 5.0717 3.94057 5.8026 3.63782C6.53351 3.33507 7.33777 3.25585 8.1137 3.41019C8.88962 3.56454 9.60235 3.9455 10.1618 4.50491C10.7212 5.06432 11.1021 5.77705 11.2565 6.55297C11.4108 7.3289 11.3316 8.13317 11.0289 8.86407C10.7261 9.59497 10.2134 10.2197 9.55562 10.6592C8.89782 11.0987 8.12446 11.3333 7.33334 11.3333C6.27247 11.3333 5.25505 10.9119 4.50491 10.1618C3.75476 9.41162 3.33334 8.3942 3.33334 7.33334Z" fill="#1E1E1E"/>
-                    </svg>
-                  </div>
+                />
+
+                {/* Search Icon */}
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.8067 12.86L11.54 10.6C12.2713 9.66831 12.6681 8.51777 12.6667 7.33334C12.6667 6.2785 12.3539 5.24736 11.7678 4.37029C11.1818 3.49323 10.3489 2.80965 9.37431 2.40598C8.39978 2.00231 7.32742 1.89669 6.29285 2.10248C5.25829 2.30827 4.30798 2.81622 3.5621 3.5621C2.81622 4.30798 2.30827 5.25829 2.10248 6.29285C1.89669 7.32742 2.00231 8.39978 2.40598 9.37431C2.80965 10.3489 3.49323 11.1818 4.37029 11.7678C5.24736 12.3539 6.2785 12.6667 7.33334 12.6667C8.51777 12.6681 9.66831 12.2713 10.6 11.54L12.86 13.8067C12.922 13.8692 12.9957 13.9188 13.077 13.9526C13.1582 13.9864 13.2453 14.0039 13.3333 14.0039C13.4213 14.0039 13.5085 13.9864 13.5897 13.9526C13.671 13.9188 13.7447 13.8692 13.8067 13.8067C13.8692 13.7447 13.9188 13.671 13.9526 13.5897C13.9864 13.5085 14.0039 13.4213 14.0039 13.3333C14.0039 13.2453 13.9864 13.1582 13.9526 13.077C13.9188 12.9957 13.8692 12.922 13.8067 12.86ZM3.33334 7.33334C3.33334 6.54221 3.56793 5.76885 4.00746 5.11106C4.44698 4.45326 5.0717 3.94057 5.8026 3.63782C6.53351 3.33507 7.33777 3.25585 8.1137 3.41019C8.88962 3.56454 9.60235 3.9455 10.1618 4.50491C10.7212 5.06432 11.1021 5.77705 11.2565 6.55297C11.4108 7.3289 11.3316 8.13317 11.0289 8.86407C10.7261 9.59497 10.2134 10.2197 9.55562 10.6592C8.89782 11.0987 8.12446 11.3333 7.33334 11.3333C6.27247 11.3333 5.25505 10.9119 4.50491 10.1618C3.75476 9.41162 3.33334 8.3942 3.33334 7.33334Z" fill="#1E1E1E" />
+                  </svg>
                 </div>
-                {/* Filter Buttons – Parallelogram on right */}
-                <div className="flex gap-2 ml-auto">
-                  {/*Filter Button */}
-                  <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
+              </div>
+              {/* Filter Buttons – Parallelogram on right */}
+              <div className="flex gap-2 ml-auto">
+                {/*Filter Button */}
+                <button className="relative w-[60px] h-[40px] skew-x-[-12deg] bg-transparent border border-black flex items-center justify-center overflow-hidden rounded-lg hover:bg-black/10 transition-all"
                   onClick={(e) => {
                     e.stopPropagation();
                     setMenuOpen((prev) => !prev);
                   }}
+                >
+                  <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M14 16.5C14.3852 16.5002 14.7556 16.6486 15.0344 16.9144C15.3132 17.1802 15.479 17.5431 15.4975 17.9279C15.516 18.3127 15.3858 18.6898 15.1338 18.9812C14.8818 19.2726 14.5274 19.4558 14.144 19.493L14 19.5H10C9.61478 19.4998 9.24441 19.3514 8.96561 19.0856C8.68682 18.8198 8.52099 18.4569 8.50248 18.0721C8.48396 17.6873 8.61419 17.3102 8.86618 17.0188C9.11816 16.7274 9.47258 16.5442 9.856 16.507L10 16.5H14ZM17 10.5C17.3978 10.5 17.7794 10.658 18.0607 10.9393C18.342 11.2206 18.5 11.6022 18.5 12C18.5 12.3978 18.342 12.7794 18.0607 13.0607C17.7794 13.342 17.3978 13.5 17 13.5H7C6.60218 13.5 6.22064 13.342 5.93934 13.0607C5.65804 12.7794 5.5 12.3978 5.5 12C5.5 11.6022 5.65804 11.2206 5.93934 10.9393C6.22064 10.658 6.60218 10.5 7 10.5H17ZM20 4.5C20.3978 4.5 20.7794 4.65804 21.0607 4.93934C21.342 5.22064 21.5 5.60218 21.5 6C21.5 6.39782 21.342 6.77936 21.0607 7.06066C20.7794 7.34196 20.3978 7.5 20 7.5H4C3.60218 7.5 3.22064 7.34196 2.93934 7.06066C2.65804 6.77936 2.5 6.39782 2.5 6C2.5 5.60218 2.65804 5.22064 2.93934 4.93934C3.22064 4.65804 3.60218 4.5 4 4.5H20Z" fill="#1E1E1E" />
+                    </svg>
+                  </span>
+                </button>
+                {/* Action Menu – appears beside the button */}
+                {menuOpen && (
+                  <div
+                    className="absolute right-40 w-[500px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
+                    onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
                   >
-                    <span className="skew-x-[12deg] font-bold text-sm text-black flex items-center gap-2">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14 16.5C14.3852 16.5002 14.7556 16.6486 15.0344 16.9144C15.3132 17.1802 15.479 17.5431 15.4975 17.9279C15.516 18.3127 15.3858 18.6898 15.1338 18.9812C14.8818 19.2726 14.5274 19.4558 14.144 19.493L14 19.5H10C9.61478 19.4998 9.24441 19.3514 8.96561 19.0856C8.68682 18.8198 8.52099 18.4569 8.50248 18.0721C8.48396 17.6873 8.61419 17.3102 8.86618 17.0188C9.11816 16.7274 9.47258 16.5442 9.856 16.507L10 16.5H14ZM17 10.5C17.3978 10.5 17.7794 10.658 18.0607 10.9393C18.342 11.2206 18.5 11.6022 18.5 12C18.5 12.3978 18.342 12.7794 18.0607 13.0607C17.7794 13.342 17.3978 13.5 17 13.5H7C6.60218 13.5 6.22064 13.342 5.93934 13.0607C5.65804 12.7794 5.5 12.3978 5.5 12C5.5 11.6022 5.65804 11.2206 5.93934 10.9393C6.22064 10.658 6.60218 10.5 7 10.5H17ZM20 4.5C20.3978 4.5 20.7794 4.65804 21.0607 4.93934C21.342 5.22064 21.5 5.60218 21.5 6C21.5 6.39782 21.342 6.77936 21.0607 7.06066C20.7794 7.34196 20.3978 7.5 20 7.5H4C3.60218 7.5 3.22064 7.34196 2.93934 7.06066C2.65804 6.77936 2.5 6.39782 2.5 6C2.5 5.60218 2.65804 5.22064 2.93934 4.93934C3.22064 4.65804 3.60218 4.5 4 4.5H20Z" fill="#1E1E1E"/>
-                      </svg>
-                    </span>
-                  </button>
-                  {/* Action Menu – appears beside the button */}
-                    {menuOpen && (
-                      <div
-                        className="absolute right-40 w-[500px] skew-x-[-12deg] bg-white border rounded-lg shadow-lg z-50"
-                        onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
-                      >
-                        <div className="p-2">
-                          {/* Payment Status */}
-                          <h6 className="px-2 skew-x-[12deg] py-1 font-semibold mt-2">Payment Status</h6>
-                          <div className="flex gap-2">
-                            {PAYMENT_STATUSES.map((status) => {
-                              const isSelected = selectedPaymentStatus.includes(status);
+                    <div className="p-2">
+                      {/* Payment Status */}
+                      <h6 className="px-2 skew-x-[12deg] py-1 font-semibold mt-2">Payment Status</h6>
+                      <div className="flex gap-2">
+                        {PAYMENT_STATUSES.map((status) => {
+                          const isSelected = selectedPaymentStatus.includes(status);
 
-                              return (
-                                <div
-                                  key={status}
-                                  className="flex items-center skew-x-[12deg] px-2 py-1 cursor-pointer hover:bg-gray-100 rounded-md"
-                                  onClick={() => {
-                                    if (status === "All") {
-                                      setSelectedPaymentStatus(["Pending", "Due", "Paid", "All"]);
-                                    } else {
-                                      setSelectedPaymentStatus(prev =>
-                                        prev.includes(status)
-                                          ? prev.filter(s => s !== status && s !== "All")
-                                          : [...prev.filter(s => s !== "All"), status]
-                                      );
-                                    }
-                                  }}
-                                >
-                                  <div className="flex items-center justify-center w-9 h-9 mr-2">
-                                    {isSelected ? /* ✅ SELECTED SVG */
-                                        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                                          <path
-                                            d="M15.0537 9.16113C16.6809 7.53396 19.3191 7.53395 20.9463 9.16113L26.8389 15.0537C28.4659 16.6809 28.466 19.3192 26.8389 20.9463L20.9463 26.8389C19.3192 28.466 16.6809 28.4659 15.0537 26.8389L9.16113 20.9463C7.53395 19.3191 7.53396 16.6809 9.16113 15.0537L15.0537 9.16113Z"
-                                            fill="#FFEB9C"
-                                          />
-                                          <path
-                                            d="M31.5873 8.96738C25.7014 13.6017 22.2888 16.641 18.7083 22.3035C18.6366 22.4169 18.4767 22.4333 18.3856 22.3348L12.7212 16.2001C12.6426 16.115 12.6504 15.9817 12.7383 15.9064L15.8265 13.2606C15.9194 13.181 16.0609 13.2004 16.129 13.3019L18.3444 16.6048C24.2049 11.4469 29.2798 9.33343 31.3963 8.61265C31.6142 8.53845 31.7681 8.82499 31.5873 8.96738Z"
-                                            fill="#1E1E1E"
-                                          />
-                                        </svg> :  /* ⬜ UNSELECTED SVG */
-                                        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                                          <path
-                                            fillRule="evenodd"
-                                            clipRule="evenodd"
-                                            d="M20.9463 9.16112C19.3191 7.53394 16.6809 7.53394 15.0537 9.16112L9.16117 15.0537C7.53398 16.6809 7.53398 19.319 9.16117 20.9462L15.0537 26.8388C16.6809 28.466 19.3191 28.466 20.9463 26.8388L26.8388 20.9462C28.466 19.319 28.466 16.6809 26.8388 15.0537L20.9463 9.16112ZM20.357 10.3396C19.0553 9.03789 16.9447 9.03789 15.643 10.3396L10.3397 15.6429C9.03793 16.9447 9.03793 19.0552 10.3397 20.357L15.643 25.6603C16.9447 26.962 19.0553 26.962 20.357 25.6603L25.6603 20.357C26.9621 19.0552 26.9621 16.9447 25.6603 15.6429L20.357 10.3396Z"
-                                            fill="#637381"
-                                          />
-                                        </svg>}
-                                  </div>
-                                  <span className="text-sm">{status}</span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
+                          return (
+                            <div
+                              key={status}
+                              className="flex items-center skew-x-[12deg] px-2 py-1 cursor-pointer hover:bg-gray-100 rounded-md"
+                              onClick={() => {
+                                if (status === "All") {
+                                  setSelectedPaymentStatus(["Pending", "Due", "Paid", "All"]);
+                                } else {
+                                  setSelectedPaymentStatus(prev =>
+                                    prev.includes(status)
+                                      ? prev.filter(s => s !== status && s !== "All")
+                                      : [...prev.filter(s => s !== "All"), status]
+                                  );
+                                }
+                              }}
+                            >
+                              <div className="flex items-center justify-center w-9 h-9 mr-2">
+                                {isSelected ? /* ✅ SELECTED SVG */
+                                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                                    <path
+                                      d="M15.0537 9.16113C16.6809 7.53396 19.3191 7.53395 20.9463 9.16113L26.8389 15.0537C28.4659 16.6809 28.466 19.3192 26.8389 20.9463L20.9463 26.8389C19.3192 28.466 16.6809 28.4659 15.0537 26.8389L9.16113 20.9463C7.53395 19.3191 7.53396 16.6809 9.16113 15.0537L15.0537 9.16113Z"
+                                      fill="#FFEB9C"
+                                    />
+                                    <path
+                                      d="M31.5873 8.96738C25.7014 13.6017 22.2888 16.641 18.7083 22.3035C18.6366 22.4169 18.4767 22.4333 18.3856 22.3348L12.7212 16.2001C12.6426 16.115 12.6504 15.9817 12.7383 15.9064L15.8265 13.2606C15.9194 13.181 16.0609 13.2004 16.129 13.3019L18.3444 16.6048C24.2049 11.4469 29.2798 9.33343 31.3963 8.61265C31.6142 8.53845 31.7681 8.82499 31.5873 8.96738Z"
+                                      fill="#1E1E1E"
+                                    />
+                                  </svg> :  /* ⬜ UNSELECTED SVG */
+                                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                                    <path
+                                      fillRule="evenodd"
+                                      clipRule="evenodd"
+                                      d="M20.9463 9.16112C19.3191 7.53394 16.6809 7.53394 15.0537 9.16112L9.16117 15.0537C7.53398 16.6809 7.53398 19.319 9.16117 20.9462L15.0537 26.8388C16.6809 28.466 19.3191 28.466 20.9463 26.8388L26.8388 20.9462C28.466 19.319 28.466 16.6809 26.8388 15.0537L20.9463 9.16112ZM20.357 10.3396C19.0553 9.03789 16.9447 9.03789 15.643 10.3396L10.3397 15.6429C9.03793 16.9447 9.03793 19.0552 10.3397 20.357L15.643 25.6603C16.9447 26.962 19.0553 26.962 20.357 25.6603L25.6603 20.357C26.9621 19.0552 26.9621 16.9447 25.6603 15.6429L20.357 10.3396Z"
+                                      fill="#637381"
+                                    />
+                                  </svg>}
+                              </div>
+                              <span className="text-sm">{status}</span>
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
-                </div>
-              </div>  
-
-              <div className="flex flex-col gap-2 mt-4">
-              {paginatedPayments.map((payment, index) => (
-                <ContractRow
-                  key={index}
-                  payment={payment}
-                  showCheckbox={true}
-                  onSideClick={() => {
-                    setEditingPayment(payment);   
-                    setIsModalOpen(true);        
-                  }}
-                />
-              ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-3 mt-10">
-              {/* Previous */}
-              <button
-                onClick={goToPrevious}
-                disabled={currentPage === 1}
-                className="px-3 py-1 text-sm font-medium rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <img src="/ic-eva_arrow-ios-back-fill.svg" alt="Previous" />
-              </button>
 
-              {/* Page Numbers */}
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => goToPage(page)}
-                  className={`
+            <div className="flex flex-col gap-2 mt-4">
+              {paymentsLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-black" />
+                </div>
+              ) : applicantPayments.length === 0 ? (
+                <div className="flex items-center justify-center py-12 text-gray-500">
+                  No payments found
+                </div>
+              ) : (
+                paginatedPayments.map((payment, index) => (
+                  <ContractRow
+                    key={payment.id || index}
+                    payment={payment}
+                    showCheckbox={true}
+                    onSideClick={() => {
+                      setEditingPayment(payment);
+                      setIsModalOpen(true);
+                    }}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-10">
+            {/* Previous */}
+            <button
+              onClick={goToPrevious}
+              disabled={currentPage === 1}
+              className="px-3 py-1 text-sm font-medium rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <img src="/ic-eva_arrow-ios-back-fill.svg" alt="Previous" />
+            </button>
+
+            {/* Page Numbers */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={`
                     relative
                     w-11 h-9
                     skew-x-[-12deg]
@@ -993,38 +1136,59 @@ export default function ApplicantPage() {
                     text-sm font-semibold
                     transition-all duration-200
                     ${currentPage === page
-                      ? "border border-black text-black"
-                      : "border border-transparent text-black/60 hover:bg-black/10 hover:text-black"
-                    }
+                    ? "border border-black text-black"
+                    : "border border-transparent text-black/60 hover:bg-black/10 hover:text-black"
+                  }
                   `}
-                >
-                  {/* Un-skew content */}
-                  <span className="flex h-full w-full items-center justify-center skew-x-[12deg]">
-                    {page}
-                  </span>
-                </button>
-              ))}
-
-              {/* Next */}
-              <button
-                onClick={goToNext}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 text-sm font-medium rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <img src="/ic-eva_arrow-ios-forward-fill.svg" alt="Next" />
+                {/* Un-skew content */}
+                <span className="flex h-full w-full items-center justify-center skew-x-[12deg]">
+                  {page}
+                </span>
               </button>
-            </div>
-          )}
-        </div>
-    <PaymentModal
-      isOpen={isModalOpen}
-      payment={editingPayment}
-      onClose={() => setIsModalOpen(false)}
-      onSave={(data) => {
-        console.log("payment saved:", data);
-        setIsModalOpen(false);
-      }}
-    />
+            ))}
+
+            {/* Next */}
+            <button
+              onClick={goToNext}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 text-sm font-medium rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <img src="/ic-eva_arrow-ios-forward-fill.svg" alt="Next" />
+            </button>
+          </div>
+        )}
+      </div>
+      <PaymentModal
+        isOpen={isModalOpen}
+        payment={editingPayment}
+        contract={contract}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingPayment(null);
+        }}
+        onSave={async (data) => {
+          setIsModalOpen(false);
+          setEditingPayment(null);
+          // Refresh payments and stats after creating/updating
+          setPaymentsLoading(true);
+          setStatsLoading(true);
+          try {
+            const contractUuid = (contract as any)?.id;
+            const [paymentsResponse, statsResponse] = await Promise.all([
+              listPayments(1, 100, undefined, undefined, contractUuid),
+              getPaymentStats(contractUuid)
+            ]);
+            setPayments(paymentsResponse.items);
+            setPaymentStats(statsResponse);
+          } catch (error) {
+            // Failed to refresh payments or stats
+          } finally {
+            setPaymentsLoading(false);
+            setStatsLoading(false);
+          }
+        }}
+      />
     </DashboardLayout>
   );
 }

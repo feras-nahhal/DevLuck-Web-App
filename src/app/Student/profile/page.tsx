@@ -155,7 +155,8 @@ export default function ApplicantPage() {
         <div className="flex flex-col  gap-[10px] w-full max-w-[500px]">
   
             {/* Name + Button Row */}
-            <div className="flex items-center justify-between w-full">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between w-full">
+
               <h1 className="font-barlow font-extrabold text-[40px] leading-[64px] text-[#1E1E1E]">
                 {profile?.name || "Complete your name"}
               </h1>
@@ -234,9 +235,9 @@ export default function ApplicantPage() {
             </div>
            <div className="flex flex-col gap-4 w-[62px] h-[152px] mx-auto">
               {[
-                { value: profile?.status ?? "—", label: "Status", key: "status" },
+                { value: (profile as any)?.email ?? "—", label: "Email", key: "email" },
                 { value: profile?.availability ?? "—", label: "Availability", key: "availability" },
-                { value: formatDate(profile?.createdAt) ?? "—", label: "Joined", key: "joined" },
+                { value: (profile as any)?.salaryExpectation ? (profile as any).salaryExpectation.toLocaleString() : "—", label: "Salary Expectation", key: "salaryExpectation" },
               ].map((item) => (
                 <div key={item.key} className="flex flex-row items-center gap-1.5 w-[115px] h-[40px]">
                   <img src="/cards/tag.svg" alt="Tag Icon" />
@@ -244,7 +245,7 @@ export default function ApplicantPage() {
                     <span className="w-[77px] h-[22px] text-[14px] font-normal leading-[22px] text-[#1E1E1E] flex items-center">
                       {item.value}
                     </span>
-                    <span className="w-[49px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
+                    <span className="w-[77px] h-[18px] text-[12px] font-normal leading-[18px] text-[#00000090] flex items-center">
                       {item.label}
                     </span>
                   </div>
@@ -338,7 +339,7 @@ export default function ApplicantPage() {
                 <div className="flex flex-wrap gap-3">
                   {skills.map((skill) => (
                       <span
-                          
+                        key={skill.id}
                         className="px-4 py-2 text-[14px] font-publicSans text-[#1E1E1E] transform -skew-x-12 rounded-[8px] border border-black/80 whitespace-nowrap transform-none"
                       >
                         {skill.name}
@@ -747,8 +748,11 @@ export default function ApplicantPage() {
       onSave={async (data) => {
         await updateProfile({
           name: data.name,
+          email: data.email,
           description: data.description,
-          availability: data.availability || undefined
+          availability: data.availability || undefined,
+          salaryExpectation: data.salaryExpectation ? parseFloat(data.salaryExpectation) : undefined,
+          image: data.image || undefined
         });
         await getProfile();
       }}

@@ -197,7 +197,7 @@ export default function ContractListPage() {
       const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
       // API Hooks
-      const { opportunities, loading: opportunitiesLoading, error: opportunitiesError, listOpportunities } = useStudentOpportunityHandler();
+      const { opportunities, loading: opportunitiesLoading, error: opportunitiesError, listOpportunities, getOpportunityQuestions } = useStudentOpportunityHandler();
       const { createApplication, loading: applying } = useStudentApplicationHandler();
 
       const [menuOpen, setMenuOpen] = useState(false);
@@ -303,11 +303,17 @@ export default function ContractListPage() {
       // Handle Apply button click
       const handleApply = async (contract: MappedOpportunity) => {
         try {
-          // Use originalId if available (from API), otherwise use id
           const opportunityId = (contract as any).originalId || String(contract.id);
           setApplyingOpportunityId(opportunityId);
+          
+          const questions = await getOpportunityQuestions(opportunityId);
+          
+          if (questions && questions.length > 0) {
+            router.push(`/Student/opportunity/${opportunityId}/questions`);
+          } else {
           await createApplication(opportunityId);
           setToast({ message: "Application submitted successfully!", type: 'success' });
+          }
         } catch (err: any) {
           setToast({ message: err.message || "Failed to submit application", type: 'error' });
         } finally {
@@ -658,7 +664,7 @@ return (
                   }}
                 />
               </div>
- 
+
               {/* Scale */}
               <div className="flex justify-between text-xs text-[#919EAB]">
                 <span>$0</span>
