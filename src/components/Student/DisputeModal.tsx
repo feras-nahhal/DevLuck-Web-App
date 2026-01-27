@@ -10,7 +10,7 @@ interface ContractDispute {
   reason: string;
   note: string;
 }
-
+  
 
 interface ContractDisputeModalProps {
   isOpen: boolean;

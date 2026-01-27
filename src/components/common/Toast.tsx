@@ -9,7 +9,7 @@ interface ToastProps {
   onClose: () => void
   duration?: number
 }
-
+  
 export const Toast = ({ message, type = 'success', isVisible, onClose, duration = 3000 }: ToastProps) => {
   useEffect(() => {
     if (isVisible) {

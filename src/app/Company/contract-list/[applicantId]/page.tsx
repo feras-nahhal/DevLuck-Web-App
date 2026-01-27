@@ -3,10 +3,6 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import DashboardLayout from "@/src/components/Company/DashboardLayout";
 import { mockApplicants } from "@/src/mocks/mockApplicants";
-import { educationData } from "@/src/mocks/mockEducation";
-import { experienceData } from "@/src/mocks/mockExperience";
-import { languageData } from "@/src/mocks/mockLanguages";
-import { portfolioData } from "@/src/mocks/mockPortfolio";
 import { mockApplicantPayments } from "@/src/mocks/mockApplicantPayments";
 import { ArrowUpRight } from "lucide-react";
 import PaymentModal from "@/src/components/Company/PaymentModal";
@@ -14,7 +10,7 @@ import { notFound } from "next/navigation";
 import { useContractHandler } from "@/src/hooks/companyapihandler/useContractHandler";
 import { usePaymentHandler } from "@/src/hooks/companyapihandler/usePaymentHandler";
 import { api } from "@/src/lib/api";
-
+  
 /* ──────────────────────────────────────────────
    Card Component
 ────────────────────────────────────────────── */
