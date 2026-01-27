@@ -22,6 +22,7 @@ interface Opportunity {
     id: string
     name: string
     logo?: string
+    logoUrl?: string
     industry?: string
     location?: string
     website?: string

@@ -1061,9 +1061,9 @@ export default function contractDetailPage() {
                   return (
                     <div>
                       <div className="flex items-center gap-4">
-                        {company.logo && (
+                        {(company.logoUrl || company.logo) && (
                           <img
-                            src={company.logo}
+                            src={company.logoUrl || company.logo}
                             alt={company.name}
                             className="w-24 h-24 rounded-lg object-cover"
                           />
