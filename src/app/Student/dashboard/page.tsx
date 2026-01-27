@@ -2,7 +2,6 @@
 "use client";
 import DashboardLayout from "@/src/components/Student/DashboardLayout";
 import { ArrowUpRight } from 'lucide-react';
-import { mockContracts} from "@/src/mocks/mockContract";
 import { useRouter } from "next/navigation";
 import { useStudentProfileHandler } from "@/src/hooks/studentapihandler/useStudentProfileHandler";
 import { useStudentOpportunityHandler } from "@/src/hooks/studentapihandler/useStudentOpportunityHandler";
