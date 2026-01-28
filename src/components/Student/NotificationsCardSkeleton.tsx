@@ -13,7 +13,7 @@ export default function NotificationsCardSkeleton() {
           background: "transparent",
           boxSizing: "border-box",
         }}
-      >
+      >  
         {/* 🩶 Avatar placeholder */}
         <div className="w-10 h-10 rounded-full bg-gray-300/50 shrink-0" />
 

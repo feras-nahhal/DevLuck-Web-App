@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useSidebar } from "@/src/lib/sidebarContext";
 import { mockNotifications, type Notification } from "@/src/mocks/notifications.mock";
 
-
+  
 const LeftSidebar = ({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen: (open: boolean) => void }) => {
   const pathname = usePathname();
   const { isCollapsed, setIsCollapsed } = useSidebar();
